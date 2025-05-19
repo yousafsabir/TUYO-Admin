@@ -11,16 +11,5 @@ export function getLocaleFromPathname(pathname: string): Locale {
 }
 
 export function getLocaleFromRegion(): Locale {
-  if (typeof window === "undefined") return defaultLocale;
-
-  const browserLanguages = navigator.languages || [navigator.language];
-
-  for (const language of browserLanguages) {
-    const languagePrefix = language.split("-")[0].toLowerCase();
-    if (locales.includes(languagePrefix as Locale)) {
-      return languagePrefix as Locale;
-    }
-  }
-
   return defaultLocale;
 }
