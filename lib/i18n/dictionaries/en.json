@@ -1,0 +1,92 @@
+{
+  "login": {
+    "title": "Login to Tuyo Panel",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "submit": "Sign In",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "errors": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "invalidCredentials": "Invalid email or password"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to Tuyo Panel administration dashboard",
+    "admins": "Admins",
+    "users": "Users",
+    "recentActivity": "Recent Activity",
+    "totalAdmins": "Total administrators in the system",
+    "totalUsers": "Total registered users",
+    "latestActions": "Latest actions performed in the system",
+    "noActivity": "No recent activity to display",
+    "loading": "Loading..."
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "admins": "Admins",
+    "users": "Users",
+    "logout": "Logout"
+  },
+  "admin": {
+    "title": "Admins",
+    "description": "Manage administrator accounts",
+    "addAdmin": "Add Admin",
+    "addAdminDescription": "Create a new administrator account",
+    "deleteAdmin": "Delete Admin",
+    "deleteAdminConfirmation": "Are you sure you want to delete this admin? This action cannot be undone.",
+    "name": "Name",
+    "namePlaceholder": "Enter admin name",
+    "email": "Email",
+    "emailPlaceholder": "Enter admin email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter admin password",
+    "createdAt": "Created At",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "noAdmins": "No admins found",
+    "errors": {
+      "nameRequired": "Name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters"
+    }
+  },
+  "users": {
+    "title": "Users",
+    "description": "Manage user accounts",
+    "user": "User",
+    "username": "Username",
+    "email": "Email",
+    "influencer": "Influencer",
+    "noUsers": "No users found",
+    "noSearchResults": "No users found matching your search",
+    "searchPlaceholder": "Search users by name, username, or email...",
+    "forSearch": "for search",
+    "statusUpdated": "Status Updated",
+    "influencerStatusUpdated": "User influencer status has been updated",
+    "failedToUpdateStatus": "Failed to update influencer status"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "create": "Create",
+    "creating": "Creating...",
+    "save": "Save",
+    "saving": "Saving...",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "error": "Error",
+    "search": "Search",
+    "loading": "Loading..."
+  }
+}

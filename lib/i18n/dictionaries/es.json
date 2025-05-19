@@ -1,0 +1,92 @@
+{
+  "login": {
+    "title": "Iniciar sesión en Tuyo Panel",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "Ingresa tu correo electrónico",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Ingresa tu contraseña",
+    "submit": "Iniciar sesión",
+    "rememberMe": "Recordarme",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "errors": {
+      "emailRequired": "El correo electrónico es obligatorio",
+      "emailInvalid": "Por favor ingresa un correo electrónico válido",
+      "passwordRequired": "La contraseña es obligatoria",
+      "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
+      "invalidCredentials": "Correo electrónico o contraseña inválidos"
+    }
+  },
+  "dashboard": {
+    "title": "Panel de Control",
+    "welcome": "Bienvenido al panel de administración de Tuyo Panel",
+    "admins": "Administradores",
+    "users": "Usuarios",
+    "recentActivity": "Actividad Reciente",
+    "totalAdmins": "Total de administradores en el sistema",
+    "totalUsers": "Total de usuarios registrados",
+    "latestActions": "Últimas acciones realizadas en el sistema",
+    "noActivity": "No hay actividad reciente para mostrar",
+    "loading": "Cargando..."
+  },
+  "navigation": {
+    "dashboard": "Panel de Control",
+    "admins": "Administradores",
+    "users": "Usuarios",
+    "logout": "Cerrar Sesión"
+  },
+  "admin": {
+    "title": "Administradores",
+    "description": "Gestionar cuentas de administradores",
+    "addAdmin": "Agregar Administrador",
+    "addAdminDescription": "Crear una nueva cuenta de administrador",
+    "deleteAdmin": "Eliminar Administrador",
+    "deleteAdminConfirmation": "¿Estás seguro de que deseas eliminar este administrador? Esta acción no se puede deshacer.",
+    "name": "Nombre",
+    "namePlaceholder": "Ingresa el nombre del administrador",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "Ingresa el correo electrónico del administrador",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Ingresa la contraseña del administrador",
+    "createdAt": "Fecha de creación",
+    "actions": "Acciones",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "noAdmins": "No se encontraron administradores",
+    "errors": {
+      "nameRequired": "El nombre es obligatorio",
+      "emailRequired": "El correo electrónico es obligatorio",
+      "emailInvalid": "Por favor ingresa un correo electrónico válido",
+      "passwordRequired": "La contraseña es obligatoria",
+      "passwordMinLength": "La contraseña debe tener al menos 6 caracteres"
+    }
+  },
+  "users": {
+    "title": "Usuarios",
+    "description": "Gestionar cuentas de usuarios",
+    "user": "Usuario",
+    "username": "Nombre de usuario",
+    "email": "Correo electrónico",
+    "influencer": "Influencer",
+    "noUsers": "No se encontraron usuarios",
+    "noSearchResults": "No se encontraron usuarios que coincidan con tu búsqueda",
+    "searchPlaceholder": "Buscar usuarios por nombre, nombre de usuario o correo electrónico...",
+    "forSearch": "para la búsqueda",
+    "statusUpdated": "Estado Actualizado",
+    "influencerStatusUpdated": "El estado de influencer del usuario ha sido actualizado",
+    "failedToUpdateStatus": "Error al actualizar el estado de influencer"
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "creating": "Creando...",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "delete": "Eliminar",
+    "deleting": "Eliminando...",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "error": "Error",
+    "search": "Buscar",
+    "loading": "Cargando..."
+  }
+}
