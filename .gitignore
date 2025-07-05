@@ -25,3 +25,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Apple
+.DS_Store
+*.xcuserdatad/
+*.xcodeproj/project.xcworkspace/
+*.moved-aside
