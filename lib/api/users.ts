@@ -2,7 +2,7 @@ import { API_BASE_URL } from "./config"
 import { fetchWithNgrok, createAuthHeaders } from "./fetch-utils"
 
 // Define the API response type
-export type ApiResponse<T> = {
+type ApiResponse<T> = {
   statusCode: number
   status: string
   message: string
@@ -21,14 +21,14 @@ export type User = {
 }
 
 // Pagination type
-export type Pagination = {
+type Pagination = {
   page: number
   limit: number
   total: number
 }
 
 // Users list response type
-export type UsersListResponse = {
+type UsersListResponse = {
   users: User[]
   pagination: Pagination
 }

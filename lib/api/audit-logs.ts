@@ -15,7 +15,7 @@ export interface AuditLog {
   }
 }
 
-export interface AuditLogsResponse {
+interface AuditLogsResponse {
   statusCode: number
   status: string
   message: string
@@ -67,6 +67,6 @@ export async function getAuditLogs(filters: AuditLogFilters = {}): Promise<Audit
 }
 
 // Keep the old function for backward compatibility with recent activity table
-export async function getRecentAuditLogs(page = 1, limit = 10): Promise<AuditLogsResponse> {
+async function getRecentAuditLogs(page = 1, limit = 10): Promise<AuditLogsResponse> {
   return getAuditLogs({ page, limit })
 }

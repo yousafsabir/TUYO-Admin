@@ -2,7 +2,7 @@ import { fetchWithNgrok, createAuthHeaders } from "./fetch-utils"
 import { API_BASE_URL } from "./config"
 
 // Define the API response type
-export type ApiResponse<T> = {
+type ApiResponse<T> = {
   statusCode: number
   status: string
   message: string
@@ -10,46 +10,46 @@ export type ApiResponse<T> = {
 }
 
 // Categories and subcategories structure
-export type CategoryData = {
+type CategoryData = {
   id: number
   subcategories: [string, string][] // [name, iconKey]
 }
 
-export type CategoriesSubcategories = {
+type CategoriesSubcategories = {
   [categoryName: string]: CategoryData
 }
 
 // Category type
-export type Category = {
+type Category = {
   name: string
   subcategories: string[]
 }
 
 // Category creation data type
-export type CreateCategoryData = {
+type CreateCategoryData = {
   name: string
 }
 
 // Category update data type
-export type UpdateCategoryData = {
+type UpdateCategoryData = {
   name: string
   newName: string
 }
 
 // Category delete data type
-export type DeleteCategoryData = {
+type DeleteCategoryData = {
   name: string
 }
 
 // Subcategory creation data type
-export type CreateSubcategoryData = {
+type CreateSubcategoryData = {
   categoryId: number
   name: string
   iconKey: string
 }
 
 // Subcategory update data type
-export type UpdateSubcategoryData = {
+type UpdateSubcategoryData = {
   categoryId: number
   name: string
   newName: string
@@ -57,7 +57,7 @@ export type UpdateSubcategoryData = {
 }
 
 // Subcategory delete data type
-export type DeleteSubcategoryData = {
+type DeleteSubcategoryData = {
   categoryId: number
   name: string
 }

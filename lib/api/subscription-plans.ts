@@ -2,7 +2,7 @@ import { fetchWithNgrok, createAuthHeaders } from "./fetch-utils"
 import { API_BASE_URL } from "./config"
 
 // Define the API response type
-export type ApiResponse<T> = {
+type ApiResponse<T> = {
   statusCode: number
   status: string
   message: string
@@ -10,7 +10,7 @@ export type ApiResponse<T> = {
 }
 
 // Feature type for subscription plans
-export type PlanFeature = {
+type PlanFeature = {
   heading: string
   para: string
 }
@@ -33,7 +33,7 @@ export type SubscriptionPlan = {
 }
 
 // Subscription plan update data type (only editable fields)
-export type UpdateSubscriptionPlanData = {
+type UpdateSubscriptionPlanData = {
   id: number
   title: string
   price: number

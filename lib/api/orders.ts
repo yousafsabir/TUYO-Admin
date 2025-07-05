@@ -18,7 +18,7 @@ export interface Order {
   updatedAt: string
 }
 
-export interface OrdersResponse {
+interface OrdersResponse {
   statusCode: number
   status: string
   message: string
@@ -32,7 +32,7 @@ export interface OrdersResponse {
   }
 }
 
-export interface OrdersParams {
+interface OrdersParams {
   page?: number
   limit?: number
 }

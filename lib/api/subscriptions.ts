@@ -18,7 +18,7 @@ export interface Subscription {
   updatedAt: string
 }
 
-export interface SubscriptionsResponse {
+interface SubscriptionsResponse {
   statusCode: number
   status: string
   message: string

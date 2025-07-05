@@ -49,7 +49,7 @@ export function getSubcategoryIconLabel(key: SubcategoryIconKey): string {
     .join(" ")
 }
 
-export const subcategoryIconOptions = Object.keys(subcategoriesIcons).map((key) => ({
+const subcategoryIconOptions = Object.keys(subcategoriesIcons).map((key) => ({
   value: key,
   label: getSubcategoryIconLabel(key as SubcategoryIconKey),
   icon: subcategoriesIcons[key as SubcategoryIconKey],

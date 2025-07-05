@@ -2,7 +2,7 @@ import { API_BASE_URL } from "./config"
 import { fetchWithNgrok, createAuthHeaders } from "./fetch-utils"
 
 // Define the API response type
-export type ApiResponse<T> = {
+type ApiResponse<T> = {
   statusCode: number
   status: string
   message: string
@@ -13,20 +13,20 @@ export type ApiResponse<T> = {
 export type Color = [string, string]
 
 // Color creation data type
-export type CreateColorData = {
+type CreateColorData = {
   name: string
   code: string
 }
 
 // Color update data type
-export type UpdateColorData = {
+type UpdateColorData = {
   name: string
   newName: string
   code: string
 }
 
 // Color delete data type
-export type DeleteColorData = {
+type DeleteColorData = {
   name: string
 }
 

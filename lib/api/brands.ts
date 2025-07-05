@@ -2,7 +2,7 @@ import { fetchWithNgrok, createAuthHeaders } from "./fetch-utils"
 import { API_BASE_URL } from "./config"
 
 // Define the API response type
-export type ApiResponse<T> = {
+type ApiResponse<T> = {
   statusCode: number
   status: string
   message: string
@@ -16,19 +16,19 @@ export type Brand = {
 }
 
 // Brand creation data type
-export type CreateBrandData = {
+type CreateBrandData = {
   name: string
   image: File
 }
 
 // Brand update data type
-export type UpdateBrandData = {
+type UpdateBrandData = {
   name: string
   newName: string
 }
 
 // Brand delete data type
-export type DeleteBrandData = {
+type DeleteBrandData = {
   name: string
 }
 

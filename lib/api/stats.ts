@@ -2,7 +2,7 @@ import { fetchWithNgrok, createAuthHeaders } from "./fetch-utils"
 import { API_BASE_URL } from "./config"
 
 // Define the API response type
-export type ApiResponse<T> = {
+type ApiResponse<T> = {
   statusCode: number
   status: string
   message: string
@@ -10,7 +10,7 @@ export type ApiResponse<T> = {
 }
 
 // Server stats type
-export type ServerStats = {
+type ServerStats = {
   users: number
   admins: number
 }

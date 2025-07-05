@@ -5,7 +5,7 @@ import { API_BASE_URL } from "./config"
 import { createAuthHeaders } from "./fetch-utils"
 
 // Define the API response type
-export type ApiResponse<T> = {
+type ApiResponse<T> = {
   statusCode: number
   status: string
   message: string
@@ -21,14 +21,14 @@ export type Admin = {
 }
 
 // Pagination type
-export type Pagination = {
+type Pagination = {
   page: number
   limit: number
   total: number
 }
 
 // Admin list response type
-export type AdminsListResponse = {
+type AdminsListResponse = {
   admins: Admin[]
   pagination: Pagination
 }
@@ -40,13 +40,13 @@ export function getAuthToken(): string | null {
 }
 
 // Function to set the auth token in localStorage
-export function setAuthToken(token: string): void {
+function setAuthToken(token: string): void {
   if (typeof window === "undefined") return
   localStorage.setItem("auth_token", token)
 }
 
 // Function to remove the auth token from localStorage
-export function removeAuthToken(): void {
+function removeAuthToken(): void {
   if (typeof window === "undefined") return
   localStorage.removeItem("auth_token")
 }
@@ -171,7 +171,7 @@ export async function logoutUser() {
 }
 
 // Function to decode JWT token and get user info
-export function decodeToken(token: string): any {
+function decodeToken(token: string): any {
   try {
     // JWT tokens are base64 encoded in 3 parts: header.payload.signature
     const base64Url = token.split(".")[1]

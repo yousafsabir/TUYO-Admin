@@ -2,7 +2,7 @@ import { API_BASE_URL } from "./config"
 import { fetchWithNgrok, createAuthHeaders } from "./fetch-utils"
 
 // Define the API response type
-export type ApiResponse<T> = {
+type ApiResponse<T> = {
   statusCode: number
   status: string
   message: string
@@ -10,13 +10,13 @@ export type ApiResponse<T> = {
 }
 
 // Product image type
-export type ProductImage = {
+type ProductImage = {
   id: number
   url: string
 }
 
 // Seller type
-export type Seller = {
+type Seller = {
   id: number
   firstName: string
   lastName: string
@@ -58,20 +58,20 @@ export type Product = {
 }
 
 // Pagination type
-export type Pagination = {
+type Pagination = {
   page: number
   limit: number
   total: number
 }
 
 // Products list response type
-export type ProductsListResponse = {
+type ProductsListResponse = {
   products: Product[]
   pagination: Pagination
 }
 
 // Product update data type - now accepts FormData
-export type ProductUpdateData =
+type ProductUpdateData =
   | FormData
   | {
       isPremium?: boolean
