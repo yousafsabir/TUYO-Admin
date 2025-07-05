@@ -1,0 +1,174 @@
+"use client"
+
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { X, Filter } from "lucide-react"
+import { getDbTables } from "@/lib/api/store-config"
+import { getAllAdmins } from "@/lib/api/auth"
+import type { AuditLogFilters, AuditLogOperation, AuditLogTimeFrame } from "@/lib/api/audit-logs"
+
+interface AuditLogsFiltersProps {
+  filters: AuditLogFilters
+  onFiltersChange: (filters: AuditLogFilters) => void
+  dictionary: any
+}
+
+export function AuditLogsFilters({ filters, onFiltersChange, dictionary }: AuditLogsFiltersProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  // Fetch admins for the admin filter
+  const { data: adminsData } = useQuery({
+    queryKey: ["admins"],
+    queryFn: () => getAllAdmins(1, 100), // Get first 100 admins
+  })
+
+  // Fetch database tables for the table filter
+  const { data: tablesData } = useQuery({
+    queryKey: ["db-tables"],
+    queryFn: getDbTables,
+  })
+
+  const operations: { value: AuditLogOperation; label: string }[] = [
+    { value: "CREATE", label: dictionary?.auditLogs?.operations?.CREATE || "Create" },
+    { value: "UPDATE", label: dictionary?.auditLogs?.operations?.UPDATE || "Update" },
+    { value: "DELETE", label: dictionary?.auditLogs?.operations?.DELETE || "Delete" },
+  ]
+
+  const timeFrames: { value: AuditLogTimeFrame; label: string }[] = [
+    { value: "today", label: dictionary?.auditLogs?.timeFrames?.today || "Today" },
+    { value: "yesterday", label: dictionary?.auditLogs?.timeFrames?.yesterday || "Yesterday" },
+    { value: "last-week", label: dictionary?.auditLogs?.timeFrames?.["last-week"] || "Last Week" },
+    { value: "last-month", label: dictionary?.auditLogs?.timeFrames?.["last-month"] || "Last Month" },
+  ]
+
+  const updateFilter = (key: keyof AuditLogFilters, value: any) => {
+    onFiltersChange({
+      ...filters,
+      [key]: value || undefined,
+      page: 1, // Reset to first page when filters change
+    })
+  }
+
+  const clearFilters = () => {
+    onFiltersChange({ page: 1, limit: filters.limit })
+  }
+
+  const hasActiveFilters = !!(filters.adminId || filters.tableName || filters.operation || filters.timeFrame)
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Filter className="h-4 w-4" />
+            {dictionary?.auditLogs?.filters || "Filters"}
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            {hasActiveFilters && (
+              <Button variant="outline" size="sm" onClick={clearFilters}>
+                <X className="h-3 w-3 mr-1" />
+                {dictionary?.common?.clear || "Clear"}
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
+              {isExpanded ? dictionary?.common?.collapse || "Collapse" : dictionary?.common?.expand || "Expand"}
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+
+      {isExpanded && (
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Admin Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{dictionary?.auditLogs?.admin || "Admin"}</label>
+              <Select
+                value={filters.adminId?.toString() || "all"}
+                onValueChange={(value) => updateFilter("adminId", value === "all" ? undefined : Number.parseInt(value))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={dictionary?.auditLogs?.selectAdmin || "Select admin"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{dictionary?.common?.all || "All"}</SelectItem>
+                  {adminsData?.data?.admins?.map((admin) => (
+                    <SelectItem key={admin.id} value={admin.id.toString()}>
+                      {admin.name} ({admin.email})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Table Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{dictionary?.auditLogs?.table || "Table"}</label>
+              <Select
+                value={filters.tableName || "all"}
+                onValueChange={(value) => updateFilter("tableName", value === "all" ? undefined : value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={dictionary?.auditLogs?.selectTable || "Select table"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{dictionary?.common?.all || "All"}</SelectItem>
+                  {tablesData?.data?.map((table) => (
+                    <SelectItem key={table} value={table}>
+                      {dictionary?.auditLogs?.tables?.[table] || table}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Operation Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{dictionary?.auditLogs?.operation || "Operation"}</label>
+              <Select
+                value={filters.operation || "all"}
+                onValueChange={(value) => updateFilter("operation", value === "all" ? undefined : value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={dictionary?.auditLogs?.selectOperation || "Select operation"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{dictionary?.common?.all || "All"}</SelectItem>
+                  {operations.map((op) => (
+                    <SelectItem key={op.value} value={op.value}>
+                      {op.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Time Frame Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{dictionary?.auditLogs?.timeFrame || "Time Frame"}</label>
+              <Select
+                value={filters.timeFrame || "all-time"}
+                onValueChange={(value) => updateFilter("timeFrame", value === "all-time" ? undefined : value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={dictionary?.auditLogs?.selectTimeFrame || "Select time frame"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all-time">{dictionary?.common?.all || "All Time"}</SelectItem>
+                  {timeFrames.map((tf) => (
+                    <SelectItem key={tf.value} value={tf.value}>
+                      {tf.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      )}
+    </Card>
+  )
+}

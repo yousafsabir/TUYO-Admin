@@ -1,0 +1,122 @@
+import { fetchWithNgrok, createAuthHeaders } from "./fetch-utils"
+import { API_BASE_URL } from "./config"
+
+// Define the API response type
+export type ApiResponse<T> = {
+  statusCode: number
+  status: string
+  message: string
+  data: T
+}
+
+// Brand type
+export type Brand = {
+  name: string
+  imageUrl: string
+}
+
+// Brand creation data type
+export type CreateBrandData = {
+  name: string
+  image: File
+}
+
+// Brand update data type
+export type UpdateBrandData = {
+  name: string
+  newName: string
+}
+
+// Brand delete data type
+export type DeleteBrandData = {
+  name: string
+}
+
+// Function to get all brands
+export async function getAllBrands(): Promise<ApiResponse<Brand[]>> {
+  try {
+    const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/brands`, {
+      headers: createAuthHeaders(),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch brands: ${response.status}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching brands:", error)
+    throw error
+  }
+}
+
+// Function to create a new brand
+export async function createBrand(data: CreateBrandData): Promise<ApiResponse<Brand>> {
+  try {
+    const formData = new FormData()
+    formData.append("name", data.name)
+    formData.append("image", data.image)
+
+    const headers = createAuthHeaders()
+    // Remove Content-Type header to let the browser set it with boundary for FormData
+    delete (headers as any)["Content-Type"]
+
+    const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/brands`, {
+      method: "POST",
+      headers,
+      body: formData,
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: `HTTP error ${response.status}` }))
+      throw new Error(errorData.message || "Failed to create brand")
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error creating brand:", error)
+    throw error
+  }
+}
+
+// Function to update a brand
+export async function updateBrand(data: UpdateBrandData): Promise<ApiResponse<Brand>> {
+  try {
+    const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/brands`, {
+      method: "PATCH",
+      headers: createAuthHeaders(),
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: `HTTP error ${response.status}` }))
+      throw new Error(errorData.message || "Failed to update brand")
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error updating brand:", error)
+    throw error
+  }
+}
+
+// Function to delete a brand
+export async function deleteBrand(data: DeleteBrandData): Promise<ApiResponse<null>> {
+  try {
+    const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/brands`, {
+      method: "DELETE",
+      headers: createAuthHeaders(),
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: `HTTP error ${response.status}` }))
+      throw new Error(errorData.message || "Failed to delete brand")
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error deleting brand:", error)
+    throw error
+  }
+}
