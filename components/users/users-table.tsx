@@ -1,100 +1,119 @@
-"use client"
+"use client";
 
-import { useState, type FormEvent } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { getAllUsers, toggleUserInfluencerStatus, type User } from "@/lib/api/users"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { ChevronLeft, ChevronRight, Loader2, Search } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { toast } from "@/components/ui/use-toast"
-import { imageUrl } from "@/lib/utils"
+import { useState, type FormEvent } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import {
+  getAllUsers,
+  toggleUserInfluencerStatus,
+  type User,
+} from "@/lib/api/users";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ChevronLeft, ChevronRight, Loader2, Search } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "@/components/ui/use-toast";
+import { imageUrl } from "@/lib/utils";
 
-interface UsersTableProps {
-  dictionary: any
-}
+interface UsersTableProps {}
 
-export function UsersTable({ dictionary }: UsersTableProps) {
-  const [page, setPage] = useState(1)
-  const [limit] = useState(10)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [currentQuery, setCurrentQuery] = useState("")
-  const queryClient = useQueryClient()
+export function UsersTable({}: UsersTableProps) {
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentQuery, setCurrentQuery] = useState("");
+  const queryClient = useQueryClient();
+  const t = useTranslations();
 
   // Track which users are being updated
-  const [updatingUsers, setUpdatingUsers] = useState<Record<number, boolean>>({})
+  const [updatingUsers, setUpdatingUsers] = useState<Record<number, boolean>>(
+    {},
+  );
   // Track avatar loading errors
-  const [avatarErrors, setAvatarErrors] = useState<Record<number, boolean>>({})
+  const [avatarErrors, setAvatarErrors] = useState<Record<number, boolean>>({});
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["users", page, limit, currentQuery],
     queryFn: () => getAllUsers(page, limit, currentQuery),
-  })
+  });
 
   const { mutate: toggleInfluencerStatus } = useMutation({
     mutationFn: (userId: number) => toggleUserInfluencerStatus(userId),
     onMutate: (userId) => {
       // Set updating state for this user
-      setUpdatingUsers((prev) => ({ ...prev, [userId]: true }))
+      setUpdatingUsers((prev) => ({ ...prev, [userId]: true }));
     },
     onSuccess: (response) => {
       // Invalidate the users query to refresh the list
-      queryClient.invalidateQueries({ queryKey: ["users"] })
+      queryClient.invalidateQueries({ queryKey: ["users"] });
 
       // Show success toast
       toast({
-        title: dictionary?.users?.statusUpdated || "Status Updated",
-        description: dictionary?.users?.influencerStatusUpdated || "User influencer status has been updated.",
-      })
+        title: t("users.statusUpdated") || "Status Updated",
+        description:
+          t("users.influencerStatusUpdated") ||
+          "User influencer status has been updated.",
+      });
     },
     onError: (error) => {
       // Show error toast
       toast({
         variant: "destructive",
-        title: dictionary?.common?.error || "Error",
+        title: t("common.error") || "Error",
         description:
           error instanceof Error
             ? error.message
-            : dictionary?.users?.failedToUpdateStatus || "Failed to update influencer status.",
-      })
+            : t("users.failedToUpdateStatus") ||
+              "Failed to update influencer status.",
+      });
     },
     onSettled: (_, __, userId) => {
       // Clear updating state for this user
       setUpdatingUsers((prev) => {
-        const newState = { ...prev }
-        delete newState[userId]
-        return newState
-      })
+        const newState = { ...prev };
+        delete newState[userId];
+        return newState;
+      });
     },
-  })
+  });
 
   const handlePreviousPage = () => {
-    setPage((prev) => Math.max(prev - 1, 1))
-  }
+    setPage((prev) => Math.max(prev - 1, 1));
+  };
 
   const handleNextPage = () => {
-    if (data?.data?.pagination && page < Math.ceil(data.data.pagination.total / limit)) {
-      setPage((prev) => prev + 1)
+    if (
+      data?.data?.pagination &&
+      page < Math.ceil(data.data.pagination.total / limit)
+    ) {
+      setPage((prev) => prev + 1);
     }
-  }
+  };
 
   const handleInfluencerToggle = (userId: number) => {
-    toggleInfluencerStatus(userId)
-  }
+    toggleInfluencerStatus(userId);
+  };
 
   const handleSearch = (e: FormEvent) => {
-    e.preventDefault()
-    setCurrentQuery(searchQuery)
-    setPage(1) // Reset to first page when searching
-  }
+    e.preventDefault();
+    setCurrentQuery(searchQuery);
+    setPage(1); // Reset to first page when searching
+  };
 
   const handleAvatarError = (userId: number) => {
-    setAvatarErrors((prev) => ({ ...prev, [userId]: true }))
-  }
+    setAvatarErrors((prev) => ({ ...prev, [userId]: true }));
+  };
 
   return (
     <div className="space-y-4">
@@ -104,14 +123,14 @@ export function UsersTable({ dictionary }: UsersTableProps) {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder={dictionary?.users?.searchPlaceholder || "Search users..."}
+            placeholder={t("users.searchPlaceholder") || "Search users..."}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-8"
           />
         </div>
         <Button type="submit" disabled={isLoading}>
-          {dictionary?.common?.search || "Search"}
+          {t("common.search") || "Search"}
         </Button>
       </form>
 
@@ -121,7 +140,9 @@ export function UsersTable({ dictionary }: UsersTableProps) {
         </div>
       ) : isError ? (
         <Alert variant="destructive" className="my-4">
-          <AlertDescription>{error instanceof Error ? error.message : "Failed to load users"}</AlertDescription>
+          <AlertDescription>
+            {error instanceof Error ? error.message : "Failed to load users"}
+          </AlertDescription>
         </Alert>
       ) : (
         <>
@@ -129,19 +150,25 @@ export function UsersTable({ dictionary }: UsersTableProps) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead>Username</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead className="text-center">Influencer</TableHead>
+                  <TableHead>{t("users.user") || "User"}</TableHead>
+                  <TableHead>{t("users.username") || "Username"}</TableHead>
+                  <TableHead>{t("users.email") || "Email"}</TableHead>
+                  <TableHead className="text-center">
+                    {t("users.influencer") || "Influencer"}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data?.data?.users.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                    <TableCell
+                      colSpan={4}
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       {currentQuery
-                        ? dictionary?.users?.noSearchResults || "No users found matching your search"
-                        : dictionary?.users?.noUsers || "No users found"}
+                        ? t("users.noSearchResults") ||
+                          "No users found matching your search"
+                        : t("users.noUsers") || "No users found"}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -152,7 +179,9 @@ export function UsersTable({ dictionary }: UsersTableProps) {
                           <Avatar>
                             {!avatarErrors[user.id] ? (
                               <AvatarImage
-                                src={imageUrl(user.avatarUrl) || "/placeholder.svg"}
+                                src={
+                                  imageUrl(user.avatarUrl) || "/placeholder.svg"
+                                }
                                 alt={`${user.firstName} ${user.lastName}`}
                                 onError={() => handleAvatarError(user.id)}
                               />
@@ -166,7 +195,9 @@ export function UsersTable({ dictionary }: UsersTableProps) {
                             <p className="font-medium">
                               {user.firstName} {user.lastName}
                             </p>
-                            <p className="text-xs text-muted-foreground">ID: {user.id}</p>
+                            <p className="text-xs text-muted-foreground">
+                              ID: {user.id}
+                            </p>
                           </div>
                         </div>
                       </TableCell>
@@ -179,7 +210,9 @@ export function UsersTable({ dictionary }: UsersTableProps) {
                           ) : (
                             <Switch
                               checked={user.isInfluencer}
-                              onCheckedChange={() => handleInfluencerToggle(user.id)}
+                              onCheckedChange={() =>
+                                handleInfluencerToggle(user.id)
+                              }
                             />
                           )}
                         </div>
@@ -192,32 +225,47 @@ export function UsersTable({ dictionary }: UsersTableProps) {
           </div>
 
           {/* Pagination */}
-          {data?.data?.users.length > 0 && (
+          {data && data.data && data.data.users.length > 0 && (
             <div className="flex items-center justify-between">
               <div className="text-sm text-muted-foreground">
-                Showing {(page - 1) * limit + 1} to {Math.min(page * limit, data.data.pagination.total)} of{" "}
-                {data.data.pagination.total} users
+                {t("pagination.showing") || "Showing"} {(page - 1) * limit + 1}{" "}
+                {t("pagination.to") || "to"}{" "}
+                {Math.min(page * limit, data?.data?.pagination?.total || 0)}{" "}
+                {t("pagination.of") || "of"}{" "}
+                {data?.data?.pagination?.total || 0}{" "}
+                {t("users.itemsName") || "users"}
                 {currentQuery && (
                   <span className="ml-1">
-                    {dictionary?.users?.forSearch || "for search"} "{currentQuery}"
+                    {t("users.forSearch") || "for search"} "{currentQuery}"
                   </span>
                 )}
               </div>
               <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm" onClick={handlePreviousPage} disabled={page <= 1}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePreviousPage}
+                  disabled={page <= 1}
+                >
                   <ChevronLeft className="h-4 w-4 mr-1" />
-                  Previous
+                  {t("pagination.prev") || "Previous"}
                 </Button>
                 <div className="text-sm">
-                  Page {page} of {Math.ceil(data.data.pagination.total / limit)}
+                  {t("pagination.page") || "Page"} {page}{" "}
+                  {t("pagination.of") || "of"}{" "}
+                  {data?.data?.pagination?.total
+                    ? Math.ceil(data?.data?.pagination?.total / limit)
+                    : 0}
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleNextPage}
-                  disabled={page >= Math.ceil(data.data.pagination.total / limit)}
+                  disabled={
+                    page >= Math.ceil(data.data.pagination.total / limit)
+                  }
                 >
-                  Next
+                  {t("pagination.next") || "Next"}
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               </div>
@@ -226,5 +274,5 @@ export function UsersTable({ dictionary }: UsersTableProps) {
         </>
       )}
     </div>
-  )
+  );
 }

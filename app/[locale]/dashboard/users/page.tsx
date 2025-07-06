@@ -1,22 +1,23 @@
-import type { Locale } from "@/lib/i18n/config"
-import { getDictionary } from "@/lib/i18n/get-dictionary"
-import { UsersTable } from "@/components/users/users-table"
+import type { Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
+import { UsersTable } from "@/components/users/users-table";
+import { useTranslations } from "next-intl";
 
-export default async function UsersPage({
-  params: { lang },
-}: {
-  params: { lang: Locale }
-}) {
-  const dictionary = await getDictionary(lang)
+export default async function UsersPage() {
+  const t = useTranslations();
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">{dictionary?.users?.title || "Users"}</h2>
-        <p className="text-muted-foreground">{dictionary?.users?.description || "Manage user accounts."}</p>
+        <h2 className="text-3xl font-bold tracking-tight">
+          {t("users.title") || "Users"}
+        </h2>
+        <p className="text-muted-foreground">
+          {t("users.description") || "Manage user accounts."}
+        </p>
       </div>
 
-      <UsersTable dictionary={dictionary} />
+      <UsersTable />
     </div>
-  )
+  );
 }

@@ -124,6 +124,7 @@
     "statusUpdated": "Status Updated",
     "influencerStatusUpdated": "User influencer status has been updated",
     "failedToUpdateStatus": "Failed to update influencer status",
+    "itemsName": "Users",
     "table": {
       "name": "Name",
       "email": "Email",
