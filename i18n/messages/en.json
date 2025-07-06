@@ -17,7 +17,10 @@
     "expand": "Expand",
     "all": "All",
     "select": "Select",
-    "close": "Close"
+    "close": "Close",
+    "update": "Update",
+    "updating": "Updating...",
+    "actions": "Actions"
   },
   "login": {
     "title": "Login to Tuyo Panel",
@@ -255,7 +258,11 @@
     "name": "Name",
     "newName": "New Subcategory Name",
     "namePlaceholder": "Enter subcategory name",
-    "inCategory": "in"
+    "inCategory": "in",
+    "icon": "Icon",
+    "selectIcon": "Select Icon",
+    "currentName": "Current Name",
+    "newNamePlaceholder": "Enter new subcategory name"
   },
   "subscriptionPlans": {
     "title": "Subscription Plans",
@@ -338,7 +345,30 @@
   "colors": {
     "title": "Colors",
     "description": "Manage colors available for products.",
-    "addColor": "Add Color"
+    "addColorDescription": "Add a new color to your store configuration.",
+    "colorCreated": "Color created",
+    "colorCreatedDescription": "The color has been created successfully.",
+    "addColor": "Add Color",
+    "noResultsFound": "No colors found matching your search",
+    "noColors": "No colors available",
+    "name": "Name",
+    "color": "Color",
+    "hexCode": "Hex Code",
+    "searchPlaceholder": "Search colors...",
+    "errorLoading": "Error loading colors",
+    "editColor": "Edit Color",
+    "editColorDescription": "Update the color information.",
+    "namePlaceholder": "Enter color name",
+    "editNamePlaceholder": "Enter color name",
+    "preview": "Preview",
+    "colorUpdated": "Color updated",
+    "colorUpdatedDescription": "The color has been updated successfully.",
+    "nameRequired": "Name is required",
+    "deleteColor": "Delete Color",
+    "deleteColorConfirmation": "Are you sure you want to delete this color?",
+    "deleteColorWarning": "This action cannot be undone.",
+    "colorDeleted": "Color deleted",
+    "colorDeletedDescription": "The color has been deleted successfully."
   },
   "pagination": {
     "prev": "Previous",

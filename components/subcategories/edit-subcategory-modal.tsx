@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { z } from "zod"
-import { updateSubcategory } from "@/lib/api/categories"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
+import { updateSubcategory } from "@/lib/api/categories";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -14,13 +14,24 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Loader2 } from "lucide-react"
-import { subcategoriesIcons, getSubcategoryIconLabel, type SubcategoryIconKey } from "@/lib/subcategories-icons"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Loader2 } from "lucide-react";
+import {
+  subcategoriesIcons,
+  getSubcategoryIconLabel,
+  type SubcategoryIconKey,
+} from "@/lib/subcategories-icons";
+import { useTranslations } from "next-intl";
 
 const subcategorySchema = z.object({
   categoryId: z.number().min(1, "Category is required"),
@@ -30,24 +41,28 @@ const subcategorySchema = z.object({
     .min(1, "New subcategory name is required")
     .max(100, "Subcategory name must be less than 100 characters"),
   iconKey: z.string().min(1, "Icon is required"),
-})
+});
 
-type SubcategoryFormValues = z.infer<typeof subcategorySchema>
+type SubcategoryFormValues = z.infer<typeof subcategorySchema>;
 
 interface EditSubcategoryModalProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
   subcategory: {
-    name: string
-    iconKey: string
-    categoryId: number
-  } | null
-  dictionary: any
+    name: string;
+    iconKey: string;
+    categoryId: number;
+  } | null;
 }
 
-export function EditSubcategoryModal({ isOpen, onClose, subcategory, dictionary }: EditSubcategoryModalProps) {
-  const [error, setError] = useState<string | null>(null)
-  const queryClient = useQueryClient()
+export function EditSubcategoryModal({
+  isOpen,
+  onClose,
+  subcategory,
+}: EditSubcategoryModalProps) {
+  const t = useTranslations();
+  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -58,57 +73,60 @@ export function EditSubcategoryModal({ isOpen, onClose, subcategory, dictionary 
     formState: { errors },
   } = useForm<SubcategoryFormValues>({
     resolver: zodResolver(subcategorySchema),
-  })
+  });
 
-  const selectedIconKey = watch("iconKey")
+  const selectedIconKey = watch("iconKey");
 
   // Set form values when subcategory changes
   useEffect(() => {
     if (subcategory) {
-      setValue("categoryId", subcategory.categoryId)
-      setValue("name", subcategory.name)
-      setValue("newName", subcategory.name)
-      setValue("iconKey", subcategory.iconKey)
+      setValue("categoryId", subcategory.categoryId);
+      setValue("name", subcategory.name);
+      setValue("newName", subcategory.name);
+      setValue("iconKey", subcategory.iconKey);
     }
-  }, [subcategory, setValue])
+  }, [subcategory, setValue]);
 
   const { mutate: editSubcategory, isPending } = useMutation({
     mutationFn: updateSubcategory,
     onSuccess: () => {
       // Invalidate the categories query to refresh the list
-      queryClient.invalidateQueries({ queryKey: ["categories-subcategories"] })
+      queryClient.invalidateQueries({ queryKey: ["categories-subcategories"] });
 
       // Reset form and close modal
-      reset()
-      onClose()
+      reset();
+      onClose();
     },
     onError: (error: Error) => {
-      setError(error.message || "Failed to update subcategory")
+      setError(error.message || "Failed to update subcategory");
     },
-  })
+  });
 
   const onSubmit = (data: SubcategoryFormValues) => {
-    setError(null)
-    editSubcategory(data)
-  }
+    setError(null);
+    editSubcategory(data);
+  };
 
   const handleClose = () => {
     if (!isPending) {
-      reset()
-      setError(null)
-      onClose()
+      reset();
+      setError(null);
+      onClose();
     }
-  }
+  };
 
-  if (!subcategory) return null
+  if (!subcategory) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{dictionary?.subcategories?.editSubcategory || "Edit Subcategory"}</DialogTitle>
+          <DialogTitle>
+            {t("subcategories.editSubcategory") || "Edit Subcategory"}
+          </DialogTitle>
           <DialogDescription>
-            {dictionary?.subcategories?.editSubcategoryDescription || "Update the subcategory name and icon."}
+            {t("subcategories.editSubcategoryDescription") ||
+              "Update the subcategory name and icon."}
           </DialogDescription>
         </DialogHeader>
 
@@ -121,33 +139,60 @@ export function EditSubcategoryModal({ isOpen, onClose, subcategory, dictionary 
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="currentName">{dictionary?.subcategories?.currentName || "Current Name"}</Label>
-            <Input id="currentName" value={subcategory.name} disabled className="bg-muted" />
+            <Label htmlFor="currentName">
+              {t("subcategories.currentName") || "Current Name"}
+            </Label>
+            <Input
+              id="currentName"
+              value={subcategory.name}
+              disabled
+              className="bg-muted"
+            />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="newName">{dictionary?.subcategories?.newName || "New Name"}</Label>
+            <Label htmlFor="newName">
+              {t("subcategories.newName") || "New Name"}
+            </Label>
             <Input
               id="newName"
               {...register("newName")}
-              placeholder={dictionary?.subcategories?.newNamePlaceholder || "Enter new subcategory name"}
+              placeholder={
+                t("subcategories.newNamePlaceholder") ||
+                "Enter new subcategory name"
+              }
               className={errors.newName ? "border-red-500" : ""}
             />
-            {errors.newName && <p className="text-sm text-red-500">{errors.newName.message}</p>}
+            {errors.newName && (
+              <p className="text-sm text-red-500">{errors.newName.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="iconKey">{dictionary?.subcategories?.icon || "Icon"}</Label>
+            <Label htmlFor="iconKey">{t("subcategories.icon") || "Icon"}</Label>
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm text-muted-foreground">Current icon:</span>
+              <span className="text-sm text-muted-foreground">
+                Current icon:
+              </span>
               <div className="w-4 h-4 flex items-center justify-center">
                 {subcategoriesIcons[subcategory.iconKey as SubcategoryIconKey]}
               </div>
-              <span className="text-sm">{getSubcategoryIconLabel(subcategory.iconKey as SubcategoryIconKey)}</span>
+              <span className="text-sm">
+                {getSubcategoryIconLabel(
+                  subcategory.iconKey as SubcategoryIconKey,
+                )}
+              </span>
             </div>
-            <Select onValueChange={(value) => setValue("iconKey", value)} value={selectedIconKey}>
+            <Select
+              onValueChange={(value) => setValue("iconKey", value)}
+              value={selectedIconKey}
+            >
               <SelectTrigger className={errors.iconKey ? "border-red-500" : ""}>
-                <SelectValue placeholder={dictionary?.subcategories?.selectIcon || "Select an icon"} />
+                <SelectValue
+                  placeholder={
+                    t("subcategories.selectIcon") || "Select an icon"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 {Object.keys(subcategoriesIcons).map((key) => (
@@ -162,26 +207,33 @@ export function EditSubcategoryModal({ isOpen, onClose, subcategory, dictionary 
                 ))}
               </SelectContent>
             </Select>
-            {errors.iconKey && <p className="text-sm text-red-500">{errors.iconKey.message}</p>}
+            {errors.iconKey && (
+              <p className="text-sm text-red-500">{errors.iconKey.message}</p>
+            )}
           </div>
 
           <DialogFooter className="mt-6">
-            <Button type="button" variant="outline" onClick={handleClose} disabled={isPending}>
-              {dictionary?.common?.cancel || "Cancel"}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isPending}
+            >
+              {t("common.cancel") || "Cancel"}
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {dictionary?.common?.updating || "Updating..."}
+                  {t("common.updating") || "Updating..."}
                 </>
               ) : (
-                dictionary?.common?.update || "Update"
+                t("common.update") || "Update"
               )}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

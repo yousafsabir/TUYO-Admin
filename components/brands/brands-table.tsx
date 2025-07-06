@@ -1,59 +1,66 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { getAllBrands, type Brand } from "@/lib/api/brands"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Edit, Loader2, Trash2 } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { EditBrandModal } from "./edit-brand-modal"
-import { DeleteBrandDialog } from "./delete-brand-dialog"
-import { imageUrl } from "@/lib/utils"
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getAllBrands, type Brand } from "@/lib/api/brands";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Edit, Loader2, Trash2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { EditBrandModal } from "./edit-brand-modal";
+import { DeleteBrandDialog } from "./delete-brand-dialog";
+import { imageUrl } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
-interface BrandsTableProps {
-  dictionary: any
-}
-
-export function BrandsTable({ dictionary }: BrandsTableProps) {
-  const [brandToEdit, setBrandToEdit] = useState<Brand | null>(null)
-  const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null)
-  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
+export function BrandsTable() {
+  const t = useTranslations();
+  const [brandToEdit, setBrandToEdit] = useState<Brand | null>(null);
+  const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["brands"],
     queryFn: getAllBrands,
-  })
+  });
 
   const handleEditClick = (brand: Brand) => {
-    setBrandToEdit(brand)
-  }
+    setBrandToEdit(brand);
+  };
 
   const handleDeleteClick = (brand: Brand) => {
-    setBrandToDelete(brand)
-  }
+    setBrandToDelete(brand);
+  };
 
   const handleImageError = (brandName: string) => {
-    setImageErrors((prev) => ({ ...prev, [brandName]: true }))
-  }
+    setImageErrors((prev) => ({ ...prev, [brandName]: true }));
+  };
 
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
-    )
+    );
   }
 
   if (isError) {
     return (
       <Alert variant="destructive" className="my-4">
-        <AlertDescription>{error instanceof Error ? error.message : "Failed to load brands"}</AlertDescription>
+        <AlertDescription>
+          {error instanceof Error ? error.message : "Failed to load brands"}
+        </AlertDescription>
       </Alert>
-    )
+    );
   }
 
-  const brands = data?.data || []
+  const brands = data?.data || [];
 
   return (
     <div className="space-y-4">
@@ -61,16 +68,21 @@ export function BrandsTable({ dictionary }: BrandsTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{dictionary?.brands?.image || "Image"}</TableHead>
-              <TableHead>{dictionary?.brands?.name || "Name"}</TableHead>
-              <TableHead className="text-right">{dictionary?.brands?.actions || "Actions"}</TableHead>
+              <TableHead>{t("brands.image") || "Image"}</TableHead>
+              <TableHead>{t("brands.name") || "Name"}</TableHead>
+              <TableHead className="text-right">
+                {t("brands.actions") || "Actions"}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {brands.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
-                  {dictionary?.brands?.noBrands || "No brands found"}
+                <TableCell
+                  colSpan={3}
+                  className="text-center py-8 text-muted-foreground"
+                >
+                  {t("brands.noBrands") || "No brands found"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -86,7 +98,9 @@ export function BrandsTable({ dictionary }: BrandsTableProps) {
                           onError={() => handleImageError(brand.name)}
                         />
                       ) : (
-                        <div className="text-xs text-gray-400 text-center">No Image</div>
+                        <div className="text-xs text-gray-400 text-center">
+                          No Image
+                        </div>
                       )}
                     </div>
                   </TableCell>
@@ -100,7 +114,7 @@ export function BrandsTable({ dictionary }: BrandsTableProps) {
                         className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                       >
                         <Edit className="h-4 w-4 mr-1" />
-                        {dictionary?.brands?.edit || "Edit"}
+                        {t("brands.edit") || "Edit"}
                       </Button>
                       <Button
                         variant="ghost"
@@ -109,7 +123,7 @@ export function BrandsTable({ dictionary }: BrandsTableProps) {
                         className="text-destructive hover:text-destructive hover:bg-destructive/10"
                       >
                         <Trash2 className="h-4 w-4 mr-1" />
-                        {dictionary?.brands?.delete || "Delete"}
+                        {t("brands.delete") || "Delete"}
                       </Button>
                     </div>
                   </TableCell>
@@ -125,7 +139,6 @@ export function BrandsTable({ dictionary }: BrandsTableProps) {
         isOpen={brandToEdit !== null}
         onClose={() => setBrandToEdit(null)}
         brand={brandToEdit}
-        dictionary={dictionary}
       />
 
       {/* Delete Brand Dialog */}
@@ -133,8 +146,7 @@ export function BrandsTable({ dictionary }: BrandsTableProps) {
         isOpen={brandToDelete !== null}
         onClose={() => setBrandToDelete(null)}
         brand={brandToDelete}
-        dictionary={dictionary}
       />
     </div>
-  )
+  );
 }

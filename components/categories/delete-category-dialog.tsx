@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { deleteCategory } from "@/lib/api/categories"
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteCategory } from "@/lib/api/categories";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,16 +12,16 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Loader2 } from "lucide-react"
+} from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface DeleteCategoryDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  categoryName: string | null
-  subcategoriesCount: number
-  dictionary: any
+  isOpen: boolean;
+  onClose: () => void;
+  categoryName: string | null;
+  subcategoriesCount: number;
 }
 
 export function DeleteCategoryDialog({
@@ -29,39 +29,41 @@ export function DeleteCategoryDialog({
   onClose,
   categoryName,
   subcategoriesCount,
-  dictionary,
 }: DeleteCategoryDialogProps) {
-  const [error, setError] = useState<string | null>(null)
-  const queryClient = useQueryClient()
+  const t = useTranslations();
+  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const { mutate: removeCategory, isPending } = useMutation({
     mutationFn: (name: string) => deleteCategory({ name }),
     onSuccess: () => {
       // Invalidate the categories query to refresh the list
-      queryClient.invalidateQueries({ queryKey: ["categories-subcategories"] })
-      onClose()
+      queryClient.invalidateQueries({ queryKey: ["categories-subcategories"] });
+      onClose();
     },
     onError: (error: Error) => {
-      setError(error.message || "Failed to delete category")
+      setError(error.message || "Failed to delete category");
     },
-  })
+  });
 
   const handleDelete = () => {
     if (categoryName) {
-      setError(null)
-      removeCategory(categoryName)
+      setError(null);
+      removeCategory(categoryName);
     }
-  }
+  };
 
-  if (!categoryName) return null
+  if (!categoryName) return null;
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{dictionary?.categories?.deleteCategory || "Delete Category"}</AlertDialogTitle>
+          <AlertDialogTitle>
+            {t("categories.deleteCategory") || "Delete Category"}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            {dictionary?.categories?.deleteCategoryConfirmation ||
+            {t("categories.deleteCategoryConfirmation") ||
               "Are you sure you want to delete this category? This action cannot be undone."}
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -75,22 +77,29 @@ export function DeleteCategoryDialog({
 
         <div className="mt-2 space-y-2 rounded-md bg-muted p-4">
           <div>
-            <span className="font-medium">{dictionary?.categories?.name || "Name"}:</span> {categoryName}
+            <span className="font-medium">
+              {t("categories.name") || "Name"}:
+            </span>{" "}
+            {categoryName}
           </div>
           <div>
-            <span className="font-medium">{dictionary?.categories?.subcategories || "Subcategories"}:</span>{" "}
+            <span className="font-medium">
+              {t("categories.subcategories") || "Subcategories"}:
+            </span>{" "}
             {subcategoriesCount}
           </div>
           {subcategoriesCount > 0 && (
             <div className="text-sm text-orange-600 mt-2">
-              {dictionary?.categories?.deleteWarning ||
+              {t("categories.deleteWarning") ||
                 "Warning: This will also delete all subcategories in this category."}
             </div>
           )}
         </div>
 
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>{dictionary?.common?.cancel || "Cancel"}</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>
+            {t("common.cancel") || "Cancel"}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={isPending}
@@ -99,14 +108,14 @@ export function DeleteCategoryDialog({
             {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {dictionary?.common?.deleting || "Deleting..."}
+                {t("common.deleting") || "Deleting..."}
               </>
             ) : (
-              dictionary?.common?.delete || "Delete"
+              t("common.delete") || "Delete"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }
