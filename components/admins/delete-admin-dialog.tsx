@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { deleteAdmin } from "@/lib/api/auth"
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteAdmin } from "@/lib/api/auth";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,50 +12,54 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Loader2 } from "lucide-react"
+} from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface DeleteAdminDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  admin: { id: number; name: string; email: string } | null
-  dictionary: any
+  isOpen: boolean;
+  onClose: () => void;
+  admin: { id: number; name: string; email: string } | null;
 }
 
-export function DeleteAdminDialog({ isOpen, onClose, admin, dictionary }: DeleteAdminDialogProps) {
-  const [error, setError] = useState<string | null>(null)
-  const queryClient = useQueryClient()
+export function DeleteAdminDialog({
+  isOpen,
+  onClose,
+  admin,
+}: DeleteAdminDialogProps) {
+  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const t = useTranslations();
 
   const { mutate: removeAdmin, isPending } = useMutation({
     mutationFn: (id: number) => deleteAdmin(id),
     onSuccess: () => {
       // Invalidate the admins query to refresh the list
-      queryClient.invalidateQueries({ queryKey: ["admins"] })
-      onClose()
+      queryClient.invalidateQueries({ queryKey: ["admins"] });
+      onClose();
     },
     onError: (error: Error) => {
-      setError(error.message || "Failed to delete admin")
+      setError(error.message || "Failed to delete admin");
     },
-  })
+  });
 
   const handleDelete = () => {
     if (admin) {
-      setError(null)
-      removeAdmin(admin.id)
+      setError(null);
+      removeAdmin(admin.id);
     }
-  }
+  };
 
-  if (!admin) return null
+  if (!admin) return null;
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{dictionary?.admin?.deleteAdmin || "Delete Admin"}</AlertDialogTitle>
+          <AlertDialogTitle>{t("admin.deleteAdmin")}</AlertDialogTitle>
           <AlertDialogDescription>
-            {dictionary?.admin?.deleteAdminConfirmation ||
-              "Are you sure you want to delete this admin? This action cannot be undone."}
+            {t("admin.deleteAdminConfirmation")}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -68,15 +72,18 @@ export function DeleteAdminDialog({ isOpen, onClose, admin, dictionary }: Delete
 
         <div className="mt-2 space-y-2 rounded-md bg-muted p-4">
           <div>
-            <span className="font-medium">{dictionary?.admin?.name || "Name"}:</span> {admin.name}
+            <span className="font-medium">{t("admin.name")}:</span> {admin.name}
           </div>
           <div>
-            <span className="font-medium">{dictionary?.admin?.email || "Email"}:</span> {admin.email}
+            <span className="font-medium">{t("admin.email")}:</span>{" "}
+            {admin.email}
           </div>
         </div>
 
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>{dictionary?.common?.cancel || "Cancel"}</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>
+            {t("common.cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={isPending}
@@ -85,14 +92,14 @@ export function DeleteAdminDialog({ isOpen, onClose, admin, dictionary }: Delete
             {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {dictionary?.common?.deleting || "Deleting..."}
+                {t("common.deleting")}
               </>
             ) : (
-              dictionary?.common?.delete || "Delete"
+              t("common.delete")
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { adminSchema, type AdminFormValues } from "@/lib/validations/admin"
-import { createAdmin } from "@/lib/api/auth"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
+import { createAdmin } from "@/lib/api/auth";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -14,21 +14,36 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Loader2 } from "lucide-react"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface AddAdminModalProps {
-  isOpen: boolean
-  onClose: () => void
-  dictionary: any
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export function AddAdminModal({ isOpen, onClose, dictionary }: AddAdminModalProps) {
-  const [error, setError] = useState<string | null>(null)
-  const queryClient = useQueryClient()
+export function AddAdminModal({ isOpen, onClose }: AddAdminModalProps) {
+  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const t = useTranslations();
+
+  const adminSchema = z.object({
+    name: z.string().min(1, { message: t("admin.errors.nameRequired") }),
+    email: z
+      .string()
+      .min(1, { message: t("admin.errors.emailRequired") })
+      .email({ message: t("admin.errors.emailInvalid") }),
+    password: z
+      .string()
+      .min(1, { message: t("admin.errors.passwordRequired") })
+      .min(6, { message: t("admin.errors.passwordMinLength") }),
+  });
+
+  type AdminFormValues = z.infer<typeof adminSchema>;
 
   const {
     register,
@@ -36,49 +51,50 @@ export function AddAdminModal({ isOpen, onClose, dictionary }: AddAdminModalProp
     reset,
     formState: { errors },
   } = useForm<AdminFormValues>({
-    resolver: zodResolver(adminSchema(dictionary)),
+    resolver: zodResolver(adminSchema),
     defaultValues: {
       name: "",
       email: "",
       password: "",
     },
-  })
+  });
 
   const { mutate: addAdmin, isPending } = useMutation({
     mutationFn: createAdmin,
     onSuccess: () => {
       // Invalidate the admins query to refresh the list
-      queryClient.invalidateQueries({ queryKey: ["admins"] })
+      queryClient.invalidateQueries({ queryKey: ["admins"] });
 
       // Reset form and close modal
-      reset()
-      onClose()
+      reset();
+      onClose();
     },
     onError: (error: Error) => {
-      setError(error.message || "Failed to create admin")
+      setError(error.message || "Failed to create admin");
     },
-  })
+  });
 
   const onSubmit = (data: AdminFormValues) => {
-    setError(null)
-    addAdmin(data)
-  }
+    setError(null);
+    addAdmin(data);
+  };
 
   const handleClose = () => {
     if (!isPending) {
-      reset()
-      setError(null)
-      onClose()
+      reset();
+      setError(null);
+      onClose();
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{dictionary?.admin?.addAdmin || "Add Admin"}</DialogTitle>
+          <DialogTitle>{t("admin.addAdmin") || "Add Admin"}</DialogTitle>
           <DialogDescription>
-            {dictionary?.admin?.addAdminDescription || "Create a new administrator account."}
+            {t("admin.addAdminDescription") ||
+              "Create a new administrator account."}
           </DialogDescription>
         </DialogHeader>
 
@@ -91,57 +107,72 @@ export function AddAdminModal({ isOpen, onClose, dictionary }: AddAdminModalProp
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">{dictionary?.admin?.name || "Name"}</Label>
+            <Label htmlFor="name">{t("admin.name") || "Name"}</Label>
             <Input
               id="name"
               {...register("name")}
-              placeholder={dictionary?.admin?.namePlaceholder || "Enter admin name"}
+              placeholder={t("admin.namePlaceholder") || "Enter admin name"}
               className={errors.name ? "border-red-500" : ""}
             />
-            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+            {errors.name && (
+              <p className="text-sm text-red-500">{errors.name.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">{dictionary?.admin?.email || "Email"}</Label>
+            <Label htmlFor="email">{t("admin.email") || "Email"}</Label>
             <Input
               id="email"
               type="email"
               {...register("email")}
-              placeholder={dictionary?.admin?.emailPlaceholder || "Enter admin email"}
+              placeholder={t("admin.emailPlaceholder") || "Enter admin email"}
               className={errors.email ? "border-red-500" : ""}
             />
-            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">{dictionary?.admin?.password || "Password"}</Label>
+            <Label htmlFor="password">
+              {t("admin.password") || "Password"}
+            </Label>
             <Input
               id="password"
               type="password"
               {...register("password")}
-              placeholder={dictionary?.admin?.passwordPlaceholder || "Enter admin password"}
+              placeholder={
+                t("admin.passwordPlaceholder") || "Enter admin password"
+              }
               className={errors.password ? "border-red-500" : ""}
             />
-            {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password.message}</p>
+            )}
           </div>
 
           <DialogFooter className="mt-6">
-            <Button type="button" variant="outline" onClick={handleClose} disabled={isPending}>
-              {dictionary?.common?.cancel || "Cancel"}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isPending}
+            >
+              {t("common.cancel") || "Cancel"}
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {dictionary?.common?.creating || "Creating..."}
+                  {t("common.creating")}
                 </>
               ) : (
-                dictionary?.common?.create || "Create"
+                t("common.create")
               )}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

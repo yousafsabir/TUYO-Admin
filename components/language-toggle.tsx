@@ -1,53 +1,38 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Globe } from "lucide-react"
-import { locales, type Locale } from "@/lib/i18n/config"
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Globe } from "lucide-react";
+import { locales, type Locale } from "@/lib/i18n/config";
+import { useLocale } from "next-intl";
 
 const LANGUAGE_NAMES: Record<Locale, string> = {
   en: "English",
   es: "Español",
-}
+};
 
 export function LanguageToggle() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const [currentLang, setCurrentLang] = useState<Locale>("es")
+  const router = useRouter();
+  const pathname = usePathname();
+  const locale = useLocale();
+  const [currentLang, setCurrentLang] = useState<Locale>("es");
 
   // Load saved language preference on mount
   useEffect(() => {
-    const savedLang = localStorage.getItem("language") as Locale | null
-    if (savedLang && locales.includes(savedLang)) {
-      setCurrentLang(savedLang)
-    } else {
-      // Extract current language from URL if no saved preference
-      const urlLang = pathname.split("/")[1] as Locale
-      if (locales.includes(urlLang)) {
-        setCurrentLang(urlLang)
-      }
-    }
-  }, [pathname])
+    setCurrentLang(locale);
+  }, []);
 
   const switchLanguage = (locale: Locale) => {
-    if (locale === currentLang) return
-
-    // Save preference to localStorage
-    localStorage.setItem("language", locale)
-    setCurrentLang(locale)
-
-    // Navigate to the same page but with different locale
-    const segments = pathname.split("/")
-
-    if (locales.includes(segments[1] as Locale)) {
-      segments[1] = locale
-      router.push(segments.join("/"))
-    } else {
-      router.push(`/${locale}${pathname}`)
-    }
-  }
+    if (locale === currentLang) return;
+    router.push("/" + locale + pathname.slice(3));
+  };
 
   return (
     <DropdownMenu>
@@ -69,5 +54,5 @@ export function LanguageToggle() {
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
