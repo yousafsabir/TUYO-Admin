@@ -150,7 +150,8 @@
     "editProductDescription": "Update product settings and preferences.",
     "premiumStatus": "Premium Status",
     "premiumStatusDescription": "Mark this product as premium to give it special visibility.",
-    "addProduct": "Add Product"
+    "addProduct": "Add Product",
+    "addDescription": "Create a new product listing."
   },
   "orders": {
     "title": "Orders",
