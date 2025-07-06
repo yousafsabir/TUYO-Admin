@@ -1,3 +1,5 @@
+'use client'
+
 import { SubscriptionsTable } from '@/components/subscriptions/subscriptions-table'
 import { useTranslations } from 'next-intl'
 

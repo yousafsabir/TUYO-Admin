@@ -1,3 +1,5 @@
+'use client'
+
 import AddProductForm from './add-product-form'
 import { useTranslations } from 'next-intl'
 

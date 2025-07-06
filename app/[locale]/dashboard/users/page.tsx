@@ -1,3 +1,5 @@
+'use client'
+
 import { UsersTable } from '@/components/users/users-table'
 import { useTranslations } from 'next-intl'
 

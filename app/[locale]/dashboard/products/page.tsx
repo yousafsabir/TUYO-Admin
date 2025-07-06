@@ -1,3 +1,5 @@
+'use client'
+
 import { ProductsTable } from '@/components/products/products-table'
 import { useTranslations } from 'next-intl'
 

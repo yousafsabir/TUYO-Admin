@@ -1,9 +1,11 @@
+'use client'
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { DashboardStats } from './dashboard-stats'
 import { RecentActivityTable } from '@/components/audit-logs/recent-activity-table'
 import { useTranslations } from 'next-intl'
 
-export default async function DashboardPage() {
+export default function DashboardPage() {
 	const t = useTranslations()
 
 	return (

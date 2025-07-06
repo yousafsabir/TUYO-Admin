@@ -1,3 +1,5 @@
+'use client'
+
 import { OrdersTable } from '@/components/orders/orders-table'
 import { useTranslations } from 'next-intl'
 

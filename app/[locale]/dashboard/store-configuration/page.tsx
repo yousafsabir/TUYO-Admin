@@ -1,3 +1,5 @@
+'use client'
+
 import { StoreConfigurationForm } from '@/components/store-configuration/store-configuration-form'
 import { useTranslations } from 'next-intl'
 

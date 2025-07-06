@@ -1,3 +1,5 @@
+'use client'
+
 import EditProductForm from './edit-product-form'
 import { useTranslations } from 'next-intl'
 import { use } from 'react'
