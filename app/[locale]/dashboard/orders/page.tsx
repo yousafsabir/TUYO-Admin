@@ -3,7 +3,7 @@
 import { OrdersTable } from '@/components/orders/orders-table'
 import { useTranslations } from 'next-intl'
 
-export default async function OrdersPage() {
+export default function OrdersPage() {
 	const t = useTranslations()
 	return (
 		<div className='space-y-6'>

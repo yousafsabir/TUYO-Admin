@@ -3,7 +3,7 @@
 import { ProductsTable } from '@/components/products/products-table'
 import { useTranslations } from 'next-intl'
 
-export default async function ProductsPage() {
+export default function ProductsPage() {
 	const t = useTranslations()
 
 	return (

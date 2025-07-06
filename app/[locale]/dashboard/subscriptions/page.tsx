@@ -3,7 +3,7 @@
 import { SubscriptionsTable } from '@/components/subscriptions/subscriptions-table'
 import { useTranslations } from 'next-intl'
 
-export default async function SubscriptionsPage() {
+export default function SubscriptionsPage() {
 	const t = useTranslations()
 
 	return (

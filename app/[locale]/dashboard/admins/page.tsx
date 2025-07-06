@@ -9,7 +9,7 @@ import { useAuth } from '@/lib/context/auth-context'
 import { ROOT_ADMIN_EMAIL } from '@/lib/constants'
 import { useTranslations } from 'next-intl'
 
-export function AdminsPage() {
+export default function AdminsPage() {
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 	const t = useTranslations()
 	const { user } = useAuth()

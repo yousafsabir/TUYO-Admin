@@ -3,7 +3,7 @@
 import { StoreConfigurationForm } from '@/components/store-configuration/store-configuration-form'
 import { useTranslations } from 'next-intl'
 
-export default async function StoreConfigurationPage() {
+export default function StoreConfigurationPage() {
 	const t = useTranslations()
 
 	return (

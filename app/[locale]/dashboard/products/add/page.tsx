@@ -3,7 +3,7 @@
 import AddProductForm from './add-product-form'
 import { useTranslations } from 'next-intl'
 
-export default async function AddProductPage() {
+export default function AddProductPage() {
 	const t = useTranslations()
 
 	return (

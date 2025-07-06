@@ -4,7 +4,7 @@ import EditProductForm from './edit-product-form'
 import { useTranslations } from 'next-intl'
 import { use } from 'react'
 
-export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = use(params)
 	const t = useTranslations()
 

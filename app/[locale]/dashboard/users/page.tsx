@@ -3,7 +3,7 @@
 import { UsersTable } from '@/components/users/users-table'
 import { useTranslations } from 'next-intl'
 
-export default async function UsersPage() {
+export default function UsersPage() {
 	const t = useTranslations()
 
 	return (
