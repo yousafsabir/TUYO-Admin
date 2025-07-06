@@ -176,6 +176,7 @@ export function UsersTable({}: UsersTableProps) {
 																onError={() =>
 																	handleAvatarError(user.id)
 																}
+																className='object-cover object-top'
 															/>
 														) : null}
 														<AvatarFallback>

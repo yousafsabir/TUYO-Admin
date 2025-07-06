@@ -128,7 +128,7 @@ export function AddSubcategoryModal({ isOpen, onClose, categoriesData }: AddSubc
 							onValueChange={(value) =>
 								setValue('categoryId', Number.parseInt(value))
 							}
-							value={selectedCategoryId.toString()}>
+							value={selectedCategoryId ? selectedCategoryId.toString() : ''}>
 							<SelectTrigger className={errors.categoryId ? 'border-red-500' : ''}>
 								<SelectValue
 									placeholder={
