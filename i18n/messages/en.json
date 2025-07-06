@@ -185,8 +185,13 @@
   "subscriptions": {
     "title": "Subscriptions",
     "description": "Manage user subscriptions and billing.",
+    "id": "ID",
     "user": "User",
+    "userId": "User ID",
     "plan": "Plan",
+    "payment": "Payment",
+    "listings": "Listings",
+    "created": "Created",
     "status": "Status",
     "paymentStatus": "Payment Status",
     "listingsRemaining": "Listings Remaining",
@@ -197,10 +202,12 @@
     "createdAt": "Created",
     "noSubscriptions": "No subscriptions found",
     "comingSoon": "Subscription management features will be added here.",
+    "errorLoading": "Error loading subscriptions",
     "showing": "Showing",
     "of": "of",
     "subscriptions": "subscriptions",
-    "page": "Page"
+    "page": "Page",
+    "unlimited": "Unlimited"
   },
   "storeConfiguration": {
     "title": "Store Configuration",
