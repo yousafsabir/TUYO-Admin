@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useAuth } from "@/lib/context/auth-context"
-import { Button } from "@/components/ui/button"
-import { LanguageToggle } from "@/components/language-toggle"
+import { useAuth } from "@/lib/context/auth-context";
+import { Button } from "@/components/ui/button";
+import { LanguageToggle } from "@/components/language-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,16 +10,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { User, LogOut } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+} from "@/components/ui/dropdown-menu";
+import { User, LogOut } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useTranslations } from "next-intl";
 
-interface DashboardHeaderProps {
-  dictionary: any
-}
-
-export function DashboardHeader({ dictionary }: DashboardHeaderProps) {
-  const { user, logout } = useAuth()
+export function DashboardHeader() {
+  const t = useTranslations();
+  const { user, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background px-4 md:px-6">
@@ -40,17 +38,22 @@ export function DashboardHeader({ dictionary }: DashboardHeaderProps) {
             <DropdownMenuLabel>
               <div className="flex flex-col">
                 <span>{user?.name || "Admin"}</span>
-                <span className="text-xs text-muted-foreground">{user?.email}</span>
+                <span className="text-xs text-muted-foreground">
+                  {user?.email}
+                </span>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => logout()} className="text-destructive">
+            <DropdownMenuItem
+              onClick={() => logout()}
+              className="text-destructive"
+            >
               <LogOut className="mr-2 h-4 w-4" />
-              {dictionary.navigation.logout || "Logout"}
+              {t("navigation.logout") || "Logout"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
     </header>
-  )
+  );
 }

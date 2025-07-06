@@ -1,70 +1,76 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Users, UserCog, LayoutDashboard, Menu, Package, Settings, CreditCard, ShoppingCart } from "lucide-react"
-import type { Locale } from "@/lib/i18n/config"
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Users,
+  UserCog,
+  LayoutDashboard,
+  Menu,
+  Package,
+  Settings,
+  CreditCard,
+  ShoppingCart,
+} from "lucide-react";
+import type { Locale } from "@/lib/i18n/config";
 
-interface DashboardSidebarProps {
-  dictionary: any
-  lang: Locale
-}
-
-export function DashboardSidebar({ dictionary, lang }: DashboardSidebarProps) {
-  const pathname = usePathname()
-  const [open, setOpen] = useState(false)
+export function DashboardSidebar() {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const t = useTranslations();
 
   const routes = [
     {
-      label: dictionary?.navigation?.dashboard || "Dashboard",
+      label: t("navigation.dashboard") || "Dashboard",
       icon: LayoutDashboard,
-      href: `/${lang}/dashboard`,
-      active: pathname === `/${lang}/dashboard`,
+      href: `/dashboard`,
+      active: pathname === `/dashboard`,
     },
     {
-      label: dictionary?.navigation?.admins || "Admins",
+      label: t("navigation.admins") || "Admins",
       icon: UserCog,
-      href: `/${lang}/dashboard/admins`,
-      active: pathname === `/${lang}/dashboard/admins`,
+      href: `/dashboard/admins`,
+      active: pathname === `/dashboard/admins`,
     },
     {
-      label: dictionary?.navigation?.users || "Users",
+      label: t("navigation.users") || "Users",
       icon: Users,
-      href: `/${lang}/dashboard/users`,
-      active: pathname === `/${lang}/dashboard/users`,
+      href: `/dashboard/users`,
+      active: pathname === `/dashboard/users`,
     },
     {
-      label: dictionary?.navigation?.products || "Products",
+      label: t("navigation.products") || "Products",
       icon: Package,
-      href: `/${lang}/dashboard/products`,
-      active: pathname.startsWith(`/${lang}/dashboard/products`),
+      href: `/dashboard/products`,
+      active: pathname.startsWith(`/dashboard/products`),
     },
     {
-      label: dictionary?.navigation?.orders || "Orders",
+      label: t("navigation.orders") || "Orders",
       icon: ShoppingCart,
-      href: `/${lang}/dashboard/orders`,
-      active: pathname === `/${lang}/dashboard/orders`,
+      href: `/dashboard/orders`,
+      active: pathname === `/dashboard/orders`,
     },
     {
-      label: dictionary?.navigation?.subscriptions || "Subscriptions",
+      label: t("navigation.subscriptions") || "Subscriptions",
       icon: CreditCard,
-      href: `/${lang}/dashboard/subscriptions`,
-      active: pathname === `/${lang}/dashboard/subscriptions`,
+      href: `/dashboard/subscriptions`,
+      active: pathname === `/dashboard/subscriptions`,
     },
     {
-      label: dictionary?.navigation?.storeConfiguration || "Store Configuration",
+      label: t("navigation.storeConfiguration") || "Store Configuration",
       icon: Settings,
-      href: `/${lang}/dashboard/store-configuration`,
-      active: pathname === `/${lang}/dashboard/store-configuration`,
+      href: `/dashboard/store-configuration`,
+      active: pathname === `/dashboard/store-configuration`,
     },
-  ]
+  ];
 
   return (
     <>
@@ -109,17 +115,17 @@ export function DashboardSidebar({ dictionary, lang }: DashboardSidebarProps) {
         </div>
       </div>
     </>
-  )
+  );
 }
 
 interface MobileSidebarProps {
   routes: {
-    label: string
-    icon: React.ElementType
-    href: string
-    active: boolean
-  }[]
-  setOpen: (open: boolean) => void
+    label: string;
+    icon: React.ElementType;
+    href: string;
+    active: boolean;
+  }[];
+  setOpen: (open: boolean) => void;
 }
 
 function MobileSidebar({ routes, setOpen }: MobileSidebarProps) {
@@ -149,5 +155,5 @@ function MobileSidebar({ routes, setOpen }: MobileSidebarProps) {
         </nav>
       </ScrollArea>
     </div>
-  )
+  );
 }
