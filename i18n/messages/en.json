@@ -151,7 +151,10 @@
     "premiumStatus": "Premium Status",
     "premiumStatusDescription": "Mark this product as premium to give it special visibility.",
     "addProduct": "Add Product",
-    "addDescription": "Create a new product listing."
+    "addDescription": "Create a new product listing.",
+    "editOtherDetails": "Edit Other Details",
+    "featuredStatus": "Featured Status",
+    "featuredStatusDescription": "Mark this product as featured to give it special visibility."
   },
   "orders": {
     "title": "Orders",
@@ -342,6 +345,7 @@
     "next": "Next",
     "page": "Page",
     "showing": "Showing",
-    "of": "of"
+    "of": "of",
+    "to": "to"
   }
 }
