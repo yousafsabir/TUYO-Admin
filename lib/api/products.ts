@@ -124,6 +124,7 @@ export async function updateProduct(
       ? (() => {
           const authHeaders = createAuthHeaders(false);
           // Remove Content-Type completely for FormData
+          // @ts-ignore
           delete authHeaders["Content-Type"];
           return authHeaders;
         })()
@@ -159,6 +160,7 @@ export async function createProduct(
   try {
     const headers = createAuthHeaders(false);
     // Remove Content-Type completely for FormData
+    // @ts-ignore
     delete headers["Content-Type"];
 
     const response = await fetchWithNgrok(`${API_BASE_URL}/products`, {
@@ -189,6 +191,7 @@ export async function updateProductFull(
   try {
     const headers = createAuthHeaders(false);
     // Remove Content-Type completely for FormData
+    // @ts-ignore
     delete headers["Content-Type"];
 
     const response = await fetchWithNgrok(

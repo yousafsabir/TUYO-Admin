@@ -297,6 +297,7 @@
   "auditLogs": {
     "admin": "Admin",
     "table": "Table",
+    "heading": "Audit Logs",
     "operation": "Operation",
     "executedAt": "Executed At",
     "actions": "Actions",
@@ -384,6 +385,7 @@
     "page": "Page",
     "showing": "Showing",
     "of": "of",
-    "to": "to"
+    "to": "to",
+    "total": "total"
   }
 }

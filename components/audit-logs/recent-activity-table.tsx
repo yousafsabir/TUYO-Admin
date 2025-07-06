@@ -203,7 +203,7 @@ export function RecentActivityTable() {
               onClick={() => handlePageChange(pagination.page - 1)}
               disabled={pagination.page <= 1}
             >
-              {t("paginatio.prev") || "Previous"}
+              {t("pagination.prev") || "Previous"}
             </Button>
             <div className="flex items-center space-x-1">
               {Array.from(

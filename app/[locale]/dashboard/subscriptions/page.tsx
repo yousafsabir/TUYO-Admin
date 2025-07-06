@@ -1,5 +1,3 @@
-import type { Locale } from "@/lib/i18n/config";
-import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { SubscriptionsTable } from "@/components/subscriptions/subscriptions-table";
 import { useTranslations } from "next-intl";
 

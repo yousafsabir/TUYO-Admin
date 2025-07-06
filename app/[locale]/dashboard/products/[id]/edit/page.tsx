@@ -1,5 +1,3 @@
-import type { Locale } from "@/lib/i18n/config";
-import { getDictionary } from "@/lib/i18n/get-dictionary";
 import EditProductForm from "./edit-product-form";
 import { useTranslations } from "next-intl";
 import { use } from "react";
@@ -7,7 +5,7 @@ import { use } from "react";
 export default async function EditProductPage({
   params,
 }: {
-  params: Promise<{ lang: Locale; id: string }>;
+  params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
   const t = useTranslations();

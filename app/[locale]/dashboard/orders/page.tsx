@@ -1,5 +1,3 @@
-import type { Locale } from "@/lib/i18n/config";
-import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { OrdersTable } from "@/components/orders/orders-table";
 import { useTranslations } from "next-intl";
 
