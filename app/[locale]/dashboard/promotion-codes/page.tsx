@@ -24,11 +24,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
@@ -243,6 +243,47 @@ const useCreatePromotionCode = () => {
 			toast({
 				title: t('common.success'),
 				description: t('promotionCodes.createSuccess'),
+				variant: 'default',
+			})
+		},
+		onError: (error: Error) => {
+			toast({
+				title: t('common.error'),
+				description: error.message,
+				variant: 'destructive',
+			})
+		},
+	})
+}
+
+// Update Promotion Code
+const useUpdatePromotionCode = () => {
+	const queryClient = useQueryClient()
+	const { toast } = useToast()
+	const t = useTranslations()
+
+	return useMutation({
+		mutationFn: async ({ id, data }: { id: string; data: { active: boolean } }) => {
+			const response = await fetchWithNgrok(`/stripe/promotion-codes/${id}`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(data),
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.message || 'Failed to update promotion code')
+			}
+
+			return response.json()
+		},
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({ queryKey: ['promotion-codes'] })
+			toast({
+				title: t('common.success'),
+				description: t('promotionCodes.updateSuccess'),
 				variant: 'default',
 			})
 		},
@@ -1228,11 +1269,11 @@ function CouponsFilterBar({
 }
 
 // Promotion Codes Table Component
-// Promotion Codes Table Component
 function PromotionCodesTable({ filters }: { filters: PromotionCodeFilters }) {
 	const t = useTranslations()
 	const locale = useLocale()
 	const { toast } = useToast()
+	const updatePromotionCodeMutation = useUpdatePromotionCode()
 
 	const { data: promotionCodesData, isLoading, error } = usePromotionCodes(filters)
 
@@ -1264,6 +1305,17 @@ function PromotionCodesTable({ filters }: { filters: PromotionCodeFilters }) {
 				description: t('common.copiedFailed'),
 				variant: 'destructive',
 			})
+		}
+	}
+
+	const handleActiveToggle = async (promotionCode: PromotionCode, newActiveState: boolean) => {
+		try {
+			await updatePromotionCodeMutation.mutateAsync({
+				id: promotionCode.id,
+				data: { active: newActiveState },
+			})
+		} catch (error) {
+			// Error is handled by the mutation
 		}
 	}
 
@@ -1303,19 +1355,20 @@ function PromotionCodesTable({ filters }: { filters: PromotionCodeFilters }) {
 							<TableHead>{t('promotionCodes.table.status')}</TableHead>
 							<TableHead>{t('promotionCodes.table.created')}</TableHead>
 							<TableHead>{t('promotionCodes.table.expires')}</TableHead>
+							<TableHead>{t('promotionCodes.table.active')}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{isLoading ? (
 							<TableRow>
-								<TableCell colSpan={7} className='py-8 text-center'>
+								<TableCell colSpan={8} className='py-8 text-center'>
 									{t('common.loading')}
 								</TableCell>
 							</TableRow>
 						) : error ? (
 							<TableRow>
 								<TableCell
-									colSpan={7}
+									colSpan={8}
 									className='py-8 text-center text-destructive'>
 									{t('common.error')}: {error.message}
 								</TableCell>
@@ -1323,7 +1376,7 @@ function PromotionCodesTable({ filters }: { filters: PromotionCodeFilters }) {
 						) : !promotionCodesData?.data?.length ? (
 							<TableRow>
 								<TableCell
-									colSpan={7}
+									colSpan={8}
 									className='py-8 text-center text-muted-foreground'>
 									{t('promotionCodes.noPromotionCodes')}
 								</TableCell>
@@ -1377,6 +1430,23 @@ function PromotionCodesTable({ filters }: { filters: PromotionCodeFilters }) {
 										{code.expiresAt
 											? formatDate(code.expiresAt, locale)
 											: t('promotionCodes.table.noExpiry')}
+									</TableCell>
+									<TableCell>
+										<div className='flex items-center space-x-2'>
+											<Switch
+												checked={code.active}
+												onCheckedChange={(checked) =>
+													handleActiveToggle(code, checked)
+												}
+												disabled={updatePromotionCodeMutation.isPending}
+												aria-label={t('promotionCodes.table.toggleActive')}
+											/>
+											<span className='text-sm text-muted-foreground'>
+												{code.active
+													? t('promotionCodes.status.active')
+													: t('promotionCodes.status.inactive')}
+											</span>
+										</div>
 									</TableCell>
 								</TableRow>
 							))
