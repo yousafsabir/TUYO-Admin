@@ -54,7 +54,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			if (response.status === 'success' && response.data) {
 				setUser(response.data)
 				setIsAuthenticated(true)
-				router.push(pathname.slice(3))
+				const path = pathname.slice(3)
+				if (path === '/login') {
+					router.push('/dashboard')
+				} else router.push(path)
 			} else {
 				throw new Error('Invalid response structure')
 			}
