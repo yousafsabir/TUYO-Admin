@@ -2,7 +2,7 @@
 
 import { Locale, useLocale, useTranslations } from 'next-intl'
 import { fetchWithNgrok } from '@/lib/api/fetch-utils'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { copyTextToClipboard } from '@/lib/utils'
@@ -24,10 +24,22 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
-import { Copy, RefreshCw, Filter, X } from 'lucide-react'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog'
+import { Copy, RefreshCw, Filter, X, Plus } from 'lucide-react'
 import React, { useState, useCallback } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 
 // TypeScript types
 type PromotionCode = {
@@ -105,6 +117,42 @@ type CouponFilters = {
 	}
 }
 
+// Zod schemas for coupon creation
+const discountTypeSchema = z.enum(['percent', 'amount'])
+const couponDurationSchema = z.enum(['once', 'repeating', 'forever'])
+
+const createCouponSchema = z
+	.object({
+		id: z.string().min(1, 'ID is required').max(50, 'ID must be 50 characters or less'),
+		name: z
+			.string()
+			.min(1, 'Name is required')
+			.max(255, 'Name must be 255 characters or less')
+			.optional(),
+		discountType: discountTypeSchema,
+		amount: z.number().min(1, 'Amount must be at least 1'),
+		duration: couponDurationSchema,
+		durationInMonths: z.number().min(1).max(12).optional(),
+	})
+	.superRefine(({ duration, durationInMonths, discountType, amount }, ctx) => {
+		if (duration === 'repeating' && !durationInMonths) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: "Duration in months is required when duration is 'repeating'",
+				path: ['durationInMonths'],
+			})
+		}
+		if (discountType === 'percent' && amount > 100) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: "Amount must not be greater than 100 when discount type is 'percent'",
+				path: ['amount'],
+			})
+		}
+	})
+
+type CreateCouponFormData = z.infer<typeof createCouponSchema>
+
 // Custom hooks
 const usePromotionCodes = (filters: PromotionCodeFilters = {}) => {
 	return useQuery<ApiResponse<PromotionCode[]>>({
@@ -167,6 +215,46 @@ const useCoupons = (filters: CouponFilters = {}) => {
 	})
 }
 
+// Create coupon mutation
+const useCreateCoupon = () => {
+	const queryClient = useQueryClient()
+	const { toast } = useToast()
+
+	return useMutation({
+		mutationFn: async (data: CreateCouponFormData) => {
+			const response = await fetchWithNgrok('/stripe/coupons', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(data),
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.message || 'Failed to create coupon')
+			}
+
+			return response.json()
+		},
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({ queryKey: ['coupons'] })
+			toast({
+				title: 'Success',
+				description: 'Coupon created successfully',
+				variant: 'default',
+			})
+		},
+		onError: (error: Error) => {
+			toast({
+				title: 'Error',
+				description: error.message,
+				variant: 'destructive',
+			})
+		},
+	})
+}
+
 // Format date helper
 const formatDate = (timestamp: number, locale: Locale) => {
 	return new Date(timestamp * 1000).toLocaleDateString(locale === 'en' ? 'en-US' : locale, {
@@ -174,6 +262,216 @@ const formatDate = (timestamp: number, locale: Locale) => {
 		month: 'short',
 		day: 'numeric',
 	})
+}
+
+// Add Coupon Modal Component
+function AddCouponModal() {
+	const t = useTranslations()
+	const [open, setOpen] = useState(false)
+	const createCouponMutation = useCreateCoupon()
+
+	const form = useForm<CreateCouponFormData>({
+		resolver: zodResolver(createCouponSchema),
+		defaultValues: {
+			id: '',
+			name: '',
+			discountType: 'percent',
+			amount: 1,
+			duration: 'once',
+			durationInMonths: undefined,
+		},
+	})
+
+	const watchedDuration = form.watch('duration')
+	const watchedDiscountType = form.watch('discountType')
+
+	const onSubmit = async (data: CreateCouponFormData) => {
+		try {
+			await createCouponMutation.mutateAsync(data)
+			form.reset()
+			setOpen(false)
+		} catch (error) {
+			// Error is handled by the mutation
+		}
+	}
+
+	return (
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogTrigger asChild>
+				<Button className='gap-2'>
+					<Plus className='h-4 w-4' />
+					{t('coupons.addCoupon')}
+				</Button>
+			</DialogTrigger>
+			<DialogContent className='sm:max-w-[425px]'>
+				<DialogHeader>
+					<DialogTitle>{t('coupons.addCoupon')}</DialogTitle>
+					<DialogDescription>{t('coupons.addCouponDescription')}</DialogDescription>
+				</DialogHeader>
+				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+					<div className='space-y-4'>
+						{/* Coupon ID */}
+						<div className='space-y-2'>
+							<Label htmlFor='coupon-id'>{t('coupons.form.id.label')}</Label>
+							<Input
+								id='coupon-id'
+								placeholder={t('coupons.form.id.placeholder')}
+								{...form.register('id')}
+							/>
+							{form.formState.errors.id && (
+								<p className='text-sm text-destructive'>
+									{form.formState.errors.id.message}
+								</p>
+							)}
+						</div>
+
+						{/* Coupon Name */}
+						<div className='space-y-2'>
+							<Label htmlFor='coupon-name'>{t('coupons.form.name.label')}</Label>
+							<Input
+								id='coupon-name'
+								placeholder={t('coupons.form.name.placeholder')}
+								{...form.register('name')}
+							/>
+							{form.formState.errors.name && (
+								<p className='text-sm text-destructive'>
+									{form.formState.errors.name.message}
+								</p>
+							)}
+						</div>
+
+						{/* Discount Type */}
+						<div className='space-y-2'>
+							<Label htmlFor='discount-type'>
+								{t('coupons.form.discountType.label')}
+							</Label>
+							<Select
+								value={form.watch('discountType')}
+								onValueChange={(value) =>
+									form.setValue('discountType', value as 'percent' | 'amount')
+								}>
+								<SelectTrigger id='discount-type'>
+									<SelectValue
+										placeholder={t('coupons.form.discountType.placeholder')}
+									/>
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value='percent'>
+										{t('coupons.form.discountType.percent')}
+									</SelectItem>
+									<SelectItem value='amount'>
+										{t('coupons.form.discountType.amount')}
+									</SelectItem>
+								</SelectContent>
+							</Select>
+							{form.formState.errors.discountType && (
+								<p className='text-sm text-destructive'>
+									{form.formState.errors.discountType.message}
+								</p>
+							)}
+						</div>
+
+						{/* Amount */}
+						<div className='space-y-2'>
+							<Label htmlFor='amount'>
+								{watchedDiscountType === 'percent'
+									? t('coupons.form.amount.labelPercent')
+									: t('coupons.form.amount.labelAmount')}
+							</Label>
+							<Input
+								id='amount'
+								type='number'
+								min='1'
+								max={watchedDiscountType === 'percent' ? 100 : undefined}
+								placeholder={
+									watchedDiscountType === 'percent'
+										? t('coupons.form.amount.placeholderPercent')
+										: t('coupons.form.amount.placeholderAmount')
+								}
+								{...form.register('amount', { valueAsNumber: true })}
+							/>
+							{form.formState.errors.amount && (
+								<p className='text-sm text-destructive'>
+									{form.formState.errors.amount.message}
+								</p>
+							)}
+						</div>
+
+						{/* Duration */}
+						<div className='space-y-2'>
+							<Label htmlFor='duration'>{t('coupons.form.duration.label')}</Label>
+							<Select
+								value={form.watch('duration')}
+								onValueChange={(value) =>
+									value &&
+									form.setValue(
+										'duration',
+										value as 'once' | 'repeating' | 'forever',
+									)
+								}>
+								<SelectTrigger id='duration'>
+									<SelectValue
+										placeholder={t('coupons.form.duration.placeholder')}
+									/>
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value='once'>
+										{t('coupons.form.duration.once')}
+									</SelectItem>
+									<SelectItem value='repeating'>
+										{t('coupons.form.duration.repeating')}
+									</SelectItem>
+									<SelectItem value='forever'>
+										{t('coupons.form.duration.forever')}
+									</SelectItem>
+								</SelectContent>
+							</Select>
+							{form.formState.errors.duration && (
+								<p className='text-sm text-destructive'>
+									{form.formState.errors.duration.message}
+								</p>
+							)}
+						</div>
+
+						{/* Duration in Months (conditional) */}
+						{watchedDuration === 'repeating' && (
+							<div className='space-y-2'>
+								<Label htmlFor='duration-months'>
+									{t('coupons.form.durationInMonths.label')}
+								</Label>
+								<Input
+									id='duration-months'
+									type='number'
+									min='1'
+									max='12'
+									placeholder={t('coupons.form.durationInMonths.placeholder')}
+									{...form.register('durationInMonths', { valueAsNumber: true })}
+								/>
+								{form.formState.errors.durationInMonths && (
+									<p className='text-sm text-destructive'>
+										{form.formState.errors.durationInMonths.message}
+									</p>
+								)}
+							</div>
+						)}
+					</div>
+
+					{/* <DialogFooter> */}
+					<div className='flex justify-end gap-2'>
+						<Button type='button' variant='outline' onClick={() => setOpen(false)}>
+							{t('common.cancel')}
+						</Button>
+						<Button type='submit' disabled={createCouponMutation.isPending}>
+							{createCouponMutation.isPending
+								? t('common.creating')
+								: t('common.create')}
+						</Button>
+					</div>
+					{/* </DialogFooter> */}
+				</form>
+			</DialogContent>
+		</Dialog>
+	)
 }
 
 // Promotion Codes Filter Bar Component
@@ -652,18 +950,25 @@ function CouponsTable({ filters }: { filters: CouponFilters }) {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>{t('coupons.title')}</CardTitle>
-				<CardDescription>
-					{couponsData?.data && (
-						<span>
-							{t('coupons.summary', {
-								total: couponsData.data.length,
-								active: couponsData.data.filter((coupon) => coupon.valid).length,
-								inactive: couponsData.data.filter((coupon) => !coupon.valid).length,
-							})}
-						</span>
-					)}
-				</CardDescription>
+				<div className='flex items-center justify-between'>
+					<div>
+						<CardTitle>{t('coupons.title')}</CardTitle>
+						<CardDescription>
+							{couponsData?.data && (
+								<span>
+									{t('coupons.summary', {
+										total: couponsData.data.length,
+										active: couponsData.data.filter((coupon) => coupon.valid)
+											.length,
+										inactive: couponsData.data.filter((coupon) => !coupon.valid)
+											.length,
+									})}
+								</span>
+							)}
+						</CardDescription>
+					</div>
+					<AddCouponModal />
+				</div>
 			</CardHeader>
 			<CardContent>
 				<Table>

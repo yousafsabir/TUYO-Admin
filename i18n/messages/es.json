@@ -433,6 +433,8 @@
 		"description": "Administra los cupones de descuento de tu tienda.",
 		"noCoupons": "No se encontraron cupones",
 		"summary": "Mostrando {total} cupones ({active} activos, {inactive} inactivos)",
+		"addCoupon": "Agregar cupón",
+		"addCouponDescription": "Crear un nuevo cupón de descuento para tu tienda.",
 		"table": {
 			"id": "ID",
 			"name": "Nombre",
@@ -450,6 +452,39 @@
 			},
 			"createdBefore": {
 				"label": "Creado antes de"
+			}
+		},
+		"form": {
+			"id": {
+				"label": "ID del cupón",
+				"placeholder": "Ingrese ID único del cupón..."
+			},
+			"name": {
+				"label": "Nombre del cupón",
+				"placeholder": "Ingrese nombre del cupón..."
+			},
+			"discountType": {
+				"label": "Tipo de descuento",
+				"placeholder": "Seleccione tipo de descuento",
+				"percent": "Porcentaje",
+				"amount": "Cantidad fija"
+			},
+			"amount": {
+				"labelPercent": "Porcentaje (%)",
+				"labelAmount": "Cantidad ($)",
+				"placeholderPercent": "Ingrese porcentaje (1-100)",
+				"placeholderAmount": "Ingrese cantidad en dólares"
+			},
+			"duration": {
+				"label": "Duración",
+				"placeholder": "Seleccione duración",
+				"once": "Una vez",
+				"repeating": "Repetitivo",
+				"forever": "Para siempre"
+			},
+			"durationInMonths": {
+				"label": "Duración (Meses)",
+				"placeholder": "Ingrese número de meses (1-12)"
 			}
 		}
 	},

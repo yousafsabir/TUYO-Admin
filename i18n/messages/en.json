@@ -433,6 +433,8 @@
 		"description": "Manage discount coupons for your store.",
 		"noCoupons": "No coupons found",
 		"summary": "Showing {total} coupons ({active} active, {inactive} inactive)",
+		"addCoupon": "Add Coupon",
+		"addCouponDescription": "Create a new discount coupon for your store.",
 		"table": {
 			"id": "ID",
 			"name": "Name",
@@ -450,6 +452,39 @@
 			},
 			"createdBefore": {
 				"label": "Created Before"
+			}
+		},
+		"form": {
+			"id": {
+				"label": "Coupon ID",
+				"placeholder": "Enter unique coupon ID..."
+			},
+			"name": {
+				"label": "Coupon Name",
+				"placeholder": "Enter coupon name..."
+			},
+			"discountType": {
+				"label": "Discount Type",
+				"placeholder": "Select discount type",
+				"percent": "Percentage",
+				"amount": "Fixed Amount"
+			},
+			"amount": {
+				"labelPercent": "Percentage (%)",
+				"labelAmount": "Amount ($)",
+				"placeholderPercent": "Enter percentage (1-100)",
+				"placeholderAmount": "Enter amount in dollars"
+			},
+			"duration": {
+				"label": "Duration",
+				"placeholder": "Select duration",
+				"once": "Once",
+				"repeating": "Repeating",
+				"forever": "Forever"
+			},
+			"durationInMonths": {
+				"label": "Duration (Months)",
+				"placeholder": "Enter number of months (1-12)"
 			}
 		}
 	},
