@@ -442,6 +442,15 @@
 			"status": "Estado",
 			"created": "Creado",
 			"redeemed": "Canjeado"
+		},
+		"filters": {
+			"title": "Filtros",
+			"createdAfter": {
+				"label": "Creado después de"
+			},
+			"createdBefore": {
+				"label": "Creado antes de"
+			}
 		}
 	},
 	"pagination": {

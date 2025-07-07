@@ -96,6 +96,15 @@ type PromotionCodeFilters = {
 	}
 }
 
+type CouponFilters = {
+	created?: {
+		gt?: number
+		gte?: number
+		lt?: number
+		lte?: number
+	}
+}
+
 // Custom hooks
 const usePromotionCodes = (filters: PromotionCodeFilters = {}) => {
 	return useQuery<ApiResponse<PromotionCode[]>>({
@@ -132,11 +141,24 @@ const usePromotionCodes = (filters: PromotionCodeFilters = {}) => {
 	})
 }
 
-const useCoupons = () => {
+const useCoupons = (filters: CouponFilters = {}) => {
 	return useQuery<ApiResponse<Coupon[]>>({
-		queryKey: ['coupons'],
+		queryKey: ['coupons', filters],
 		queryFn: async () => {
-			const response = await fetchWithNgrok('/stripe/coupons')
+			const params = new URLSearchParams()
+
+			// Add filter params
+			if (filters.created) {
+				if (filters.created.gt) params.append('created[gt]', filters.created.gt.toString())
+				if (filters.created.gte)
+					params.append('created[gte]', filters.created.gte.toString())
+				if (filters.created.lt) params.append('created[lt]', filters.created.lt.toString())
+				if (filters.created.lte)
+					params.append('created[lte]', filters.created.lte.toString())
+			}
+
+			const url = `/stripe/coupons${params.toString() ? `?${params.toString()}` : ''}`
+			const response = await fetchWithNgrok(url)
 			if (!response.ok) {
 				throw new Error('Failed to fetch coupons')
 			}
@@ -332,139 +354,108 @@ function PromotionCodesFilterBar({
 	)
 }
 
-// Coupons Table Component
-function CouponsTable() {
+// Coupons Filter Bar Component
+function CouponsFilterBar({
+	filters,
+	onFiltersChange,
+	onClearFilters,
+}: {
+	filters: CouponFilters
+	onFiltersChange: (filters: CouponFilters) => void
+	onClearFilters: () => void
+}) {
 	const t = useTranslations()
-	const locale = useLocale()
-	const { toast } = useToast()
+	const [localFilters, setLocalFilters] = useState<CouponFilters>(filters)
 
-	const { data: couponsData, isLoading, error } = useCoupons()
+	const handleCreatedDateChange = useCallback(
+		(type: 'gt' | 'gte' | 'lt' | 'lte', value: string) => {
+			const timestamp = value ? new Date(value).getTime() / 1000 : undefined
+			const newCreated = { ...localFilters.created, [type]: timestamp }
 
-	// Status badge component for coupons
-	const CouponStatusBadge = ({ valid, t }: { valid: boolean; t: any }) => {
-		return valid ? (
-			<Badge variant='default'>{t('promotionCodes.status.active')}</Badge>
-		) : (
-			<Badge variant='destructive'>{t('promotionCodes.status.inactive')}</Badge>
-		)
-	}
-
-	async function onCopyCode(code: string) {
-		const success = await copyTextToClipboard(code)
-		if (success) {
-			toast({
-				title: t('common.success'),
-				description: t('common.copiedSuccessfully'),
-				variant: 'default',
+			// Remove undefined values
+			Object.keys(newCreated).forEach((key) => {
+				if (newCreated[key as keyof typeof newCreated] === undefined) {
+					delete newCreated[key as keyof typeof newCreated]
+				}
 			})
-		} else {
-			toast({
-				title: t('common.error'),
-				description: t('common.copiedFailed'),
-				variant: 'destructive',
-			})
-		}
-	}
+
+			const newFilters = {
+				...localFilters,
+				created: Object.keys(newCreated).length > 0 ? newCreated : undefined,
+			}
+			setLocalFilters(newFilters)
+			onFiltersChange(newFilters)
+		},
+		[localFilters, onFiltersChange],
+	)
+
+	const hasActiveFilters =
+		filters.created &&
+		Object.keys(filters.created).some((key) => {
+			const value = filters.created![key as keyof typeof filters.created]
+			return value !== undefined && value !== null
+		})
 
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Coupons</CardTitle>
-				<CardDescription>
-					{couponsData?.data && (
-						<span>
-							Showing {couponsData.data.length} coupons (
-							{couponsData.data.filter((coupon) => coupon.valid).length} active,{' '}
-							{couponsData.data.filter((coupon) => !coupon.valid).length} inactive)
-						</span>
+				<div className='flex items-center justify-between'>
+					<div className='flex items-center gap-2'>
+						<Filter className='h-4 w-4' />
+						<CardTitle className='text-lg'>{t('coupons.filters.title')}</CardTitle>
+					</div>
+					{hasActiveFilters && (
+						<Button
+							variant='ghost'
+							size='sm'
+							onClick={onClearFilters}
+							className='gap-2'>
+							<X className='h-4 w-4' />
+							{t('common.clear')}
+						</Button>
 					)}
-				</CardDescription>
+				</div>
 			</CardHeader>
 			<CardContent>
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>ID</TableHead>
-							<TableHead>Name</TableHead>
-							<TableHead>{t('promotionCodes.table.discount')}</TableHead>
-							<TableHead>Duration</TableHead>
-							<TableHead>{t('promotionCodes.table.usage')}</TableHead>
-							<TableHead>{t('promotionCodes.table.status')}</TableHead>
-							<TableHead>{t('promotionCodes.table.created')}</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{isLoading ? (
-							<TableRow>
-								<TableCell colSpan={7} className='py-8 text-center'>
-									{t('common.loading')}
-								</TableCell>
-							</TableRow>
-						) : error ? (
-							<TableRow>
-								<TableCell
-									colSpan={7}
-									className='py-8 text-center text-destructive'>
-									{t('common.error')}: {error.message}
-								</TableCell>
-							</TableRow>
-						) : !couponsData?.data?.length ? (
-							<TableRow>
-								<TableCell
-									colSpan={7}
-									className='py-8 text-center text-muted-foreground'>
-									No coupons found
-								</TableCell>
-							</TableRow>
-						) : (
-							couponsData.data.map((coupon) => (
-								<TableRow key={coupon.id}>
-									<TableCell>
-										<div
-											className='flex cursor-pointer items-center gap-2 font-medium'
-											onClick={() => onCopyCode(coupon.id)}>
-											{coupon.id} <Copy className='size-4' />
-										</div>
-									</TableCell>
-									<TableCell>
-										<div className='font-medium'>{coupon.name}</div>
-									</TableCell>
-									<TableCell>
-										{coupon.percentOff
-											? `${coupon.percentOff}%`
-											: `$${(coupon.amountOff || 0) / 100}`}
-									</TableCell>
-									<TableCell>
-										<div>
-											<div className='font-medium capitalize'>
-												{coupon.duration}
-											</div>
-											{coupon.durationInMonths && (
-												<div className='text-sm text-muted-foreground'>
-													{coupon.durationInMonths} months
-												</div>
-											)}
-										</div>
-									</TableCell>
-									<TableCell>
-										<div>
-											<div className='font-medium'>
-												{coupon.timesRedeemed}
-											</div>
-											<div className='text-sm text-muted-foreground'>
-												{t('promotionCodes.table.redeemed')}
-											</div>
-										</div>
-									</TableCell>
-									<TableCell>
-										<CouponStatusBadge valid={coupon.valid} t={t} />
-									</TableCell>
-									<TableCell>{formatDate(coupon.created, locale)}</TableCell>
-								</TableRow>
-							))
-						)}
-					</TableBody>
-				</Table>
+				<div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+					{/* Created After Filter */}
+					<div className='space-y-2'>
+						<Label htmlFor='coupon-created-after'>
+							{t('coupons.filters.createdAfter.label')}
+						</Label>
+						<Input
+							id='coupon-created-after'
+							type='date'
+							value={
+								localFilters.created?.gte
+									? new Date(localFilters.created.gte * 1000)
+											.toISOString()
+											.split('T')[0]
+									: ''
+							}
+							onChange={(e) => handleCreatedDateChange('gte', e.target.value)}
+						/>
+					</div>
+
+					{/* Created Before Filter */}
+					<div className='space-y-2'>
+						<Label htmlFor='coupon-created-before'>
+							{t('coupons.filters.createdBefore.label')}
+						</Label>
+						<Input
+							id='coupon-created-before'
+							type='date'
+							value={
+								localFilters.created?.lte
+									? new Date(localFilters.created.lte * 1000)
+											.toISOString()
+											.split('T')[0]
+									: ''
+							}
+							onChange={(e) => handleCreatedDateChange('lte', e.target.value)}
+						/>
+					</div>
+				</div>
 			</CardContent>
 		</Card>
 	)
@@ -624,6 +615,146 @@ function PromotionCodesTable({ filters }: { filters: PromotionCodeFilters }) {
 	)
 }
 
+// Coupons Table Component
+function CouponsTable({ filters }: { filters: CouponFilters }) {
+	const t = useTranslations()
+	const locale = useLocale()
+	const { toast } = useToast()
+
+	const { data: couponsData, isLoading, error } = useCoupons(filters)
+
+	// Status badge component for coupons
+	const CouponStatusBadge = ({ valid, t }: { valid: boolean; t: any }) => {
+		return valid ? (
+			<Badge variant='default'>{t('promotionCodes.status.active')}</Badge>
+		) : (
+			<Badge variant='destructive'>{t('promotionCodes.status.inactive')}</Badge>
+		)
+	}
+
+	async function onCopyCode(code: string) {
+		const success = await copyTextToClipboard(code)
+		if (success) {
+			toast({
+				title: t('common.success'),
+				description: t('common.copiedSuccessfully'),
+				variant: 'default',
+			})
+		} else {
+			toast({
+				title: t('common.error'),
+				description: t('common.copiedFailed'),
+				variant: 'destructive',
+			})
+		}
+	}
+
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>{t('coupons.title')}</CardTitle>
+				<CardDescription>
+					{couponsData?.data && (
+						<span>
+							{t('coupons.summary', {
+								total: couponsData.data.length,
+								active: couponsData.data.filter((coupon) => coupon.valid).length,
+								inactive: couponsData.data.filter((coupon) => !coupon.valid).length,
+							})}
+						</span>
+					)}
+				</CardDescription>
+			</CardHeader>
+			<CardContent>
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>{t('coupons.table.id')}</TableHead>
+							<TableHead>{t('coupons.table.name')}</TableHead>
+							<TableHead>{t('coupons.table.discount')}</TableHead>
+							<TableHead>{t('coupons.table.duration')}</TableHead>
+							<TableHead>{t('coupons.table.usage')}</TableHead>
+							<TableHead>{t('coupons.table.status')}</TableHead>
+							<TableHead>{t('coupons.table.created')}</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{isLoading ? (
+							<TableRow>
+								<TableCell colSpan={7} className='py-8 text-center'>
+									{t('common.loading')}
+								</TableCell>
+							</TableRow>
+						) : error ? (
+							<TableRow>
+								<TableCell
+									colSpan={7}
+									className='py-8 text-center text-destructive'>
+									{t('common.error')}: {error.message}
+								</TableCell>
+							</TableRow>
+						) : !couponsData?.data?.length ? (
+							<TableRow>
+								<TableCell
+									colSpan={7}
+									className='py-8 text-center text-muted-foreground'>
+									{t('coupons.noCoupons')}
+								</TableCell>
+							</TableRow>
+						) : (
+							couponsData.data.map((coupon) => (
+								<TableRow key={coupon.id}>
+									<TableCell>
+										<div
+											className='flex cursor-pointer items-center gap-2 font-medium'
+											onClick={() => onCopyCode(coupon.id)}>
+											{coupon.id} <Copy className='size-4' />
+										</div>
+									</TableCell>
+									<TableCell>
+										<div className='font-medium'>{coupon.name}</div>
+									</TableCell>
+									<TableCell>
+										{coupon.percentOff
+											? `${coupon.percentOff}%`
+											: `$${(coupon.amountOff || 0) / 100}`}
+									</TableCell>
+									<TableCell>
+										<div>
+											<div className='font-medium capitalize'>
+												{coupon.duration}
+											</div>
+											{coupon.durationInMonths && (
+												<div className='text-sm text-muted-foreground'>
+													{coupon.durationInMonths} months
+												</div>
+											)}
+										</div>
+									</TableCell>
+									<TableCell>
+										<div>
+											<div className='font-medium'>
+												{coupon.timesRedeemed}
+											</div>
+											<div className='text-sm text-muted-foreground'>
+												{t('coupons.table.redeemed')}
+											</div>
+										</div>
+									</TableCell>
+									<TableCell>
+										<CouponStatusBadge valid={coupon.valid} t={t} />
+									</TableCell>
+									<TableCell>{formatDate(coupon.created, locale)}</TableCell>
+								</TableRow>
+							))
+						)}
+					</TableBody>
+				</Table>
+			</CardContent>
+		</Card>
+	)
+}
+
 // Main Page Component
 export default function PromotionCodesPage() {
 	const t = useTranslations()
@@ -631,8 +762,8 @@ export default function PromotionCodesPage() {
 	const router = useRouter()
 	const pathname = usePathname()
 
-	// Initialize filters from URL params
-	const [filters, setFilters] = useState<PromotionCodeFilters>(() => {
+	// Initialize promotion code filters from URL params
+	const [promotionCodeFilters, setPromotionCodeFilters] = useState<PromotionCodeFilters>(() => {
 		const initialFilters: PromotionCodeFilters = {}
 
 		const active = searchParams.get('active')
@@ -650,9 +781,25 @@ export default function PromotionCodesPage() {
 			initialFilters.coupon = coupon
 		}
 
-		// Handle created date filters
-		const createdGte = searchParams.get('created[gte]')
-		const createdLte = searchParams.get('created[lte]')
+		// Handle created date filters for promotion codes
+		const createdGte = searchParams.get('pc_created[gte]') // prefix for promotion codes
+		const createdLte = searchParams.get('pc_created[lte]')
+		if (createdGte || createdLte) {
+			initialFilters.created = {}
+			if (createdGte) initialFilters.created.gte = parseInt(createdGte)
+			if (createdLte) initialFilters.created.lte = parseInt(createdLte)
+		}
+
+		return initialFilters
+	})
+
+	// Initialize coupon filters from URL params
+	const [couponFilters, setCouponFilters] = useState<CouponFilters>(() => {
+		const initialFilters: CouponFilters = {}
+
+		// Handle created date filters for coupons
+		const createdGte = searchParams.get('c_created[gte]') // prefix for coupons
+		const createdLte = searchParams.get('c_created[lte]')
 		if (createdGte || createdLte) {
 			initialFilters.created = {}
 			if (createdGte) initialFilters.created.gte = parseInt(createdGte)
@@ -664,16 +811,24 @@ export default function PromotionCodesPage() {
 
 	// Use both hooks to get loading states
 	const { refetch: refetchPromotionCodes, isLoading: isLoadingPromotionCodes } =
-		usePromotionCodes(filters)
-	const { refetch: refetchCoupons, isLoading: isLoadingCoupons } = useCoupons()
+		usePromotionCodes(promotionCodeFilters)
+	const { refetch: refetchCoupons, isLoading: isLoadingCoupons } = useCoupons(couponFilters)
 
-	// Update URL when filters change
-	const handleFiltersChange = useCallback(
+	// Update URL when promotion code filters change
+	const handlePromotionCodeFiltersChange = useCallback(
 		(newFilters: PromotionCodeFilters) => {
-			setFilters(newFilters)
+			setPromotionCodeFilters(newFilters)
 
-			const params = new URLSearchParams()
+			const params = new URLSearchParams(searchParams.toString())
 
+			// Clear existing promotion code filter params
+			params.delete('active')
+			params.delete('code')
+			params.delete('coupon')
+			params.delete('pc_created[gte]')
+			params.delete('pc_created[lte]')
+
+			// Set new promotion code filter params
 			if (newFilters.active !== undefined) {
 				params.set('active', newFilters.active.toString())
 			}
@@ -684,23 +839,67 @@ export default function PromotionCodesPage() {
 				params.set('coupon', newFilters.coupon)
 			}
 			if (newFilters.created?.gte) {
-				params.set('created[gte]', newFilters.created.gte.toString())
+				params.set('pc_created[gte]', newFilters.created.gte.toString())
 			}
 			if (newFilters.created?.lte) {
-				params.set('created[lte]', newFilters.created.lte.toString())
+				params.set('pc_created[lte]', newFilters.created.lte.toString())
 			}
 
 			const queryString = params.toString()
 			router.push(`${pathname}${queryString ? `?${queryString}` : ''}`)
 		},
-		[router, pathname],
+		[router, pathname, searchParams],
 	)
 
-	// Clear all filters
-	const handleClearFilters = useCallback(() => {
-		setFilters({})
-		router.push(pathname)
-	}, [router, pathname])
+	// Update URL when coupon filters change
+	const handleCouponFiltersChange = useCallback(
+		(newFilters: CouponFilters) => {
+			setCouponFilters(newFilters)
+
+			const params = new URLSearchParams(searchParams.toString())
+
+			// Clear existing coupon filter params
+			params.delete('c_created[gte]')
+			params.delete('c_created[lte]')
+
+			// Set new coupon filter params
+			if (newFilters.created?.gte) {
+				params.set('c_created[gte]', newFilters.created.gte.toString())
+			}
+			if (newFilters.created?.lte) {
+				params.set('c_created[lte]', newFilters.created.lte.toString())
+			}
+
+			const queryString = params.toString()
+			router.push(`${pathname}${queryString ? `?${queryString}` : ''}`)
+		},
+		[router, pathname, searchParams],
+	)
+
+	// Clear promotion code filters
+	const handleClearPromotionCodeFilters = useCallback(() => {
+		setPromotionCodeFilters({})
+		const params = new URLSearchParams(searchParams.toString())
+		params.delete('active')
+		params.delete('code')
+		params.delete('coupon')
+		params.delete('pc_created[gte]')
+		params.delete('pc_created[lte]')
+
+		const queryString = params.toString()
+		router.push(`${pathname}${queryString ? `?${queryString}` : ''}`)
+	}, [router, pathname, searchParams])
+
+	// Clear coupon filters
+	const handleClearCouponFilters = useCallback(() => {
+		setCouponFilters({})
+		const params = new URLSearchParams(searchParams.toString())
+		params.delete('c_created[gte]')
+		params.delete('c_created[lte]')
+
+		const queryString = params.toString()
+		router.push(`${pathname}${queryString ? `?${queryString}` : ''}`)
+	}, [router, pathname, searchParams])
 
 	// Refresh all tables
 	const handleRefreshAll = () => {
@@ -732,16 +931,23 @@ export default function PromotionCodesPage() {
 
 			{/* Promotion Codes Filter Bar */}
 			<PromotionCodesFilterBar
-				filters={filters}
-				onFiltersChange={handleFiltersChange}
-				onClearFilters={handleClearFilters}
+				filters={promotionCodeFilters}
+				onFiltersChange={handlePromotionCodeFiltersChange}
+				onClearFilters={handleClearPromotionCodeFilters}
 			/>
 
 			{/* Promotion Codes Table */}
-			<PromotionCodesTable filters={filters} />
+			<PromotionCodesTable filters={promotionCodeFilters} />
+
+			{/* Coupons Filter Bar */}
+			<CouponsFilterBar
+				filters={couponFilters}
+				onFiltersChange={handleCouponFiltersChange}
+				onClearFilters={handleClearCouponFilters}
+			/>
 
 			{/* Coupons Table */}
-			<CouponsTable />
+			<CouponsTable filters={couponFilters} />
 		</div>
 	)
 }

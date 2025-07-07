@@ -442,6 +442,15 @@
 			"status": "Status",
 			"created": "Created",
 			"redeemed": "redeemed"
+		},
+		"filters": {
+			"title": "Filters",
+			"createdAfter": {
+				"label": "Created After"
+			},
+			"createdBefore": {
+				"label": "Created Before"
+			}
 		}
 	},
 	"pagination": {
