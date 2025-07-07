@@ -54,13 +54,10 @@ export async function getAuditLogs(filters: AuditLogFilters = {}): Promise<Audit
 	if (operation) params.append('operation', operation)
 	if (timeFrame) params.append('timeFrame', timeFrame)
 
-	const response = await fetchWithNgrok(
-		`${API_BASE_URL}/admins/audit-logs?${params.toString()}`,
-		{
-			method: 'GET',
-			headers: createAuthHeaders(),
-		},
-	)
+	const response = await fetchWithNgrok(`/admins/audit-logs?${params.toString()}`, {
+		method: 'GET',
+		headers: createAuthHeaders(),
+	})
 
 	if (!response.ok) {
 		throw new Error('Failed to fetch audit logs')

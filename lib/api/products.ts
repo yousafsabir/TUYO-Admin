@@ -87,12 +87,7 @@ export async function getAllProducts(
 	limit = 25,
 ): Promise<ApiResponse<ProductsListResponse>> {
 	try {
-		const response = await fetchWithNgrok(
-			`${API_BASE_URL}/products?page=${page}&limit=${limit}&sort=desc`,
-			{
-				headers: createAuthHeaders(),
-			},
-		)
+		const response = await fetchWithNgrok(`/products?page=${page}&limit=${limit}&sort=desc`)
 
 		if (!response.ok) {
 			throw new Error(`Failed to fetch products: ${response.status}`)
@@ -124,9 +119,8 @@ export async function updateProduct(
 				})()
 			: createAuthHeaders()
 
-		const response = await fetchWithNgrok(`${API_BASE_URL}/products/${productId}`, {
+		const response = await fetchWithNgrok(`/products/${productId}`, {
 			method: 'PATCH',
-			headers,
 			body: isFormData ? data : JSON.stringify(data),
 		})
 
@@ -147,14 +141,9 @@ export async function updateProduct(
 // Function to create a new product
 export async function createProduct(data: FormData): Promise<ApiResponse<Product>> {
 	try {
-		const headers = createAuthHeaders(false)
-		// Remove Content-Type completely for FormData
-		// @ts-ignore
-		delete headers['Content-Type']
-
-		const response = await fetchWithNgrok(`${API_BASE_URL}/products`, {
+		const response = await fetchWithNgrok(`/products`, {
 			method: 'POST',
-			headers,
+			headers: { 'Content-Type': 'multipart/form-data' },
 			body: data,
 		})
 
@@ -178,14 +167,9 @@ export async function updateProductFull(
 	data: FormData,
 ): Promise<ApiResponse<Product>> {
 	try {
-		const headers = createAuthHeaders(false)
-		// Remove Content-Type completely for FormData
-		// @ts-ignore
-		delete headers['Content-Type']
-
-		const response = await fetchWithNgrok(`${API_BASE_URL}/products/${productId}`, {
+		const response = await fetchWithNgrok(`/products/${productId}`, {
 			method: 'PATCH',
-			headers,
+			headers: { 'Content-Type': 'multipart/form-data' },
 			body: data,
 		})
 
@@ -206,9 +190,7 @@ export async function updateProductFull(
 // Function to get a single product by ID
 export async function getProductById(productId: number): Promise<ApiResponse<Product>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/products/${productId}`, {
-			headers: createAuthHeaders(),
-		})
+		const response = await fetchWithNgrok(`/products/${productId}`)
 
 		if (!response.ok) {
 			throw new Error(`Failed to fetch product: ${response.status}`)

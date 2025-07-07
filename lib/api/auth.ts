@@ -51,14 +51,11 @@ function removeAuthToken(): void {
 
 export async function loginUser(data: any) {
 	try {
-		const loginUrl = `${API_BASE_URL}/admins/login`
+		const loginUrl = `/admins/login`
 
 		// Use the updated endpoint: /admins/login
 		const response = await fetchWithNgrok(loginUrl, {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
 			body: JSON.stringify(data),
 		})
 
@@ -94,9 +91,7 @@ export async function loginUser(data: any) {
 // Add a function to check authentication status
 export async function checkAuthStatus(): Promise<ApiResponse<Admin>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/admins/me`, {
-			headers: createAuthHeaders(),
-		})
+		const response = await fetchWithNgrok(`/admins/me`)
 
 		if (!response.ok) {
 			throw new Error('Not authenticated')
@@ -111,12 +106,7 @@ export async function checkAuthStatus(): Promise<ApiResponse<Admin>> {
 // Add a function to get all admins with pagination
 export async function getAllAdmins(page = 1, limit = 25): Promise<ApiResponse<AdminsListResponse>> {
 	try {
-		const response = await fetchWithNgrok(
-			`${API_BASE_URL}/admins?page=${page}&limit=${limit}`,
-			{
-				headers: createAuthHeaders(),
-			},
-		)
+		const response = await fetchWithNgrok(`/admins?page=${page}&limit=${limit}`)
 
 		if (!response.ok) {
 			throw new Error(`Failed to fetch admins: ${response.status}`)
@@ -132,9 +122,8 @@ export async function getAllAdmins(page = 1, limit = 25): Promise<ApiResponse<Ad
 // Add a function to create a new admin
 export async function createAdmin(data: any): Promise<ApiResponse<Admin>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/admins`, {
+		const response = await fetchWithNgrok(`/admins`, {
 			method: 'POST',
-			headers: createAuthHeaders(),
 			body: JSON.stringify(data),
 		})
 
@@ -155,9 +144,8 @@ export async function createAdmin(data: any): Promise<ApiResponse<Admin>> {
 // Add a function to delete an admin
 export async function deleteAdmin(id: number): Promise<ApiResponse<null>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/admins/${id}`, {
+		const response = await fetchWithNgrok(`/admins/${id}`, {
 			method: 'DELETE',
-			headers: createAuthHeaders(),
 		})
 
 		if (!response.ok) {

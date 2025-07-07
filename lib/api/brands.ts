@@ -35,9 +35,7 @@ type DeleteBrandData = {
 // Function to get all brands
 export async function getAllBrands(): Promise<ApiResponse<Brand[]>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/brands`, {
-			headers: createAuthHeaders(),
-		})
+		const response = await fetchWithNgrok(`/store-config/brands`)
 
 		if (!response.ok) {
 			throw new Error(`Failed to fetch brands: ${response.status}`)
@@ -57,13 +55,9 @@ export async function createBrand(data: CreateBrandData): Promise<ApiResponse<Br
 		formData.append('name', data.name)
 		formData.append('image', data.image)
 
-		const headers = createAuthHeaders()
-		// Remove Content-Type header to let the browser set it with boundary for FormData
-		delete (headers as any)['Content-Type']
-
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/brands`, {
+		const response = await fetchWithNgrok(`/store-config/brands`, {
 			method: 'POST',
-			headers,
+			headers: { 'Content-Type': 'multipart/form-data' },
 			body: formData,
 		})
 
@@ -84,9 +78,8 @@ export async function createBrand(data: CreateBrandData): Promise<ApiResponse<Br
 // Function to update a brand
 export async function updateBrand(data: UpdateBrandData): Promise<ApiResponse<Brand>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/brands`, {
+		const response = await fetchWithNgrok(`/store-config/brands`, {
 			method: 'PATCH',
-			headers: createAuthHeaders(),
 			body: JSON.stringify(data),
 		})
 
@@ -107,9 +100,8 @@ export async function updateBrand(data: UpdateBrandData): Promise<ApiResponse<Br
 // Function to delete a brand
 export async function deleteBrand(data: DeleteBrandData): Promise<ApiResponse<null>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/brands`, {
+		const response = await fetchWithNgrok(`/store-config/brands`, {
 			method: 'DELETE',
-			headers: createAuthHeaders(),
 			body: JSON.stringify(data),
 		})
 

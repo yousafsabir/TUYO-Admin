@@ -33,9 +33,7 @@ type DeleteColorData = {
 // Function to get all colors
 export async function getAllColors(): Promise<ApiResponse<Color[]>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/colors`, {
-			headers: createAuthHeaders(),
-		})
+		const response = await fetchWithNgrok(`/store-config/colors`)
 
 		if (!response.ok) {
 			throw new Error(`Failed to fetch colors: ${response.status}`)
@@ -51,9 +49,8 @@ export async function getAllColors(): Promise<ApiResponse<Color[]>> {
 // Function to create a new color
 export async function createColor(data: CreateColorData): Promise<ApiResponse<Color>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/colors`, {
+		const response = await fetchWithNgrok(`/store-config/colors`, {
 			method: 'POST',
-			headers: createAuthHeaders(),
 			body: JSON.stringify(data),
 		})
 
@@ -74,9 +71,8 @@ export async function createColor(data: CreateColorData): Promise<ApiResponse<Co
 // Function to update a color
 export async function updateColor(data: UpdateColorData): Promise<ApiResponse<Color>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/colors`, {
+		const response = await fetchWithNgrok(`/store-config/colors`, {
 			method: 'PATCH',
-			headers: createAuthHeaders(),
 			body: JSON.stringify(data),
 		})
 
@@ -97,9 +93,8 @@ export async function updateColor(data: UpdateColorData): Promise<ApiResponse<Co
 // Function to delete a color
 export async function deleteColor(data: DeleteColorData): Promise<ApiResponse<null>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/colors`, {
+		const response = await fetchWithNgrok(`/store-config/colors`, {
 			method: 'DELETE',
-			headers: createAuthHeaders(),
 			body: JSON.stringify(data),
 		})
 

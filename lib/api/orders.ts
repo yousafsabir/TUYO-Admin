@@ -45,9 +45,8 @@ export async function getAllOrders(params: OrdersParams = {}): Promise<OrdersRes
 			limit: limit.toString(),
 		})
 
-		const response = await fetchWithNgrok(`${API_BASE_URL}/orders?${queryParams}`, {
+		const response = await fetchWithNgrok(`/orders?${queryParams}`, {
 			method: 'GET',
-			headers: createAuthHeaders(),
 		})
 
 		if (!response.ok) {

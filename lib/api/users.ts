@@ -41,13 +41,13 @@ export async function getAllUsers(
 ): Promise<ApiResponse<UsersListResponse>> {
 	try {
 		// Build the URL with query parameters
-		let url = `${API_BASE_URL}/users?page=${page}&limit=${limit}`
+		let url = `/users?page=${page}&limit=${limit}`
 		if (query && query.trim() !== '') {
 			url += `&query=${encodeURIComponent(query.trim())}`
 		}
 
 		const response = await fetchWithNgrok(url, {
-			headers: createAuthHeaders(),
+			method: 'GET',
 		})
 
 		if (!response.ok) {
@@ -64,9 +64,8 @@ export async function getAllUsers(
 // Function to toggle user's influencer status
 export async function toggleUserInfluencerStatus(userId: number): Promise<ApiResponse<User>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/users/toggle-influencer/${userId}`, {
+		const response = await fetchWithNgrok(`/users/toggle-influencer/${userId}`, {
 			method: 'PATCH',
-			headers: createAuthHeaders(),
 		})
 
 		if (!response.ok) {

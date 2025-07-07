@@ -34,13 +34,9 @@ interface SubscriptionsResponse {
 
 export async function getSubscriptions(page = 1, limit = 25): Promise<SubscriptionsResponse> {
 	try {
-		const response = await fetchWithNgrok(
-			`${API_BASE_URL}/users/subscriptions?page=${page}&limit=${limit}`,
-			{
-				method: 'GET',
-				headers: createAuthHeaders(),
-			},
-		)
+		const response = await fetchWithNgrok(`/users/subscriptions?page=${page}&limit=${limit}`, {
+			method: 'GET',
+		})
 
 		if (!response.ok) {
 			throw new Error(`Failed to fetch subscriptions: ${response.status}`)

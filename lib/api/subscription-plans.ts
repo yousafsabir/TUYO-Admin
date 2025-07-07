@@ -49,9 +49,7 @@ type UpdateSubscriptionPlanData = {
 // Function to get all subscription plans
 export async function getAllSubscriptionPlans(): Promise<ApiResponse<SubscriptionPlan[]>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/subscription-plans`, {
-			headers: createAuthHeaders(),
-		})
+		const response = await fetchWithNgrok(`/store-config/subscription-plans`)
 
 		if (!response.ok) {
 			throw new Error(`Failed to fetch subscription plans: ${response.status}`)
@@ -69,9 +67,8 @@ export async function updateSubscriptionPlan(
 	data: UpdateSubscriptionPlanData,
 ): Promise<ApiResponse<SubscriptionPlan>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/subscription-plans`, {
+		const response = await fetchWithNgrok(`/store-config/subscription-plans`, {
 			method: 'PATCH',
-			headers: createAuthHeaders(),
 			body: JSON.stringify(data),
 		})
 

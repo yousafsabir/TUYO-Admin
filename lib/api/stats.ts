@@ -19,9 +19,7 @@ type ServerStats = {
 export async function getServerStats(): Promise<ApiResponse<ServerStats>> {
 	try {
 		// Updated URL from /server-stats to /store-stats
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-stats`, {
-			headers: createAuthHeaders(),
-		})
+		const response = await fetchWithNgrok(`/store-stats`)
 
 		if (!response.ok) {
 			throw new Error(`Failed to fetch store stats: ${response.status}`)

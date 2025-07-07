@@ -67,12 +67,7 @@ export async function getAllCategoriesSubcategories(): Promise<
 	ApiResponse<CategoriesSubcategories>
 > {
 	try {
-		const response = await fetchWithNgrok(
-			`${API_BASE_URL}/store-config/categories-subcategories`,
-			{
-				headers: createAuthHeaders(),
-			},
-		)
+		const response = await fetchWithNgrok('/store-config/categories-subcategories')
 
 		if (!response.ok) {
 			throw new Error(`Failed to fetch categories and subcategories: ${response.status}`)

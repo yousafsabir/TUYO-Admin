@@ -9,9 +9,8 @@ interface DbTablesResponse {
 }
 
 export async function getDbTables(): Promise<DbTablesResponse> {
-	const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/db-tables`, {
+	const response = await fetchWithNgrok(`/store-config/db-tables`, {
 		method: 'GET',
-		headers: createAuthHeaders(),
 	})
 
 	if (!response.ok) {
