@@ -389,6 +389,9 @@
 		"description": "Manage promotion codes and discount coupons for your store.",
 		"noPromotionCodes": "No promotion codes found",
 		"summary": "Showing {total} promotion codes ({active} active, {expired} expired)",
+		"addPromotionCode": "Add Promotion Code",
+		"addPromotionCodeDescription": "Create a new promotion code for an existing coupon.",
+		"createSuccess": "Promotion code created successfully",
 		"table": {
 			"code": "Code",
 			"coupon": "Coupon",
@@ -426,6 +429,43 @@
 			},
 			"createdBefore": {
 				"label": "Created Before"
+			}
+		},
+		"form": {
+			"coupon": {
+				"label": "Coupon ID",
+				"placeholder": "Enter the coupon ID..."
+			},
+			"code": {
+				"label": "Promotion Code",
+				"placeholder": "Enter custom code or leave blank for auto-generation",
+				"note": "Leave blank to auto-generate a unique code"
+			},
+			"active": {
+				"label": "Status"
+			},
+			"appliesTo": {
+				"label": "Applies To",
+				"all": "All",
+				"products": "Products",
+				"subscriptions": "Subscriptions"
+			},
+			"maxRedemptions": {
+				"label": "Max Redemptions",
+				"placeholder": "Enter maximum number of uses",
+				"note": "Leave blank for unlimited uses"
+			},
+			"expiresAt": {
+				"label": "Expires At",
+				"note": "Leave blank for no expiration"
+			},
+			"firstTimeTransaction": {
+				"label": "First-time customers only"
+			},
+			"minimumAmount": {
+				"label": "Minimum Amount ($)",
+				"placeholder": "Enter minimum order amount",
+				"note": "Minimum order amount required to use this code"
 			}
 		}
 	},

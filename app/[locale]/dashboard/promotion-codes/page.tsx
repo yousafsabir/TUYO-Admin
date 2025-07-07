@@ -163,7 +163,23 @@ const updateCouponSchema = z.object({
 
 type UpdateCouponFormData = z.infer<typeof updateCouponSchema>
 
-// Custom hooks
+// Schemas for Promotion Codes
+const promoAppliesToSchema = z.enum(['products', 'subscriptions', 'all'])
+type PromoAppliesTo = z.infer<typeof promoAppliesToSchema>
+
+const createPromotionCodeSchema = z.object({
+	coupon: z.string().min(1, 'Coupon ID is required'),
+	code: z.string().max(50).optional(),
+	active: z.boolean().optional(),
+	maxRedemptions: z.coerce.number().optional(),
+	expiresAt: z.number().optional(),
+	firstTimeTransaction: z.boolean().optional(),
+	minimumAmount: z.coerce.number().optional(),
+	appliesTo: promoAppliesToSchema,
+})
+
+// Promotion Codes
+// Get Promotion Codes Query
 const usePromotionCodes = (filters: PromotionCodeFilters = {}) => {
 	return useQuery<ApiResponse<PromotionCode[]>>({
 		queryKey: ['promotion-codes', filters],
@@ -199,6 +215,49 @@ const usePromotionCodes = (filters: PromotionCodeFilters = {}) => {
 	})
 }
 
+// Create Promotion Code Mutation
+const useCreatePromotionCode = () => {
+	const queryClient = useQueryClient()
+	const { toast } = useToast()
+	const t = useTranslations()
+
+	return useMutation({
+		mutationFn: async (data: any) => {
+			const response = await fetchWithNgrok('/stripe/promotion-codes', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(data),
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.message || 'Failed to create promotion code')
+			}
+
+			return response.json()
+		},
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({ queryKey: ['promotion-codes'] })
+			toast({
+				title: t('common.success'),
+				description: t('promotionCodes.createSuccess'),
+				variant: 'default',
+			})
+		},
+		onError: (error: Error) => {
+			toast({
+				title: t('common.error'),
+				description: error.message,
+				variant: 'destructive',
+			})
+		},
+	})
+}
+
+// Coupons
+// Get Coupons Query
 const useCoupons = (filters: CouponFilters = {}) => {
 	return useQuery<ApiResponse<Coupon[]>>({
 		queryKey: ['coupons', filters],
@@ -313,6 +372,243 @@ const formatDate = (timestamp: number, locale: Locale) => {
 		month: 'short',
 		day: 'numeric',
 	})
+}
+
+// Add Promotion Code Modal
+function AddPromotionCodeModal() {
+	const t = useTranslations()
+	const [open, setOpen] = useState(false)
+	const createPromotionCodeMutation = useCreatePromotionCode()
+
+	const form = useForm({
+		resolver: zodResolver(createPromotionCodeSchema),
+		defaultValues: {
+			coupon: '',
+			code: '',
+			active: true,
+			maxRedemptions: undefined,
+			expiresAt: undefined,
+			firstTimeTransaction: false,
+			minimumAmount: undefined,
+			appliesTo: 'all',
+		},
+	})
+
+	const watchedActive = form.watch('active')
+	const watchedFirstTimeTransaction = form.watch('firstTimeTransaction')
+
+	const onSubmit = async (data: any) => {
+		try {
+			await createPromotionCodeMutation.mutateAsync(data)
+			form.reset()
+			setOpen(false)
+		} catch (error) {
+			// Error is handled by the mutation
+		}
+	}
+
+	const handleExpiresAtChange = (dateString: string) => {
+		if (dateString) {
+			const timestamp = Math.floor(new Date(dateString).getTime() / 1000)
+			form.setValue('expiresAt', timestamp)
+		} else {
+			form.setValue('expiresAt', undefined)
+		}
+	}
+
+	return (
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogTrigger asChild>
+				<Button className='gap-2'>
+					<Plus className='h-4 w-4' />
+					{t('promotionCodes.addPromotionCode')}
+				</Button>
+			</DialogTrigger>
+			<DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-[500px]'>
+				<DialogHeader>
+					<DialogTitle>{t('promotionCodes.addPromotionCode')}</DialogTitle>
+					<DialogDescription>
+						{t('promotionCodes.addPromotionCodeDescription')}
+					</DialogDescription>
+				</DialogHeader>
+				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+					<div className='space-y-4'>
+						{/* Coupon ID */}
+						<div className='space-y-2'>
+							<Label htmlFor='promo-coupon'>
+								{t('promotionCodes.form.coupon.label')}
+							</Label>
+							<Input
+								id='promo-coupon'
+								placeholder={t('promotionCodes.form.coupon.placeholder')}
+								{...form.register('coupon')}
+							/>
+							{form.formState.errors.coupon && (
+								<p className='text-sm text-destructive'>
+									{form.formState.errors.coupon.message}
+								</p>
+							)}
+						</div>
+
+						{/* Promotion Code */}
+						<div className='space-y-2'>
+							<Label htmlFor='promo-code'>
+								{t('promotionCodes.form.code.label')}
+							</Label>
+							<Input
+								id='promo-code'
+								placeholder={t('promotionCodes.form.code.placeholder')}
+								{...form.register('code')}
+							/>
+							<p className='text-sm text-muted-foreground'>
+								{t('promotionCodes.form.code.note')}
+							</p>
+							{form.formState.errors.code && (
+								<p className='text-sm text-destructive'>
+									{form.formState.errors.code.message}
+								</p>
+							)}
+						</div>
+
+						{/* Active Status */}
+						<div className='space-y-2'>
+							<Label htmlFor='promo-active'>
+								{t('promotionCodes.form.active.label')}
+							</Label>
+							<Select
+								value={form.watch('active')?.toString() || 'true'}
+								onValueChange={(value) =>
+									form.setValue('active', value === 'true')
+								}>
+								<SelectTrigger id='promo-active'>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value='true'>
+										{t('promotionCodes.status.active')}
+									</SelectItem>
+									<SelectItem value='false'>
+										{t('promotionCodes.status.inactive')}
+									</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+
+						{/* Applies To */}
+						<div className='space-y-2'>
+							<Label htmlFor='promo-applies-to'>
+								{t('promotionCodes.form.appliesTo.label')}
+							</Label>
+							<Select
+								value={form.watch('appliesTo')}
+								onValueChange={(value) =>
+									form.setValue('appliesTo', value as PromoAppliesTo)
+								}>
+								<SelectTrigger id='promo-applies-to'>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value='all'>
+										{t('promotionCodes.form.appliesTo.all')}
+									</SelectItem>
+									<SelectItem value='products'>
+										{t('promotionCodes.form.appliesTo.products')}
+									</SelectItem>
+									<SelectItem value='subscriptions'>
+										{t('promotionCodes.form.appliesTo.subscriptions')}
+									</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+
+						{/* Max Redemptions */}
+						<div className='space-y-2'>
+							<Label htmlFor='promo-max-redemptions'>
+								{t('promotionCodes.form.maxRedemptions.label')}
+							</Label>
+							<Input
+								id='promo-max-redemptions'
+								type='number'
+								min='1'
+								placeholder={t('promotionCodes.form.maxRedemptions.placeholder')}
+								{...form.register('maxRedemptions')}
+							/>
+							<p className='text-sm text-muted-foreground'>
+								{t('promotionCodes.form.maxRedemptions.note')}
+							</p>
+							{form.formState.errors.maxRedemptions && (
+								<p className='text-sm text-destructive'>
+									{form.formState.errors.maxRedemptions.message}
+								</p>
+							)}
+						</div>
+
+						{/* Expires At */}
+						<div className='space-y-2'>
+							<Label htmlFor='promo-expires-at'>
+								{t('promotionCodes.form.expiresAt.label')}
+							</Label>
+							<Input
+								id='promo-expires-at'
+								type='datetime-local'
+								onChange={(e) => handleExpiresAtChange(e.target.value)}
+							/>
+							<p className='text-sm text-muted-foreground'>
+								{t('promotionCodes.form.expiresAt.note')}
+							</p>
+						</div>
+
+						{/* First Time Transaction */}
+						<div className='flex items-center space-x-2'>
+							<input
+								id='promo-first-time'
+								type='checkbox'
+								className='rounded border-gray-300'
+								{...form.register('firstTimeTransaction')}
+							/>
+							<Label htmlFor='promo-first-time' className='text-sm font-normal'>
+								{t('promotionCodes.form.firstTimeTransaction.label')}
+							</Label>
+						</div>
+
+						{/* Minimum Amount */}
+						<div className='space-y-2'>
+							<Label htmlFor='promo-minimum-amount'>
+								{t('promotionCodes.form.minimumAmount.label')}
+							</Label>
+							<Input
+								id='promo-minimum-amount'
+								type='number'
+								min='0'
+								step='0.01'
+								placeholder={t('promotionCodes.form.minimumAmount.placeholder')}
+								{...form.register('minimumAmount')}
+							/>
+							<p className='text-sm text-muted-foreground'>
+								{t('promotionCodes.form.minimumAmount.note')}
+							</p>
+							{form.formState.errors.minimumAmount && (
+								<p className='text-sm text-destructive'>
+									{form.formState.errors.minimumAmount.message}
+								</p>
+							)}
+						</div>
+					</div>
+
+					<div className='flex justify-end gap-2'>
+						<Button type='button' variant='outline' onClick={() => setOpen(false)}>
+							{t('common.cancel')}
+						</Button>
+						<Button type='submit' disabled={createPromotionCodeMutation.isPending}>
+							{createPromotionCodeMutation.isPending
+								? t('common.creating')
+								: t('common.create')}
+						</Button>
+					</div>
+				</form>
+			</DialogContent>
+		</Dialog>
+	)
 }
 
 // Add Coupon Modal Component
@@ -932,6 +1228,7 @@ function CouponsFilterBar({
 }
 
 // Promotion Codes Table Component
+// Promotion Codes Table Component
 function PromotionCodesTable({ filters }: { filters: PromotionCodeFilters }) {
 	const t = useTranslations()
 	const locale = useLocale()
@@ -973,21 +1270,27 @@ function PromotionCodesTable({ filters }: { filters: PromotionCodeFilters }) {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>{t('promotionCodes.title')}</CardTitle>
-				<CardDescription>
-					{promotionCodesData?.data && (
-						<span>
-							{t('promotionCodes.summary', {
-								total: promotionCodesData.data.length,
-								active: promotionCodesData.data.filter((code) => code.status.usable)
-									.length,
-								expired: promotionCodesData.data.filter(
-									(code) => code.status.expired,
-								).length,
-							})}
-						</span>
-					)}
-				</CardDescription>
+				<div className='flex items-center justify-between'>
+					<div>
+						<CardTitle>{t('promotionCodes.title')}</CardTitle>
+						<CardDescription>
+							{promotionCodesData?.data && (
+								<span>
+									{t('promotionCodes.summary', {
+										total: promotionCodesData.data.length,
+										active: promotionCodesData.data.filter(
+											(code) => code.status.usable,
+										).length,
+										expired: promotionCodesData.data.filter(
+											(code) => code.status.expired,
+										).length,
+									})}
+								</span>
+							)}
+						</CardDescription>
+					</div>
+					<AddPromotionCodeModal />
+				</div>
 			</CardHeader>
 			<CardContent>
 				<Table>
