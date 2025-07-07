@@ -109,18 +109,11 @@ export async function updateProduct(
 		const isFormData = data instanceof FormData
 
 		// For FormData, create headers without Content-Type
-		const headers = isFormData
-			? (() => {
-					const authHeaders = createAuthHeaders(false)
-					// Remove Content-Type completely for FormData
-					// @ts-ignore
-					delete authHeaders['Content-Type']
-					return authHeaders
-				})()
-			: createAuthHeaders()
+		const headers = isFormData ? { 'Content-Type': 'multipart/form-data' } : undefined
 
 		const response = await fetchWithNgrok(`/products/${productId}`, {
 			method: 'PATCH',
+			headers,
 			body: isFormData ? data : JSON.stringify(data),
 		})
 
