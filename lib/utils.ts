@@ -46,3 +46,25 @@ export function setLocale(locale: (typeof availableLocales)[number]) {
 		})
 	}
 }
+
+export async function copyTextToClipboard(textToCopy: string) {
+	try {
+		await navigator.clipboard.writeText(textToCopy)
+		return true // Indicate success
+	} catch (err) {
+		// Fallback for older browsers or environments where Clipboard API is not available/permitted
+		// This fallback involves creating a temporary textarea, selecting its content, and using execCommand('copy')
+		const tempTextArea = document.createElement('textarea')
+		tempTextArea.value = textToCopy
+		document.body.appendChild(tempTextArea)
+		tempTextArea.select()
+		try {
+			document.execCommand('copy')
+			document.body.removeChild(tempTextArea)
+			return true // Indicate success
+		} catch (execErr) {
+			document.body.removeChild(tempTextArea)
+			return false // Indicate failure
+		}
+	}
+}
