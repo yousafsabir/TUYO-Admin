@@ -21,7 +21,7 @@ import ProductImages, { type UploadedImage } from './product-images'
 import type { Product } from '@/lib/api/products'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
-import { xxHash } from '@/lib/utils/xxhash'
+import { xxHash } from '@/lib/utils'
 import { imageUrl } from '@/lib/utils'
 import { useTranslations } from 'use-intl'
 

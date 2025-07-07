@@ -5,7 +5,7 @@ import type React from 'react'
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -19,10 +19,12 @@ import {
 	Settings,
 	CreditCard,
 	ShoppingCart,
+	Tag,
 } from 'lucide-react'
 
 export function DashboardSidebar() {
 	const pathname = usePathname()
+	const locale = useLocale()
 	const [open, setOpen] = useState(false)
 	const t = useTranslations()
 
@@ -31,43 +33,41 @@ export function DashboardSidebar() {
 			label: t('navigation.dashboard') || 'Dashboard',
 			icon: LayoutDashboard,
 			href: `/dashboard`,
-			active: pathname === `/dashboard`,
 		},
 		{
 			label: t('navigation.admins') || 'Admins',
 			icon: UserCog,
 			href: `/dashboard/admins`,
-			active: pathname === `/dashboard/admins`,
 		},
 		{
 			label: t('navigation.users') || 'Users',
 			icon: Users,
 			href: `/dashboard/users`,
-			active: pathname === `/dashboard/users`,
 		},
 		{
 			label: t('navigation.products') || 'Products',
 			icon: Package,
 			href: `/dashboard/products`,
-			active: pathname.startsWith(`/dashboard/products`),
+		},
+		{
+			label: t('navigation.promotion-codes') || 'Promotion Codes',
+			icon: Tag,
+			href: `/dashboard/promotion-codes`,
 		},
 		{
 			label: t('navigation.orders') || 'Orders',
 			icon: ShoppingCart,
 			href: `/dashboard/orders`,
-			active: pathname === `/dashboard/orders`,
 		},
 		{
 			label: t('navigation.subscriptions') || 'Subscriptions',
 			icon: CreditCard,
 			href: `/dashboard/subscriptions`,
-			active: pathname === `/dashboard/subscriptions`,
 		},
 		{
 			label: t('navigation.storeConfiguration') || 'Store Configuration',
 			icon: Settings,
 			href: `/dashboard/store-configuration`,
-			active: pathname === `/dashboard/store-configuration`,
 		},
 	]
 
@@ -100,7 +100,7 @@ export function DashboardSidebar() {
 									href={route.href}
 									className={cn(
 										'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-										route.active
+										pathname === '/' + locale + route.href
 											? 'bg-primary text-primary-foreground'
 											: 'text-muted-foreground hover:bg-muted hover:text-foreground',
 									)}>
@@ -121,12 +121,13 @@ interface MobileSidebarProps {
 		label: string
 		icon: React.ElementType
 		href: string
-		active: boolean
 	}[]
 	setOpen: (open: boolean) => void
 }
 
 function MobileSidebar({ routes, setOpen }: MobileSidebarProps) {
+	const pathname = usePathname()
+	const locale = useLocale()
 	return (
 		<div className='flex h-full flex-col bg-background'>
 			<div className='border-b px-6 py-4'>
@@ -140,7 +141,7 @@ function MobileSidebar({ routes, setOpen }: MobileSidebarProps) {
 							href={route.href}
 							className={cn(
 								'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-								route.active
+								pathname === '/' + locale + route.href
 									? 'bg-primary text-primary-foreground'
 									: 'text-muted-foreground hover:bg-muted hover:text-foreground',
 							)}

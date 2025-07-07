@@ -20,7 +20,20 @@
 		"close": "Close",
 		"update": "Update",
 		"updating": "Updating...",
-		"actions": "Actions"
+		"actions": "Actions",
+		"refresh": "Refresh"
+	},
+	"navigation": {
+		"dashboard": "Dashboard",
+		"admins": "Admins",
+		"users": "Users",
+		"products": "Products",
+		"promotion-codes": "Promotion Codes",
+		"orders": "Orders",
+		"subscriptions": "Subscriptions",
+		"logout": "Logout",
+		"storeConfiguration": "Store Configuration",
+		"auditLogs": "Audit Logs"
 	},
 	"login": {
 		"title": "Login to Tuyo Panel",
@@ -56,17 +69,6 @@
 		"latestActions": "Latest actions performed in the system",
 		"noActivity": "No recent activity to display",
 		"loading": "Loading..."
-	},
-	"navigation": {
-		"dashboard": "Dashboard",
-		"admins": "Admins",
-		"users": "Users",
-		"products": "Products",
-		"orders": "Orders",
-		"subscriptions": "Subscriptions",
-		"logout": "Logout",
-		"storeConfiguration": "Store Configuration",
-		"auditLogs": "Audit Logs"
 	},
 	"theme": {
 		"light": "Light",
@@ -378,6 +380,29 @@
 		"deleteColorWarning": "This action cannot be undone.",
 		"colorDeleted": "Color deleted",
 		"colorDeletedDescription": "The color has been deleted successfully."
+	},
+	"promotionCodes": {
+		"title": "Promotion Codes",
+		"description": "Manage promotion codes and discount coupons for your store.",
+		"noPromotionCodes": "No promotion codes found",
+		"summary": "Showing {total} promotion codes ({active} active, {expired} expired)",
+		"table": {
+			"code": "Code",
+			"coupon": "Coupon",
+			"discount": "Discount",
+			"usage": "Usage",
+			"status": "Status",
+			"created": "Created",
+			"expires": "Expires",
+			"redeemed": "redeemed",
+			"noExpiry": "No expiry"
+		},
+		"status": {
+			"active": "Active",
+			"inactive": "Inactive",
+			"expired": "Expired",
+			"exhausted": "Exhausted"
+		}
 	},
 	"pagination": {
 		"prev": "Previous",

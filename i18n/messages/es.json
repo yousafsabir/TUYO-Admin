@@ -20,7 +20,20 @@
 		"close": "Cerrar",
 		"update": "Actualizar",
 		"updating": "Actualizando...",
-		"actions": "Acciones"
+		"actions": "Acciones",
+		"refresh": "refrescar"
+	},
+	"navigation": {
+		"dashboard": "Panel de control",
+		"admins": "Administradores",
+		"users": "Usuarios",
+		"products": "Productos",
+		"promotion-codes": "Códigos de promoción",
+		"orders": "Pedidos",
+		"subscriptions": "Suscripciones",
+		"logout": "Cerrar sesión",
+		"storeConfiguration": "Configuración de tienda",
+		"auditLogs": "Registros de auditoría"
 	},
 	"login": {
 		"title": "Iniciar sesión en el Panel de Tuyo",
@@ -56,17 +69,6 @@
 		"latestActions": "Últimas acciones realizadas en el sistema",
 		"noActivity": "No hay actividad reciente para mostrar",
 		"loading": "Cargando..."
-	},
-	"navigation": {
-		"dashboard": "Panel de control",
-		"admins": "Administradores",
-		"users": "Usuarios",
-		"products": "Productos",
-		"orders": "Pedidos",
-		"subscriptions": "Suscripciones",
-		"logout": "Cerrar sesión",
-		"storeConfiguration": "Configuración de tienda",
-		"auditLogs": "Registros de auditoría"
 	},
 	"theme": {
 		"light": "Claro",
@@ -377,6 +379,29 @@
 		"deleteColorWarning": "Esta acción no se puede deshacer.",
 		"colorDeleted": "Color eliminado",
 		"colorDeletedDescription": "El color ha sido eliminado exitosamente."
+	},
+	"promotionCodes": {
+		"title": "Códigos de promoción",
+		"description": "Gestionar códigos de promoción y cupones de descuento para tu tienda.",
+		"noPromotionCodes": "No se encontraron códigos de promoción",
+		"summary": "Mostrando {total} códigos de promoción ({active} activos, {expired} expirados)",
+		"table": {
+			"code": "Código",
+			"coupon": "Cupón",
+			"discount": "Descuento",
+			"usage": "Uso",
+			"status": "Estado",
+			"created": "Creado",
+			"expires": "Expira",
+			"redeemed": "canjeado",
+			"noExpiry": "Sin expiración"
+		},
+		"status": {
+			"active": "Activo",
+			"inactive": "Inactivo",
+			"expired": "Expirado",
+			"exhausted": "Agotado"
+		}
 	},
 	"pagination": {
 		"prev": "Anterior",
