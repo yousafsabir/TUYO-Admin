@@ -15,9 +15,19 @@ import {
 	TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Copy, RefreshCw } from 'lucide-react'
-import React from 'react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
+import { Copy, RefreshCw, Filter, X } from 'lucide-react'
+import React, { useState, useCallback } from 'react'
 import { useToast } from '@/components/ui/use-toast'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 
 // TypeScript types
 type PromotionCode = {
@@ -74,12 +84,46 @@ type ApiResponse<T> = {
 	data: T
 }
 
+type PromotionCodeFilters = {
+	active?: boolean
+	code?: string
+	coupon?: string
+	created?: {
+		gt?: number
+		gte?: number
+		lt?: number
+		lte?: number
+	}
+}
+
 // Custom hooks
-const usePromotionCodes = () => {
+const usePromotionCodes = (filters: PromotionCodeFilters = {}) => {
 	return useQuery<ApiResponse<PromotionCode[]>>({
-		queryKey: ['promotion-codes'],
+		queryKey: ['promotion-codes', filters],
 		queryFn: async () => {
-			const response = await fetchWithNgrok('/stripe/promotion-codes')
+			const params = new URLSearchParams()
+
+			// Add filter params
+			if (filters.active !== undefined) {
+				params.append('active', filters.active.toString())
+			}
+			if (filters.code) {
+				params.append('code', filters.code)
+			}
+			if (filters.coupon) {
+				params.append('coupon', filters.coupon)
+			}
+			if (filters.created) {
+				if (filters.created.gt) params.append('created[gt]', filters.created.gt.toString())
+				if (filters.created.gte)
+					params.append('created[gte]', filters.created.gte.toString())
+				if (filters.created.lt) params.append('created[lt]', filters.created.lt.toString())
+				if (filters.created.lte)
+					params.append('created[lte]', filters.created.lte.toString())
+			}
+
+			const url = `/stripe/promotion-codes${params.toString() ? `?${params.toString()}` : ''}`
+			const response = await fetchWithNgrok(url)
 			if (!response.ok) {
 				throw new Error('Failed to fetch promotion codes')
 			}
@@ -108,6 +152,184 @@ const formatDate = (timestamp: number, locale: Locale) => {
 		month: 'short',
 		day: 'numeric',
 	})
+}
+
+// Promotion Codes Filter Bar Component
+function PromotionCodesFilterBar({
+	filters,
+	onFiltersChange,
+	onClearFilters,
+}: {
+	filters: PromotionCodeFilters
+	onFiltersChange: (filters: PromotionCodeFilters) => void
+	onClearFilters: () => void
+}) {
+	const t = useTranslations()
+	const [localFilters, setLocalFilters] = useState<PromotionCodeFilters>(filters)
+
+	const handleFilterChange = useCallback(
+		(key: keyof PromotionCodeFilters, value: any) => {
+			const newFilters = { ...localFilters, [key]: value }
+			setLocalFilters(newFilters)
+			onFiltersChange(newFilters)
+		},
+		[localFilters, onFiltersChange],
+	)
+
+	const handleCreatedDateChange = useCallback(
+		(type: 'gt' | 'gte' | 'lt' | 'lte', value: string) => {
+			const timestamp = value ? new Date(value).getTime() / 1000 : undefined
+			const newCreated = { ...localFilters.created, [type]: timestamp }
+
+			// Remove undefined values
+			Object.keys(newCreated).forEach((key) => {
+				if (newCreated[key as keyof typeof newCreated] === undefined) {
+					delete newCreated[key as keyof typeof newCreated]
+				}
+			})
+
+			const newFilters = {
+				...localFilters,
+				created: Object.keys(newCreated).length > 0 ? newCreated : undefined,
+			}
+			setLocalFilters(newFilters)
+			onFiltersChange(newFilters)
+		},
+		[localFilters, onFiltersChange],
+	)
+
+	const hasActiveFilters = Object.keys(filters).some((key) => {
+		const value = filters[key as keyof PromotionCodeFilters]
+		return value !== undefined && value !== null && value !== ''
+	})
+
+	return (
+		<Card>
+			<CardHeader>
+				<div className='flex items-center justify-between'>
+					<div className='flex items-center gap-2'>
+						<Filter className='h-4 w-4' />
+						<CardTitle className='text-lg'>
+							{t('promotionCodes.filters.title')}
+						</CardTitle>
+					</div>
+					{hasActiveFilters && (
+						<Button
+							variant='ghost'
+							size='sm'
+							onClick={onClearFilters}
+							className='gap-2'>
+							<X className='h-4 w-4' />
+							{t('common.clear')}
+						</Button>
+					)}
+				</div>
+			</CardHeader>
+			<CardContent>
+				<div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
+					{/* Active Status Filter */}
+					<div className='space-y-2'>
+						<Label htmlFor='active-filter'>
+							{t('promotionCodes.filters.status.label')}
+						</Label>
+						<Select
+							value={localFilters.active?.toString() || 'all'}
+							onValueChange={(value) =>
+								handleFilterChange(
+									'active',
+									value === 'all' ? undefined : value === 'true',
+								)
+							}>
+							<SelectTrigger id='active-filter'>
+								<SelectValue
+									placeholder={t('promotionCodes.filters.status.placeholder')}
+								/>
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value='all'>
+									{t('promotionCodes.filters.status.all')}
+								</SelectItem>
+								<SelectItem value='true'>
+									{t('promotionCodes.status.active')}
+								</SelectItem>
+								<SelectItem value='false'>
+									{t('promotionCodes.status.inactive')}
+								</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+
+					{/* Code Filter */}
+					<div className='space-y-2'>
+						<Label htmlFor='code-filter'>
+							{t('promotionCodes.filters.code.label')}
+						</Label>
+						<Input
+							id='code-filter'
+							placeholder={t('promotionCodes.filters.code.placeholder')}
+							value={localFilters.code || ''}
+							onChange={(e) =>
+								handleFilterChange('code', e.target.value || undefined)
+							}
+						/>
+					</div>
+
+					{/* Coupon Filter */}
+					<div className='space-y-2'>
+						<Label htmlFor='coupon-filter'>
+							{t('promotionCodes.filters.coupon.label')}
+						</Label>
+						<Input
+							id='coupon-filter'
+							placeholder={t('promotionCodes.filters.coupon.placeholder')}
+							value={localFilters.coupon || ''}
+							onChange={(e) =>
+								handleFilterChange('coupon', e.target.value || undefined)
+							}
+						/>
+					</div>
+
+					{/* Created After Filter */}
+					<div className='space-y-2'>
+						<Label htmlFor='created-after'>
+							{t('promotionCodes.filters.createdAfter.label')}
+						</Label>
+						<Input
+							id='created-after'
+							type='date'
+							value={
+								localFilters.created?.gte
+									? new Date(localFilters.created.gte * 1000)
+											.toISOString()
+											.split('T')[0]
+									: ''
+							}
+							onChange={(e) => handleCreatedDateChange('gte', e.target.value)}
+						/>
+					</div>
+
+					{/* Created Before Filter */}
+					<div className='space-y-2'>
+						<Label htmlFor='created-before'>
+							{t('promotionCodes.filters.createdBefore.label')}
+						</Label>
+						<Input
+							id='created-before'
+							type='date'
+							value={
+								localFilters.created?.lte
+									? new Date(localFilters.created.lte * 1000)
+											.toISOString()
+											.split('T')[0]
+									: ''
+							}
+							onChange={(e) => handleCreatedDateChange('lte', e.target.value)}
+						/>
+					</div>
+				</div>
+			</CardContent>
+		</Card>
+	)
 }
 
 // Coupons Table Component
@@ -249,12 +471,12 @@ function CouponsTable() {
 }
 
 // Promotion Codes Table Component
-function PromotionCodesTable() {
+function PromotionCodesTable({ filters }: { filters: PromotionCodeFilters }) {
 	const t = useTranslations()
 	const locale = useLocale()
 	const { toast } = useToast()
 
-	const { data: promotionCodesData, isLoading, error } = usePromotionCodes()
+	const { data: promotionCodesData, isLoading, error } = usePromotionCodes(filters)
 
 	// Status badge component for promotion codes
 	const StatusBadge = ({ status, t }: { status: PromotionCode['status']; t: any }) => {
@@ -405,11 +627,80 @@ function PromotionCodesTable() {
 // Main Page Component
 export default function PromotionCodesPage() {
 	const t = useTranslations()
+	const searchParams = useSearchParams()
+	const router = useRouter()
+	const pathname = usePathname()
+
+	// Initialize filters from URL params
+	const [filters, setFilters] = useState<PromotionCodeFilters>(() => {
+		const initialFilters: PromotionCodeFilters = {}
+
+		const active = searchParams.get('active')
+		if (active !== null) {
+			initialFilters.active = active === 'true'
+		}
+
+		const code = searchParams.get('code')
+		if (code) {
+			initialFilters.code = code
+		}
+
+		const coupon = searchParams.get('coupon')
+		if (coupon) {
+			initialFilters.coupon = coupon
+		}
+
+		// Handle created date filters
+		const createdGte = searchParams.get('created[gte]')
+		const createdLte = searchParams.get('created[lte]')
+		if (createdGte || createdLte) {
+			initialFilters.created = {}
+			if (createdGte) initialFilters.created.gte = parseInt(createdGte)
+			if (createdLte) initialFilters.created.lte = parseInt(createdLte)
+		}
+
+		return initialFilters
+	})
 
 	// Use both hooks to get loading states
 	const { refetch: refetchPromotionCodes, isLoading: isLoadingPromotionCodes } =
-		usePromotionCodes()
+		usePromotionCodes(filters)
 	const { refetch: refetchCoupons, isLoading: isLoadingCoupons } = useCoupons()
+
+	// Update URL when filters change
+	const handleFiltersChange = useCallback(
+		(newFilters: PromotionCodeFilters) => {
+			setFilters(newFilters)
+
+			const params = new URLSearchParams()
+
+			if (newFilters.active !== undefined) {
+				params.set('active', newFilters.active.toString())
+			}
+			if (newFilters.code) {
+				params.set('code', newFilters.code)
+			}
+			if (newFilters.coupon) {
+				params.set('coupon', newFilters.coupon)
+			}
+			if (newFilters.created?.gte) {
+				params.set('created[gte]', newFilters.created.gte.toString())
+			}
+			if (newFilters.created?.lte) {
+				params.set('created[lte]', newFilters.created.lte.toString())
+			}
+
+			const queryString = params.toString()
+			router.push(`${pathname}${queryString ? `?${queryString}` : ''}`)
+		},
+		[router, pathname],
+	)
+
+	// Clear all filters
+	const handleClearFilters = useCallback(() => {
+		setFilters({})
+		router.push(pathname)
+	}, [router, pathname])
 
 	// Refresh all tables
 	const handleRefreshAll = () => {
@@ -439,8 +730,15 @@ export default function PromotionCodesPage() {
 				</Button>
 			</div>
 
+			{/* Promotion Codes Filter Bar */}
+			<PromotionCodesFilterBar
+				filters={filters}
+				onFiltersChange={handleFiltersChange}
+				onClearFilters={handleClearFilters}
+			/>
+
 			{/* Promotion Codes Table */}
-			<PromotionCodesTable />
+			<PromotionCodesTable filters={filters} />
 
 			{/* Coupons Table */}
 			<CouponsTable />

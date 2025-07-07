@@ -404,6 +404,28 @@
 			"inactive": "Inactivo",
 			"expired": "Expirado",
 			"exhausted": "Agotado"
+		},
+		"filters": {
+			"title": "Filtros",
+			"status": {
+				"label": "Estado",
+				"placeholder": "Todos los estados",
+				"all": "Todos los estados"
+			},
+			"code": {
+				"label": "Código de promoción",
+				"placeholder": "Ingrese código de promoción..."
+			},
+			"coupon": {
+				"label": "ID del cupón",
+				"placeholder": "Ingrese ID del cupón..."
+			},
+			"createdAfter": {
+				"label": "Creado después de"
+			},
+			"createdBefore": {
+				"label": "Creado antes de"
+			}
 		}
 	},
 	"coupons": {

@@ -404,6 +404,28 @@
 			"inactive": "Inactive",
 			"expired": "Expired",
 			"exhausted": "Exhausted"
+		},
+		"filters": {
+			"title": "Filters",
+			"status": {
+				"label": "Status",
+				"placeholder": "All statuses",
+				"all": "All statuses"
+			},
+			"code": {
+				"label": "Promotion Code",
+				"placeholder": "Enter promotion code..."
+			},
+			"coupon": {
+				"label": "Coupon ID",
+				"placeholder": "Enter coupon ID..."
+			},
+			"createdAfter": {
+				"label": "Created After"
+			},
+			"createdBefore": {
+				"label": "Created Before"
+			}
 		}
 	},
 	"coupons": {
