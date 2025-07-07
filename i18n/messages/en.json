@@ -24,7 +24,8 @@
 		"actions": "Actions",
 		"refresh": "Refresh",
 		"copiedSuccessfully": "Copied Successfully",
-		"copiedFailed": "Failed to Copy"
+		"copiedFailed": "Failed to Copy",
+		"edit": "Edit"
 	},
 	"navigation": {
 		"dashboard": "Dashboard",
@@ -435,6 +436,10 @@
 		"summary": "Showing {total} coupons ({active} active, {inactive} inactive)",
 		"addCoupon": "Add Coupon",
 		"addCouponDescription": "Create a new discount coupon for your store.",
+		"updateCoupon": "Update Coupon",
+		"updateCouponDescription": "Update the coupon name. Other properties cannot be modified.",
+		"updateSuccess": "Coupon updated successfully",
+
 		"table": {
 			"id": "ID",
 			"name": "Name",
@@ -457,7 +462,8 @@
 		"form": {
 			"id": {
 				"label": "Coupon ID",
-				"placeholder": "Enter unique coupon ID..."
+				"placeholder": "Enter unique coupon ID...",
+				"readOnlyNote": "Coupon ID cannot be changed"
 			},
 			"name": {
 				"label": "Coupon Name",
@@ -485,6 +491,14 @@
 			"durationInMonths": {
 				"label": "Duration (Months)",
 				"placeholder": "Enter number of months (1-12)"
+			},
+			"currentDiscount": {
+				"label": "Current Discount",
+				"note": "Discount amount and type cannot be changed"
+			},
+			"currentDuration": {
+				"label": "Current Duration",
+				"note": "Duration settings cannot be changed"
 			}
 		}
 	},

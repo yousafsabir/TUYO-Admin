@@ -33,7 +33,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog'
-import { Copy, RefreshCw, Filter, X, Plus } from 'lucide-react'
+import { Copy, RefreshCw, Filter, X, Plus, Edit } from 'lucide-react'
 import React, { useState, useCallback } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
@@ -153,6 +153,16 @@ const createCouponSchema = z
 
 type CreateCouponFormData = z.infer<typeof createCouponSchema>
 
+const updateCouponSchema = z.object({
+	name: z
+		.string()
+		.min(1, 'Name is required')
+		.max(255, 'Name must be 255 characters or less')
+		.optional(),
+})
+
+type UpdateCouponFormData = z.infer<typeof updateCouponSchema>
+
 // Custom hooks
 const usePromotionCodes = (filters: PromotionCodeFilters = {}) => {
 	return useQuery<ApiResponse<PromotionCode[]>>({
@@ -248,6 +258,47 @@ const useCreateCoupon = () => {
 		onError: (error: Error) => {
 			toast({
 				title: 'Error',
+				description: error.message,
+				variant: 'destructive',
+			})
+		},
+	})
+}
+
+// update coupon mutation
+const useUpdateCoupon = () => {
+	const queryClient = useQueryClient()
+	const { toast } = useToast()
+	const t = useTranslations()
+
+	return useMutation({
+		mutationFn: async ({ id, data }: { id: string; data: UpdateCouponFormData }) => {
+			const response = await fetchWithNgrok(`/stripe/coupons/${id}`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(data),
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.message || 'Failed to update coupon')
+			}
+
+			return response.json()
+		},
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({ queryKey: ['coupons'] })
+			toast({
+				title: t('common.success'),
+				description: t('coupons.updateSuccess'),
+				variant: 'default',
+			})
+		},
+		onError: (error: Error) => {
+			toast({
+				title: t('common.error'),
 				description: error.message,
 				variant: 'destructive',
 			})
@@ -456,7 +507,6 @@ function AddCouponModal() {
 						)}
 					</div>
 
-					{/* <DialogFooter> */}
 					<div className='flex justify-end gap-2'>
 						<Button type='button' variant='outline' onClick={() => setOpen(false)}>
 							{t('common.cancel')}
@@ -467,7 +517,129 @@ function AddCouponModal() {
 								: t('common.create')}
 						</Button>
 					</div>
-					{/* </DialogFooter> */}
+				</form>
+			</DialogContent>
+		</Dialog>
+	)
+}
+
+// Update Coupon Modal
+function UpdateCouponModal({
+	coupon,
+	open,
+	onOpenChange,
+}: {
+	coupon: Coupon
+	open: boolean
+	onOpenChange: (open: boolean) => void
+}) {
+	const t = useTranslations()
+	const updateCouponMutation = useUpdateCoupon()
+
+	const form = useForm<UpdateCouponFormData>({
+		resolver: zodResolver(updateCouponSchema),
+		defaultValues: {
+			name: coupon.name || '',
+		},
+	})
+
+	// Reset form when coupon changes
+	React.useEffect(() => {
+		form.reset({
+			name: coupon.name || '',
+		})
+	}, [coupon, form])
+
+	const onSubmit = async (data: UpdateCouponFormData) => {
+		try {
+			await updateCouponMutation.mutateAsync({ id: coupon.id, data })
+			onOpenChange(false)
+		} catch (error) {
+			// Error is handled by the mutation
+		}
+	}
+
+	return (
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent className='sm:max-w-[425px]'>
+				<DialogHeader>
+					<DialogTitle>{t('coupons.updateCoupon')}</DialogTitle>
+					<DialogDescription>{t('coupons.updateCouponDescription')}</DialogDescription>
+				</DialogHeader>
+				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+					<div className='space-y-4'>
+						{/* Coupon ID (Read-only) */}
+						<div className='space-y-2'>
+							<Label htmlFor='coupon-id-readonly'>{t('coupons.form.id.label')}</Label>
+							<Input
+								id='coupon-id-readonly'
+								value={coupon.id}
+								disabled
+								className='bg-muted'
+							/>
+							<p className='text-sm text-muted-foreground'>
+								{t('coupons.form.id.readOnlyNote')}
+							</p>
+						</div>
+
+						{/* Coupon Name */}
+						<div className='space-y-2'>
+							<Label htmlFor='coupon-name-update'>
+								{t('coupons.form.name.label')}
+							</Label>
+							<Input
+								id='coupon-name-update'
+								placeholder={t('coupons.form.name.placeholder')}
+								{...form.register('name')}
+							/>
+							{form.formState.errors.name && (
+								<p className='text-sm text-destructive'>
+									{form.formState.errors.name.message}
+								</p>
+							)}
+						</div>
+
+						{/* Current Discount (Read-only info) */}
+						<div className='space-y-2'>
+							<Label>{t('coupons.form.currentDiscount.label')}</Label>
+							<div className='rounded-md bg-muted p-3'>
+								<p className='text-sm font-medium'>
+									{coupon.percentOff
+										? `${coupon.percentOff}% ${t('coupons.form.discountType.percent')}`
+										: `$${(coupon.amountOff || 0) / 100} ${t('coupons.form.discountType.amount')}`}
+								</p>
+								<p className='mt-1 text-xs text-muted-foreground'>
+									{t('coupons.form.currentDiscount.note')}
+								</p>
+							</div>
+						</div>
+
+						{/* Current Duration (Read-only info) */}
+						<div className='space-y-2'>
+							<Label>{t('coupons.form.currentDuration.label')}</Label>
+							<div className='rounded-md bg-muted p-3'>
+								<p className='text-sm font-medium capitalize'>
+									{coupon.duration}
+									{coupon.durationInMonths &&
+										` (${coupon.durationInMonths} months)`}
+								</p>
+								<p className='mt-1 text-xs text-muted-foreground'>
+									{t('coupons.form.currentDuration.note')}
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<div className='flex justify-end gap-2'>
+						<Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
+							{t('common.cancel')}
+						</Button>
+						<Button type='submit' disabled={updateCouponMutation.isPending}>
+							{updateCouponMutation.isPending
+								? t('common.updating')
+								: t('common.update')}
+						</Button>
+					</div>
 				</form>
 			</DialogContent>
 		</Dialog>
@@ -918,6 +1090,8 @@ function CouponsTable({ filters }: { filters: CouponFilters }) {
 	const t = useTranslations()
 	const locale = useLocale()
 	const { toast } = useToast()
+	const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null)
+	const [updateModalOpen, setUpdateModalOpen] = useState(false)
 
 	const { data: couponsData, isLoading, error } = useCoupons(filters)
 
@@ -947,116 +1121,145 @@ function CouponsTable({ filters }: { filters: CouponFilters }) {
 		}
 	}
 
+	const handleEditCoupon = (coupon: Coupon) => {
+		setSelectedCoupon(coupon)
+		setUpdateModalOpen(true)
+	}
+
 	return (
-		<Card>
-			<CardHeader>
-				<div className='flex items-center justify-between'>
-					<div>
-						<CardTitle>{t('coupons.title')}</CardTitle>
-						<CardDescription>
-							{couponsData?.data && (
-								<span>
-									{t('coupons.summary', {
-										total: couponsData.data.length,
-										active: couponsData.data.filter((coupon) => coupon.valid)
-											.length,
-										inactive: couponsData.data.filter((coupon) => !coupon.valid)
-											.length,
-									})}
-								</span>
-							)}
-						</CardDescription>
+		<>
+			<Card>
+				<CardHeader>
+					<div className='flex items-center justify-between'>
+						<div>
+							<CardTitle>{t('coupons.title')}</CardTitle>
+							<CardDescription>
+								{couponsData?.data && (
+									<span>
+										{t('coupons.summary', {
+											total: couponsData.data.length,
+											active: couponsData.data.filter(
+												(coupon) => coupon.valid,
+											).length,
+											inactive: couponsData.data.filter(
+												(coupon) => !coupon.valid,
+											).length,
+										})}
+									</span>
+								)}
+							</CardDescription>
+						</div>
+						<AddCouponModal />
 					</div>
-					<AddCouponModal />
-				</div>
-			</CardHeader>
-			<CardContent>
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>{t('coupons.table.id')}</TableHead>
-							<TableHead>{t('coupons.table.name')}</TableHead>
-							<TableHead>{t('coupons.table.discount')}</TableHead>
-							<TableHead>{t('coupons.table.duration')}</TableHead>
-							<TableHead>{t('coupons.table.usage')}</TableHead>
-							<TableHead>{t('coupons.table.status')}</TableHead>
-							<TableHead>{t('coupons.table.created')}</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{isLoading ? (
+				</CardHeader>
+				<CardContent>
+					<Table>
+						<TableHeader>
 							<TableRow>
-								<TableCell colSpan={7} className='py-8 text-center'>
-									{t('common.loading')}
-								</TableCell>
+								<TableHead>{t('coupons.table.id')}</TableHead>
+								<TableHead>{t('coupons.table.name')}</TableHead>
+								<TableHead>{t('coupons.table.discount')}</TableHead>
+								<TableHead>{t('coupons.table.duration')}</TableHead>
+								<TableHead>{t('coupons.table.usage')}</TableHead>
+								<TableHead>{t('coupons.table.status')}</TableHead>
+								<TableHead>{t('coupons.table.created')}</TableHead>
+								<TableHead>{t('common.actions')}</TableHead>
 							</TableRow>
-						) : error ? (
-							<TableRow>
-								<TableCell
-									colSpan={7}
-									className='py-8 text-center text-destructive'>
-									{t('common.error')}: {error.message}
-								</TableCell>
-							</TableRow>
-						) : !couponsData?.data?.length ? (
-							<TableRow>
-								<TableCell
-									colSpan={7}
-									className='py-8 text-center text-muted-foreground'>
-									{t('coupons.noCoupons')}
-								</TableCell>
-							</TableRow>
-						) : (
-							couponsData.data.map((coupon) => (
-								<TableRow key={coupon.id}>
-									<TableCell>
-										<div
-											className='flex cursor-pointer items-center gap-2 font-medium'
-											onClick={() => onCopyCode(coupon.id)}>
-											{coupon.id} <Copy className='size-4' />
-										</div>
+						</TableHeader>
+						<TableBody>
+							{isLoading ? (
+								<TableRow>
+									<TableCell colSpan={8} className='py-8 text-center'>
+										{t('common.loading')}
 									</TableCell>
-									<TableCell>
-										<div className='font-medium'>{coupon.name}</div>
-									</TableCell>
-									<TableCell>
-										{coupon.percentOff
-											? `${coupon.percentOff}%`
-											: `$${(coupon.amountOff || 0) / 100}`}
-									</TableCell>
-									<TableCell>
-										<div>
-											<div className='font-medium capitalize'>
-												{coupon.duration}
-											</div>
-											{coupon.durationInMonths && (
-												<div className='text-sm text-muted-foreground'>
-													{coupon.durationInMonths} months
-												</div>
-											)}
-										</div>
-									</TableCell>
-									<TableCell>
-										<div>
-											<div className='font-medium'>
-												{coupon.timesRedeemed}
-											</div>
-											<div className='text-sm text-muted-foreground'>
-												{t('coupons.table.redeemed')}
-											</div>
-										</div>
-									</TableCell>
-									<TableCell>
-										<CouponStatusBadge valid={coupon.valid} t={t} />
-									</TableCell>
-									<TableCell>{formatDate(coupon.created, locale)}</TableCell>
 								</TableRow>
-							))
-						)}
-					</TableBody>
-				</Table>
-			</CardContent>
-		</Card>
+							) : error ? (
+								<TableRow>
+									<TableCell
+										colSpan={8}
+										className='py-8 text-center text-destructive'>
+										{t('common.error')}: {error.message}
+									</TableCell>
+								</TableRow>
+							) : !couponsData?.data?.length ? (
+								<TableRow>
+									<TableCell
+										colSpan={8}
+										className='py-8 text-center text-muted-foreground'>
+										{t('coupons.noCoupons')}
+									</TableCell>
+								</TableRow>
+							) : (
+								couponsData.data.map((coupon) => (
+									<TableRow key={coupon.id}>
+										<TableCell>
+											<div
+												className='flex cursor-pointer items-center gap-2 font-medium'
+												onClick={() => onCopyCode(coupon.id)}>
+												{coupon.id} <Copy className='size-4' />
+											</div>
+										</TableCell>
+										<TableCell>
+											<div className='font-medium'>{coupon.name}</div>
+										</TableCell>
+										<TableCell>
+											{coupon.percentOff
+												? `${coupon.percentOff}%`
+												: `$${(coupon.amountOff || 0) / 100}`}
+										</TableCell>
+										<TableCell>
+											<div>
+												<div className='font-medium capitalize'>
+													{coupon.duration}
+												</div>
+												{coupon.durationInMonths && (
+													<div className='text-sm text-muted-foreground'>
+														{coupon.durationInMonths} months
+													</div>
+												)}
+											</div>
+										</TableCell>
+										<TableCell>
+											<div>
+												<div className='font-medium'>
+													{coupon.timesRedeemed}
+												</div>
+												<div className='text-sm text-muted-foreground'>
+													{t('coupons.table.redeemed')}
+												</div>
+											</div>
+										</TableCell>
+										<TableCell>
+											<CouponStatusBadge valid={coupon.valid} t={t} />
+										</TableCell>
+										<TableCell>{formatDate(coupon.created, locale)}</TableCell>
+										<TableCell>
+											<Button
+												variant='ghost'
+												size='sm'
+												onClick={() => handleEditCoupon(coupon)}
+												className='gap-2'>
+												<Edit className='h-4 w-4' />
+												{t('common.edit')}
+											</Button>
+										</TableCell>
+									</TableRow>
+								))
+							)}
+						</TableBody>
+					</Table>
+				</CardContent>
+			</Card>
+
+			{/* Update Coupon Modal */}
+			{selectedCoupon && (
+				<UpdateCouponModal
+					coupon={selectedCoupon}
+					open={updateModalOpen}
+					onOpenChange={setUpdateModalOpen}
+				/>
+			)}
+		</>
 	)
 }
 
@@ -1256,3 +1459,5 @@ export default function PromotionCodesPage() {
 		</div>
 	)
 }
+
+// -----------------------------------------------------------------------------------
