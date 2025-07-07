@@ -11,6 +11,7 @@
 		"filters": "Filtros",
 		"clear": "Limpiar",
 		"error": "Error",
+		"success": "Éxito",
 		"search": "Buscar",
 		"loading": "Cargando...",
 		"collapse": "Contraer",
@@ -21,7 +22,9 @@
 		"update": "Actualizar",
 		"updating": "Actualizando...",
 		"actions": "Acciones",
-		"refresh": "refrescar"
+		"refresh": "refrescar",
+		"copiedSuccessfully": "Copiado correctamente",
+		"copiedFailed": "Error al copiar"
 	},
 	"navigation": {
 		"dashboard": "Panel de control",
@@ -401,6 +404,22 @@
 			"inactive": "Inactivo",
 			"expired": "Expirado",
 			"exhausted": "Agotado"
+		}
+	},
+	"coupons": {
+		"title": "Cupones",
+		"description": "Administra los cupones de descuento de tu tienda.",
+		"noCoupons": "No se encontraron cupones",
+		"summary": "Mostrando {total} cupones ({active} activos, {inactive} inactivos)",
+		"table": {
+			"id": "ID",
+			"name": "Nombre",
+			"discount": "Descuento",
+			"duration": "Duración",
+			"usage": "Uso",
+			"status": "Estado",
+			"created": "Creado",
+			"redeemed": "Canjeado"
 		}
 	},
 	"pagination": {

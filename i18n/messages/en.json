@@ -10,6 +10,7 @@
 		"confirm": "Confirm",
 		"filters": "Filters",
 		"clear": "Clear",
+		"success": "Success",
 		"error": "Error",
 		"search": "Search",
 		"loading": "Loading...",
@@ -21,7 +22,9 @@
 		"update": "Update",
 		"updating": "Updating...",
 		"actions": "Actions",
-		"refresh": "Refresh"
+		"refresh": "Refresh",
+		"copiedSuccessfully": "Copied Successfully",
+		"copiedFailed": "Failed to Copy"
 	},
 	"navigation": {
 		"dashboard": "Dashboard",
@@ -280,7 +283,6 @@
 		"editPlan": "Edit Subscription Plan",
 		"editPlanDescription": "Update subscription plan details and features",
 		"plan": "Plan",
-		"title": "Title",
 		"subtitle": "Subtitle",
 		"price": "Price",
 		"listingsLimit": "Listings Limit",
@@ -402,6 +404,22 @@
 			"inactive": "Inactive",
 			"expired": "Expired",
 			"exhausted": "Exhausted"
+		}
+	},
+	"coupons": {
+		"title": "Coupons",
+		"description": "Manage discount coupons for your store.",
+		"noCoupons": "No coupons found",
+		"summary": "Showing {total} coupons ({active} active, {inactive} inactive)",
+		"table": {
+			"id": "ID",
+			"name": "Name",
+			"discount": "Discount",
+			"duration": "Duration",
+			"usage": "Usage",
+			"status": "Status",
+			"created": "Created",
+			"redeemed": "redeemed"
 		}
 	},
 	"pagination": {
