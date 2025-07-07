@@ -10,11 +10,11 @@
 		"confirm": "Confirmar",
 		"filters": "Filtros",
 		"clear": "Limpiar",
-		"error": "Error",
 		"success": "Éxito",
+		"error": "Error",
 		"search": "Buscar",
 		"loading": "Cargando...",
-		"collapse": "Contraer",
+		"collapse": "Colapsar",
 		"expand": "Expandir",
 		"all": "Todos",
 		"select": "Seleccionar",
@@ -22,12 +22,13 @@
 		"update": "Actualizar",
 		"updating": "Actualizando...",
 		"actions": "Acciones",
-		"refresh": "refrescar",
-		"copiedSuccessfully": "Copiado correctamente",
-		"copiedFailed": "Error al copiar"
+		"refresh": "Actualizar",
+		"copiedSuccessfully": "Copiado con éxito",
+		"copiedFailed": "Error al copiar",
+		"edit": "Editar"
 	},
 	"navigation": {
-		"dashboard": "Panel de control",
+		"dashboard": "Tablero",
 		"admins": "Administradores",
 		"users": "Usuarios",
 		"products": "Productos",
@@ -35,30 +36,30 @@
 		"orders": "Pedidos",
 		"subscriptions": "Suscripciones",
 		"logout": "Cerrar sesión",
-		"storeConfiguration": "Configuración de tienda",
+		"storeConfiguration": "Configuración de la tienda",
 		"auditLogs": "Registros de auditoría"
 	},
 	"login": {
-		"title": "Iniciar sesión en el Panel de Tuyo",
+		"title": "Iniciar sesión en el panel Tuyo",
 		"email": "Correo electrónico",
-		"emailPlaceholder": "Ingrese su correo electrónico",
+		"emailPlaceholder": "Introduce tu correo electrónico",
 		"password": "Contraseña",
-		"passwordPlaceholder": "Ingrese su contraseña",
+		"passwordPlaceholder": "Introduce tu contraseña",
 		"submit": "Iniciar sesión",
-		"rememberMe": "Recordarme",
+		"rememberMe": "Recuérdame",
 		"forgotPassword": "¿Olvidaste tu contraseña?",
 		"errors": {
-			"emailRequired": "El correo electrónico es obligatorio",
-			"emailInvalid": "Por favor ingrese un correo electrónico válido",
-			"passwordRequired": "La contraseña es obligatoria",
+			"emailRequired": "Correo electrónico es obligatorio",
+			"emailInvalid": "Por favor, introduce un correo electrónico válido",
+			"passwordRequired": "Contraseña es obligatoria",
 			"passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
 			"invalidCredentials": "Correo electrónico o contraseña inválidos"
 		}
 	},
 	"dashboard": {
-		"title": "Panel de control",
-		"welcome": "Bienvenido al Panel de Administración de Tuyo",
-		"description": "Gestiona tu mercado desde este panel central.",
+		"title": "Tablero",
+		"welcome": "Bienvenido al panel de administración de Tuyo",
+		"description": "Administra tu mercado desde este tablero central.",
 		"stats": {
 			"totalUsers": "Total de usuarios",
 			"totalProducts": "Total de productos",
@@ -81,17 +82,17 @@
 	},
 	"admin": {
 		"title": "Administradores",
-		"description": "Gestionar cuentas de administrador y permisos.",
+		"description": "Gestiona cuentas y permisos de administradores.",
 		"addAdmin": "Agregar administrador",
 		"addAdminDescription": "Crear una nueva cuenta de administrador",
 		"deleteAdmin": "Eliminar administrador",
-		"deleteAdminConfirmation": "¿Estás seguro de que quieres eliminar este administrador? Esta acción no se puede deshacer.",
+		"deleteAdminConfirmation": "¿Estás seguro de que deseas eliminar a este administrador? Esta acción no se puede deshacer.",
 		"name": "Nombre",
-		"namePlaceholder": "Ingrese el nombre del administrador",
+		"namePlaceholder": "Introduce el nombre del administrador",
 		"email": "Correo electrónico",
-		"emailPlaceholder": "Ingrese el correo electrónico del administrador",
+		"emailPlaceholder": "Introduce el correo electrónico del administrador",
 		"password": "Contraseña",
-		"passwordPlaceholder": "Ingrese la contraseña del administrador",
+		"passwordPlaceholder": "Introduce la contraseña del administrador",
 		"createdAt": "Creado en",
 		"actions": "Acciones",
 		"edit": "Editar",
@@ -102,7 +103,7 @@
 		"errors": {
 			"nameRequired": "El nombre es obligatorio",
 			"emailRequired": "El correo electrónico es obligatorio",
-			"emailInvalid": "Por favor ingrese un correo electrónico válido",
+			"emailInvalid": "Por favor, introduce un correo electrónico válido",
 			"passwordRequired": "La contraseña es obligatoria",
 			"passwordMinLength": "La contraseña debe tener al menos 6 caracteres"
 		},
@@ -117,7 +118,7 @@
 	},
 	"users": {
 		"title": "Usuarios",
-		"description": "Gestionar cuentas de usuario y permisos.",
+		"description": "Gestiona cuentas y permisos de usuarios.",
 		"user": "Usuario",
 		"username": "Nombre de usuario",
 		"email": "Correo electrónico",
@@ -141,7 +142,7 @@
 	},
 	"products": {
 		"title": "Productos",
-		"description": "Gestionar listados de productos e inventario.",
+		"description": "Gestiona listados de productos e inventario.",
 		"product": "Producto",
 		"seller": "Vendedor",
 		"category": "Categoría",
@@ -156,24 +157,24 @@
 		"itemsName": "productos",
 		"openActions": "Abrir acciones",
 		"editProduct": "Editar producto",
-		"editProductDescription": "Actualizar configuración y preferencias del producto.",
+		"editProductDescription": "Actualizar configuraciones y preferencias del producto.",
 		"premiumStatus": "Estado premium",
-		"premiumStatusDescription": "Marcar este producto como premium para darle visibilidad especial.",
+		"premiumStatusDescription": "Marca este producto como premium para darle visibilidad especial.",
 		"addProduct": "Agregar producto",
-		"addDescription": "Crear un nuevo listado de producto.",
+		"addDescription": "Crear un nuevo listado de productos.",
 		"editOtherDetails": "Editar otros detalles",
 		"featuredStatus": "Estado destacado",
-		"featuredStatusDescription": "Marcar este producto como destacado para darle visibilidad especial."
+		"featuredStatusDescription": "Marca este producto como destacado para darle visibilidad especial."
 	},
 	"orders": {
 		"title": "Pedidos",
-		"description": "Gestionar pedidos de clientes y rastrear su estado.",
+		"description": "Gestiona pedidos de clientes y rastrea su estado.",
 		"comingSoon": "Próximamente",
 		"comingSoonDescription": "La funcionalidad de gestión de pedidos estará disponible pronto. Podrás ver, gestionar y rastrear todos los pedidos de clientes desde aquí.",
 		"noOrders": "No se encontraron pedidos",
 		"itemNames": "Pedidos",
 		"table": {
-			"orderId": "ID del pedido",
+			"orderId": "ID de pedido",
 			"buyerId": "ID del comprador",
 			"total": "Total",
 			"status": "Estado",
@@ -190,16 +191,16 @@
 	},
 	"subscriptions": {
 		"title": "Suscripciones",
-		"description": "Gestionar suscripciones de usuarios y facturación.",
+		"description": "Gestiona suscripciones de usuarios y facturación.",
 		"id": "ID",
 		"user": "Usuario",
-		"userId": "ID del usuario",
+		"userId": "ID de usuario",
 		"plan": "Plan",
 		"payment": "Pago",
 		"listings": "Listados",
 		"created": "Creado",
 		"status": "Estado",
-		"paymentStatus": "Estado del pago",
+		"paymentStatus": "Estado de pago",
 		"listingsRemaining": "Listados restantes",
 		"auctions": "Subastas",
 		"featured": "Destacado",
@@ -216,23 +217,23 @@
 		"unlimited": "Ilimitado"
 	},
 	"storeConfiguration": {
-		"title": "Configuración de tienda",
-		"description": "Gestionar configuración y ajustes de la tienda."
+		"title": "Configuración de la tienda",
+		"description": "Gestiona la configuración y ajustes de la tienda."
 	},
 	"brands": {
 		"title": "Marcas",
-		"description": "Gestionar marcas disponibles para productos.",
+		"description": "Gestiona las marcas disponibles para productos.",
 		"addBrand": "Agregar marca",
 		"addBrandDescription": "Crear una nueva marca con nombre e imagen",
 		"editBrand": "Editar marca",
 		"editBrandDescription": "Actualizar el nombre de la marca",
 		"deleteBrand": "Eliminar marca",
-		"deleteBrandConfirmation": "¿Estás seguro de que quieres eliminar esta marca? Esta acción no se puede deshacer.",
+		"deleteBrandConfirmation": "¿Estás seguro de que deseas eliminar esta marca? Esta acción no se puede deshacer.",
 		"name": "Nombre",
-		"newName": "Nuevo nombre de marca",
-		"namePlaceholder": "Ingrese el nombre de la marca",
+		"newName": "Nuevo nombre de la marca",
+		"namePlaceholder": "Introduce el nombre de la marca",
 		"image": "Imagen de la marca",
-		"uploadImage": "Haz clic para subir imagen de la marca",
+		"uploadImage": "Haz clic para subir la imagen de la marca",
 		"actions": "Acciones",
 		"edit": "Editar",
 		"delete": "Eliminar",
@@ -240,20 +241,20 @@
 	},
 	"categories": {
 		"title": "Categorías y subcategorías",
-		"description": "Gestionar categorías de productos y sus subcategorías.",
+		"description": "Gestiona las categorías de productos y sus subcategorías.",
 		"addCategory": "Agregar categoría",
 		"addCategoryDescription": "Crear una nueva categoría de producto",
 		"editCategory": "Editar categoría",
 		"editCategoryDescription": "Actualizar el nombre de la categoría",
 		"deleteCategory": "Eliminar categoría",
-		"deleteCategoryConfirmation": "¿Estás seguro de que quieres eliminar esta categoría? Esta acción no se puede deshacer.",
-		"deleteWarning": "Advertencia: Esto también eliminará todas las subcategorías en esta categoría.",
+		"deleteCategoryConfirmation": "¿Estás seguro de que deseas eliminar esta categoría? Esta acción no se puede deshacer.",
+		"deleteWarning": "Advertencia: Esto también eliminará todas las subcategorías de esta categoría.",
 		"category": "Categoría",
 		"name": "Nombre",
-		"newName": "Nuevo nombre de categoría",
-		"namePlaceholder": "Ingrese el nombre de la categoría",
+		"newName": "Nuevo nombre de la categoría",
+		"namePlaceholder": "Introduce el nombre de la categoría",
 		"subcategories": "Subcategorías",
-		"noSubcategories": "Sin subcategorías",
+		"noSubcategories": "No hay subcategorías",
 		"actions": "Acciones",
 		"edit": "Editar",
 		"delete": "Eliminar",
@@ -265,21 +266,21 @@
 		"editSubcategory": "Editar subcategoría",
 		"editSubcategoryDescription": "Actualizar el nombre de la subcategoría",
 		"deleteSubcategory": "Eliminar subcategoría",
-		"deleteSubcategoryConfirmation": "¿Estás seguro de que quieres eliminar esta subcategoría? Esta acción no se puede deshacer.",
+		"deleteSubcategoryConfirmation": "¿Estás seguro de que deseas eliminar esta subcategoría? Esta acción no se puede deshacer.",
 		"category": "Categoría",
 		"selectCategory": "Seleccionar una categoría",
 		"name": "Nombre",
-		"newName": "Nuevo nombre de subcategoría",
-		"namePlaceholder": "Ingrese el nombre de la subcategoría",
+		"newName": "Nuevo nombre de la subcategoría",
+		"namePlaceholder": "Introduce el nombre de la subcategoría",
 		"inCategory": "en",
 		"icon": "Icono",
 		"selectIcon": "Seleccionar icono",
 		"currentName": "Nombre actual",
-		"newNamePlaceholder": "Ingrese el nuevo nombre de subcategoría"
+		"newNamePlaceholder": "Introduce el nuevo nombre de la subcategoría"
 	},
 	"subscriptionPlans": {
 		"title": "Planes de suscripción",
-		"description": "Gestionar planes de suscripción y sus características.",
+		"description": "Gestiona planes de suscripción y sus características.",
 		"editPlan": "Editar plan de suscripción",
 		"editPlanDescription": "Actualizar detalles y características del plan de suscripción",
 		"plan": "Plan",
@@ -305,8 +306,8 @@
 		"operation": "Operación",
 		"executedAt": "Ejecutado en",
 		"actions": "Acciones",
-		"showDiff": "Mostrar diferencias",
-		"recordId": "ID del registro",
+		"showDiff": "Mostrar diferencia",
+		"recordId": "ID de registro",
 		"selectAdmin": "Seleccionar administrador",
 		"selectTable": "Seleccionar tabla",
 		"selectOperation": "Seleccionar operación",
@@ -320,8 +321,8 @@
 		"timeFrames": {
 			"today": "Hoy",
 			"yesterday": "Ayer",
-			"last-week": "Última semana",
-			"last-month": "Último mes"
+			"last-week": "La semana pasada",
+			"last-month": "El mes pasado"
 		},
 		"tables": {
 			"admins": "Administradores",
@@ -337,10 +338,10 @@
 		},
 		"diffModal": {
 			"title": "Detalles del registro de auditoría",
-			"recordId": "ID del registro",
+			"recordId": "ID de registro",
 			"beforeValue": "Antes",
 			"afterValue": "Después",
-			"noDataBefore": "Sin datos (nuevo registro)",
+			"noDataBefore": "Sin datos (registro nuevo)",
 			"noDataAfter": "Sin datos (registro eliminado)",
 			"close": "Cerrar"
 		},
@@ -357,10 +358,10 @@
 	},
 	"colors": {
 		"title": "Colores",
-		"description": "Gestionar colores disponibles para productos.",
-		"addColorDescription": "Agregar un nuevo color a la configuración de tu tienda.",
+		"description": "Gestiona los colores disponibles para productos.",
+		"addColorDescription": "Agrega un nuevo color a la configuración de tu tienda.",
 		"colorCreated": "Color creado",
-		"colorCreatedDescription": "El color ha sido creado exitosamente.",
+		"colorCreatedDescription": "El color ha sido creado con éxito.",
 		"addColor": "Agregar color",
 		"noResultsFound": "No se encontraron colores que coincidan con tu búsqueda",
 		"noColors": "No hay colores disponibles",
@@ -370,24 +371,28 @@
 		"searchPlaceholder": "Buscar colores...",
 		"errorLoading": "Error al cargar colores",
 		"editColor": "Editar color",
-		"editColorDescription": "Actualizar la información del color.",
-		"namePlaceholder": "Ingrese el nombre del color",
-		"editNamePlaceholder": "Ingrese el nombre del color",
+		"editColorDescription": "Actualiza la información del color.",
+		"namePlaceholder": "Introduce el nombre del color",
+		"editNamePlaceholder": "Introduce el nombre del color",
 		"preview": "Vista previa",
 		"colorUpdated": "Color actualizado",
-		"colorUpdatedDescription": "El color ha sido actualizado exitosamente.",
+		"colorUpdatedDescription": "El color ha sido actualizado con éxito.",
 		"nameRequired": "El nombre es obligatorio",
 		"deleteColor": "Eliminar color",
-		"deleteColorConfirmation": "¿Estás seguro de que quieres eliminar este color?",
+		"deleteColorConfirmation": "¿Estás seguro de que deseas eliminar este color?",
 		"deleteColorWarning": "Esta acción no se puede deshacer.",
 		"colorDeleted": "Color eliminado",
-		"colorDeletedDescription": "El color ha sido eliminado exitosamente."
+		"colorDeletedDescription": "El color ha sido eliminado con éxito."
 	},
 	"promotionCodes": {
 		"title": "Códigos de promoción",
-		"description": "Gestionar códigos de promoción y cupones de descuento para tu tienda.",
+		"description": "Gestiona códigos de promoción y cupones de descuento para tu tienda.",
 		"noPromotionCodes": "No se encontraron códigos de promoción",
 		"summary": "Mostrando {total} códigos de promoción ({active} activos, {expired} expirados)",
+		"addPromotionCode": "Agregar código de promoción",
+		"addPromotionCodeDescription": "Crear un nuevo código de promoción para un cupón existente.",
+		"createSuccess": "Código de promoción creado con éxito",
+		"updateSuccess": "Código de promoción actualizado con éxito",
 		"table": {
 			"code": "Código",
 			"coupon": "Cupón",
@@ -397,7 +402,9 @@
 			"created": "Creado",
 			"expires": "Expira",
 			"redeemed": "canjeado",
-			"noExpiry": "Sin expiración"
+			"noExpiry": "Sin expiración",
+			"active": "Activo",
+			"toggleActive": "Alternar estado activo"
 		},
 		"status": {
 			"active": "Activo",
@@ -414,27 +421,67 @@
 			},
 			"code": {
 				"label": "Código de promoción",
-				"placeholder": "Ingrese código de promoción..."
+				"placeholder": "Introduce el código de promoción..."
 			},
 			"coupon": {
 				"label": "ID del cupón",
-				"placeholder": "Ingrese ID del cupón..."
+				"placeholder": "Introduce el ID del cupón..."
 			},
 			"createdAfter": {
-				"label": "Creado después de"
+				"label": "Creado después"
 			},
 			"createdBefore": {
-				"label": "Creado antes de"
+				"label": "Creado antes"
+			}
+		},
+		"form": {
+			"coupon": {
+				"label": "ID del cupón",
+				"placeholder": "Introduce el ID del cupón..."
+			},
+			"code": {
+				"label": "Código de promoción",
+				"placeholder": "Introduce un código personalizado o deja en blanco para autogenerar",
+				"note": "Deja en blanco para autogenerar un código único"
+			},
+			"active": {
+				"label": "Estado"
+			},
+			"appliesTo": {
+				"label": "Aplica a",
+				"all": "Todos",
+				"products": "Productos",
+				"subscriptions": "Suscripciones"
+			},
+			"maxRedemptions": {
+				"label": "Máximo de redenciones",
+				"placeholder": "Introduce el número máximo de usos",
+				"note": "Deja en blanco para usos ilimitados"
+			},
+			"expiresAt": {
+				"label": "Expira en",
+				"note": "Deja en blanco para sin expiración"
+			},
+			"firstTimeTransaction": {
+				"label": "Solo para clientes primerizos"
+			},
+			"minimumAmount": {
+				"label": "Monto mínimo ($)",
+				"placeholder": "Introduce el monto mínimo del pedido",
+				"note": "Monto mínimo requerido para usar este código"
 			}
 		}
 	},
 	"coupons": {
 		"title": "Cupones",
-		"description": "Administra los cupones de descuento de tu tienda.",
+		"description": "Gestiona cupones de descuento para tu tienda.",
 		"noCoupons": "No se encontraron cupones",
 		"summary": "Mostrando {total} cupones ({active} activos, {inactive} inactivos)",
 		"addCoupon": "Agregar cupón",
 		"addCouponDescription": "Crear un nuevo cupón de descuento para tu tienda.",
+		"updateCoupon": "Actualizar cupón",
+		"updateCouponDescription": "Actualizar el nombre del cupón. No se pueden modificar otras propiedades.",
+		"updateSuccess": "Cupón actualizado con éxito",
 		"table": {
 			"id": "ID",
 			"name": "Nombre",
@@ -443,48 +490,57 @@
 			"usage": "Uso",
 			"status": "Estado",
 			"created": "Creado",
-			"redeemed": "Canjeado"
+			"redeemed": "canjeado"
 		},
 		"filters": {
 			"title": "Filtros",
 			"createdAfter": {
-				"label": "Creado después de"
+				"label": "Creado después"
 			},
 			"createdBefore": {
-				"label": "Creado antes de"
+				"label": "Creado antes"
 			}
 		},
 		"form": {
 			"id": {
 				"label": "ID del cupón",
-				"placeholder": "Ingrese ID único del cupón..."
+				"placeholder": "Introduce un ID único para el cupón...",
+				"readOnlyNote": "El ID del cupón no se puede cambiar"
 			},
 			"name": {
 				"label": "Nombre del cupón",
-				"placeholder": "Ingrese nombre del cupón..."
+				"placeholder": "Introduce el nombre del cupón..."
 			},
 			"discountType": {
 				"label": "Tipo de descuento",
-				"placeholder": "Seleccione tipo de descuento",
+				"placeholder": "Selecciona el tipo de descuento",
 				"percent": "Porcentaje",
 				"amount": "Cantidad fija"
 			},
 			"amount": {
 				"labelPercent": "Porcentaje (%)",
 				"labelAmount": "Cantidad ($)",
-				"placeholderPercent": "Ingrese porcentaje (1-100)",
-				"placeholderAmount": "Ingrese cantidad en dólares"
+				"placeholderPercent": "Introduce el porcentaje (1-100)",
+				"placeholderAmount": "Introduce la cantidad en dólares"
 			},
 			"duration": {
 				"label": "Duración",
-				"placeholder": "Seleccione duración",
+				"placeholder": "Selecciona la duración",
 				"once": "Una vez",
 				"repeating": "Repetitivo",
 				"forever": "Para siempre"
 			},
 			"durationInMonths": {
-				"label": "Duración (Meses)",
-				"placeholder": "Ingrese número de meses (1-12)"
+				"label": "Duración (meses)",
+				"placeholder": "Introduce el número de meses (1-12)"
+			},
+			"currentDiscount": {
+				"label": "Descuento actual",
+				"note": "La cantidad y el tipo de descuento no se pueden cambiar"
+			},
+			"currentDuration": {
+				"label": "Duración actual",
+				"note": "La configuración de duración no se puede cambiar"
 			}
 		}
 	},
