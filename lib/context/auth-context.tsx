@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
 	checkAuthStatus,
 	logoutUser,
@@ -30,6 +30,7 @@ type AuthContextType = {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+	const pathname = usePathname()
 	const [user, setUser] = useState<Admin | null>(null)
 	const [isLoading, setIsLoading] = useState(true)
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -53,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			if (response.status === 'success' && response.data) {
 				setUser(response.data)
 				setIsAuthenticated(true)
-				router.push(`/dashboard`)
+				router.push(pathname.slice(3))
 			} else {
 				throw new Error('Invalid response structure')
 			}
