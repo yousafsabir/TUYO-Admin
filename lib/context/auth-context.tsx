@@ -9,15 +9,6 @@ import {
 	isTokenExpired,
 	type Admin,
 } from '@/lib/api/auth'
-
-// Type for the API response
-type ApiResponse<T> = {
-	statusCode: number
-	status: string
-	message: string
-	data: T
-}
-
 type AuthContextType = {
 	user: Admin | null
 	isLoading: boolean
@@ -55,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				setUser(response.data)
 				setIsAuthenticated(true)
 				const path = pathname.slice(3)
-				if (path === '/login') {
+				if (!path || path === '/login') {
 					router.push('/dashboard')
 				} else router.push(path)
 			} else {
