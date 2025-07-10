@@ -109,7 +109,7 @@ export async function updateProduct(
 		const isFormData = data instanceof FormData
 
 		// For FormData, create headers without Content-Type
-		const headers = isFormData ? { 'Content-Type': 'multipart/form-data' } : undefined
+		const headers = isFormData ? { 'Content-Type': 'remove' } : undefined
 
 		const response = await fetchWithNgrok(`/products/${productId}`, {
 			method: 'PATCH',
@@ -136,7 +136,7 @@ export async function createProduct(data: FormData): Promise<ApiResponse<Product
 	try {
 		const response = await fetchWithNgrok(`/products`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'multipart/form-data' },
+			headers: { 'Content-Type': 'remove' },
 			body: data,
 		})
 
@@ -162,7 +162,7 @@ export async function updateProductFull(
 	try {
 		const response = await fetchWithNgrok(`/products/${productId}`, {
 			method: 'PATCH',
-			headers: { 'Content-Type': 'multipart/form-data' },
+			headers: { 'Content-Type': 'remove' },
 			body: data,
 		})
 

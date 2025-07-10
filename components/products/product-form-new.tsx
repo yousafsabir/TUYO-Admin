@@ -80,8 +80,6 @@ const ProductFormNew = forwardRef<ProductFormRef, ProductFormProps>((props, ref)
 	const [colorSelectionType, setColorSelectionType] = useState<'predefined' | 'custom'>(
 		'predefined',
 	)
-
-	// Form state
 	const [formData, setFormData] = useState<FormData>({
 		title: '',
 		brand: '',
@@ -538,8 +536,8 @@ const ProductFormNew = forwardRef<ProductFormRef, ProductFormProps>((props, ref)
 											categories[formData.category].subcategories,
 										) &&
 										categories[formData.category].subcategories.map((v) => (
-											<SelectItem key={v[0]} value={v[0]}>
-												{v}
+											<SelectItem key={v[0]} value={v[1]}>
+												{v[0]}
 											</SelectItem>
 										))}
 								</SelectContent>
@@ -675,7 +673,7 @@ const ProductFormNew = forwardRef<ProductFormRef, ProductFormProps>((props, ref)
 											className='h-4 w-4 rounded-full border'
 											style={{ backgroundColor: formData.colorCode }}
 										/>
-										<span className='text-sm'>Ejemplo: {formData.color}</span>
+										<span className='text-sm'>{formData.color}</span>
 									</div>
 									<Button
 										type='button'
