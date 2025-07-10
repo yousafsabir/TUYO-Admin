@@ -57,7 +57,7 @@ export async function createBrand(data: CreateBrandData): Promise<ApiResponse<Br
 
 		const response = await fetchWithNgrok(`/store-config/brands`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'multipart/form-data' },
+			headers: { 'Content-Type': 'remove' },
 			body: formData,
 		})
 

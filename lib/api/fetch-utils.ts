@@ -9,9 +9,13 @@ export async function fetchWithNgrok(url: string, options: RequestInit = {}) {
 	const authHeaders = createAuthHeaders()
 
 	// Add the ngrok header
-	const updatedHeaders = {
+	const updatedHeaders: Record<any, any> = {
 		...authHeaders,
 		...headers,
+	}
+
+	if (updatedHeaders['Content-Type'] === 'remove') {
+		delete updatedHeaders['Content-Type']
 	}
 
 	// Return the fetch promise with updated headers
