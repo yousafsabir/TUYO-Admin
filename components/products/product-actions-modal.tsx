@@ -24,7 +24,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 
 interface ProductActionsModalProps {
@@ -43,8 +43,6 @@ export function ProductActionsModal({ isOpen, onClose, product }: ProductActions
 	>('draft')
 	const queryClient = useQueryClient()
 	const router = useRouter()
-	const params = useParams()
-	const locale = params.lang as string
 
 	// Initialize the premium status when product changes
 	useEffect(() => {
@@ -93,7 +91,7 @@ export function ProductActionsModal({ isOpen, onClose, product }: ProductActions
 
 	const handleEditDetails = () => {
 		if (!product) return
-		router.push(`/${locale}/dashboard/products/${product.id}/edit`)
+		router.push(`/dashboard/products/${product.id}/edit`)
 		onClose()
 	}
 
