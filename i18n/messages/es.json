@@ -168,25 +168,50 @@
 	},
 	"orders": {
 		"title": "Pedidos",
-		"description": "Gestiona pedidos de clientes y rastrea su estado.",
-		"comingSoon": "Próximamente",
-		"comingSoonDescription": "La funcionalidad de gestión de pedidos estará disponible pronto. Podrás ver, gestionar y rastrear todos los pedidos de clientes desde aquí.",
+		"description": "Gestionar pedidos de clientes y rastrear su estado.",
 		"noOrders": "No se encontraron pedidos",
-		"itemNames": "Pedidos",
+		"itemNames": "pedidos",
+		"updateOrder": "Actualizar pedido",
+		"updateOrderDescription": "Actualizar el estado e información de envío del pedido",
 		"table": {
-			"orderId": "ID de pedido",
+			"orderId": "ID del pedido",
 			"buyerId": "ID del comprador",
 			"total": "Total",
 			"status": "Estado",
-			"paymentStatus": "Pago",
-			"shippingCost": "Envío",
-			"platformFee": "Tarifa de plataforma",
-			"createdAt": "Creado",
-			"noData": "No se encontraron pedidos",
-			"showing": "Mostrando",
-			"of": "de",
-			"orders": "pedidos",
-			"page": "Página"
+			"paymentStatus": "Estado del pago",
+			"shippingCost": "Costo de envío",
+			"createdAt": "Creado en"
+		},
+		"form": {
+			"status": {
+				"label": "Estado del pedido",
+				"placeholder": "Seleccionar estado del pedido",
+				"pending": "Pendiente",
+				"processingPayment": "Procesando pago",
+				"placed": "Realizado",
+				"processing": "Procesando",
+				"shipped": "Enviado",
+				"canceled": "Cancelado",
+				"onHold": "En espera",
+				"completed": "Completado"
+			},
+			"paymentStatus": {
+				"label": "Estado del pago",
+				"placeholder": "Seleccionar estado del pago",
+				"processing": "Procesando",
+				"paid": "Pagado",
+				"failed": "Fallido",
+				"refunded": "Reembolsado",
+				"unpaid": "Sin pagar"
+			},
+			"shippingCarrier": {
+				"label": "Transportista",
+				"placeholder": "Ingrese transportista (ej. FedEx, UPS, DHL)"
+			},
+			"trackingUrl": {
+				"label": "URL de seguimiento",
+				"placeholder": "Ingrese URL de seguimiento del envío"
+			}
 		}
 	},
 	"subscriptions": {

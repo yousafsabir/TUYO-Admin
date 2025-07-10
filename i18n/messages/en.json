@@ -169,24 +169,49 @@
 	"orders": {
 		"title": "Orders",
 		"description": "Manage customer orders and track their status.",
-		"comingSoon": "Coming Soon",
-		"comingSoonDescription": "Order management functionality will be available soon. You'll be able to view, manage, and track all customer orders from here.",
 		"noOrders": "No orders found",
-		"itemNames": "Orders",
+		"itemNames": "orders",
+		"updateOrder": "Update Order",
+		"updateOrderDescription": "Update the status and shipping information for order",
 		"table": {
 			"orderId": "Order ID",
 			"buyerId": "Buyer ID",
 			"total": "Total",
 			"status": "Status",
-			"paymentStatus": "Payment",
-			"shippingCost": "Shipping",
-			"platformFee": "Platform Fee",
-			"createdAt": "Created",
-			"noData": "No orders found",
-			"showing": "Showing",
-			"of": "of",
-			"orders": "orders",
-			"page": "Page"
+			"paymentStatus": "Payment Status",
+			"shippingCost": "Shipping Cost",
+			"createdAt": "Created At"
+		},
+		"form": {
+			"status": {
+				"label": "Order Status",
+				"placeholder": "Select order status",
+				"pending": "Pending",
+				"processingPayment": "Processing Payment",
+				"placed": "Placed",
+				"processing": "Processing",
+				"shipped": "Shipped",
+				"canceled": "Canceled",
+				"onHold": "On Hold",
+				"completed": "Completed"
+			},
+			"paymentStatus": {
+				"label": "Payment Status",
+				"placeholder": "Select payment status",
+				"processing": "Processing",
+				"paid": "Paid",
+				"failed": "Failed",
+				"refunded": "Refunded",
+				"unpaid": "Unpaid"
+			},
+			"shippingCarrier": {
+				"label": "Shipping Carrier",
+				"placeholder": "Enter shipping carrier (e.g., FedEx, UPS, DHL)"
+			},
+			"trackingUrl": {
+				"label": "Tracking URL",
+				"placeholder": "Enter shipment tracking URL"
+			}
 		}
 	},
 	"subscriptions": {

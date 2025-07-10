@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
 	Table,
 	TableBody,
@@ -11,10 +11,32 @@ import {
 	TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from '@/components/ui/dialog'
+import { Loader2, Edit } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useTranslations } from 'next-intl'
 import { fetchWithNgrok } from '@/lib/api/fetch-utils'
+import { useToast } from '@/components/ui/use-toast'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import React from 'react'
 
 // Types & Interfaces
 interface Order {
@@ -51,6 +73,27 @@ interface GetOrdersParams {
 	limit?: number
 }
 
+// Zod schema for order updates
+const updateOrderSchema = z
+	.object({
+		status: z.enum([
+			'pending',
+			'processing_payment',
+			'placed',
+			'processing',
+			'shipped',
+			'canceled',
+			'on_hold',
+			'completed',
+		]),
+		paymentStatus: z.enum(['processing', 'paid', 'failed', 'refunded', 'unpaid']),
+		shippingCarrier: z.string(),
+		shipmentTrackingUrl: z.string(),
+	})
+	.partial()
+
+type UpdateOrderFormData = z.infer<typeof updateOrderSchema>
+
 // Queries & Mutations
 const useGetOrders = (params: GetOrdersParams) =>
 	useQuery({
@@ -80,6 +123,45 @@ const useGetOrders = (params: GetOrdersParams) =>
 		},
 	})
 
+const useUpdateOrder = () => {
+	const queryClient = useQueryClient()
+	const { toast } = useToast()
+
+	return useMutation({
+		mutationFn: async ({ id, data }: { id: number; data: UpdateOrderFormData }) => {
+			const response = await fetchWithNgrok(`/orders/${id}`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(data),
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.message || 'Failed to update order')
+			}
+
+			return response.json()
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['orders'] })
+			toast({
+				title: 'Success',
+				description: 'Order updated successfully',
+				variant: 'default',
+			})
+		},
+		onError: (error: Error) => {
+			toast({
+				title: 'Error',
+				description: error.message,
+				variant: 'destructive',
+			})
+		},
+	})
+}
+
 // Util Functions
 const formatCurrency = (amount: number | undefined) => {
 	if (amount === undefined || amount === null) return 'N/A'
@@ -94,14 +176,17 @@ const formatDate = (dateString: string | undefined) => {
 const getStatusBadgeVariant = (status: string) => {
 	switch (status?.toLowerCase()) {
 		case 'placed':
+		case 'completed':
 			return 'default'
 		case 'processing':
+		case 'processing_payment':
 			return 'secondary'
 		case 'shipped':
 			return 'outline'
-		case 'delivered':
-			return 'default'
-		case 'cancelled':
+		case 'pending':
+		case 'on_hold':
+			return 'secondary'
+		case 'canceled':
 			return 'destructive'
 		default:
 			return 'secondary'
@@ -112,7 +197,8 @@ const getPaymentStatusBadgeVariant = (status: string) => {
 	switch (status?.toLowerCase()) {
 		case 'paid':
 			return 'default'
-		case 'pending':
+		case 'processing':
+		case 'unpaid':
 			return 'secondary'
 		case 'failed':
 			return 'destructive'
@@ -123,13 +209,195 @@ const getPaymentStatusBadgeVariant = (status: string) => {
 	}
 }
 
+// Update Order Modal Component
+function UpdateOrderModal({
+	order,
+	open,
+	onOpenChange,
+}: {
+	order: Order
+	open: boolean
+	onOpenChange: (open: boolean) => void
+}) {
+	const t = useTranslations()
+	const updateOrderMutation = useUpdateOrder()
+
+	const form = useForm<UpdateOrderFormData>({
+		resolver: zodResolver(updateOrderSchema),
+		defaultValues: {
+			status: order.status as any,
+			paymentStatus: order.paymentStatus as any,
+			shippingCarrier: order.shippingCarrier || '',
+			shipmentTrackingUrl: order.shipmentTrackingUrl || '',
+		},
+	})
+
+	// Reset form when order changes
+	React.useEffect(() => {
+		form.reset({
+			status: order.status as any,
+			paymentStatus: order.paymentStatus as any,
+			shippingCarrier: order.shippingCarrier || '',
+			shipmentTrackingUrl: order.shipmentTrackingUrl || '',
+		})
+	}, [order, form])
+
+	const onSubmit = async (data: UpdateOrderFormData) => {
+		try {
+			// Remove empty strings and convert to undefined
+			const cleanedData = Object.fromEntries(
+				Object.entries(data).filter(([_, value]) => value !== ''),
+			) as UpdateOrderFormData
+
+			await updateOrderMutation.mutateAsync({ id: order.id, data: cleanedData })
+			onOpenChange(false)
+		} catch (error) {
+			// Error is handled by the mutation
+		}
+	}
+
+	return (
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent className='sm:max-w-[500px]'>
+				<DialogHeader>
+					<DialogTitle>{t('orders.updateOrder')}</DialogTitle>
+					<DialogDescription>
+						{t('orders.updateOrderDescription')} #{order.id}
+					</DialogDescription>
+				</DialogHeader>
+				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+					<div className='space-y-4'>
+						{/* Order Status */}
+						<div className='space-y-2'>
+							<Label htmlFor='order-status'>{t('orders.form.status.label')}</Label>
+							<Select
+								value={form.watch('status')}
+								onValueChange={(value) => form.setValue('status', value as any)}>
+								<SelectTrigger id='order-status'>
+									<SelectValue
+										placeholder={t('orders.form.status.placeholder')}
+									/>
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value='pending'>
+										{t('orders.form.status.pending')}
+									</SelectItem>
+									<SelectItem value='processing_payment'>
+										{t('orders.form.status.processingPayment')}
+									</SelectItem>
+									<SelectItem value='placed'>
+										{t('orders.form.status.placed')}
+									</SelectItem>
+									<SelectItem value='processing'>
+										{t('orders.form.status.processing')}
+									</SelectItem>
+									<SelectItem value='shipped'>
+										{t('orders.form.status.shipped')}
+									</SelectItem>
+									<SelectItem value='canceled'>
+										{t('orders.form.status.canceled')}
+									</SelectItem>
+									<SelectItem value='on_hold'>
+										{t('orders.form.status.onHold')}
+									</SelectItem>
+									<SelectItem value='completed'>
+										{t('orders.form.status.completed')}
+									</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+
+						{/* Payment Status */}
+						<div className='space-y-2'>
+							<Label htmlFor='payment-status'>
+								{t('orders.form.paymentStatus.label')}
+							</Label>
+							<Select
+								value={form.watch('paymentStatus')}
+								onValueChange={(value) =>
+									form.setValue('paymentStatus', value as any)
+								}>
+								<SelectTrigger id='payment-status'>
+									<SelectValue
+										placeholder={t('orders.form.paymentStatus.placeholder')}
+									/>
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value='processing'>
+										{t('orders.form.paymentStatus.processing')}
+									</SelectItem>
+									<SelectItem value='paid'>
+										{t('orders.form.paymentStatus.paid')}
+									</SelectItem>
+									<SelectItem value='failed'>
+										{t('orders.form.paymentStatus.failed')}
+									</SelectItem>
+									<SelectItem value='refunded'>
+										{t('orders.form.paymentStatus.refunded')}
+									</SelectItem>
+									<SelectItem value='unpaid'>
+										{t('orders.form.paymentStatus.unpaid')}
+									</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+
+						{/* Shipping Carrier */}
+						<div className='space-y-2'>
+							<Label htmlFor='shipping-carrier'>
+								{t('orders.form.shippingCarrier.label')}
+							</Label>
+							<Input
+								id='shipping-carrier'
+								placeholder={t('orders.form.shippingCarrier.placeholder')}
+								{...form.register('shippingCarrier')}
+							/>
+						</div>
+
+						{/* Shipment Tracking URL */}
+						<div className='space-y-2'>
+							<Label htmlFor='tracking-url'>
+								{t('orders.form.trackingUrl.label')}
+							</Label>
+							<Input
+								id='tracking-url'
+								type='url'
+								placeholder={t('orders.form.trackingUrl.placeholder')}
+								{...form.register('shipmentTrackingUrl')}
+							/>
+						</div>
+					</div>
+
+					<div className='flex justify-end gap-2'>
+						<Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
+							{t('common.cancel')}
+						</Button>
+						<Button type='submit' disabled={updateOrderMutation.isPending}>
+							{updateOrderMutation.isPending
+								? t('common.updating')
+								: t('common.update')}
+						</Button>
+					</div>
+				</form>
+			</DialogContent>
+		</Dialog>
+	)
+}
+
 // Order Components
 export function OrdersTable() {
 	const t = useTranslations()
 	const [currentPage, setCurrentPage] = useState(1)
+	const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+	const [updateModalOpen, setUpdateModalOpen] = useState(false)
 	const limit = 25
 
 	const { data, isLoading, isError, error } = useGetOrders({ page: currentPage, limit })
+
+	const handleEditOrder = (order: Order) => {
+		setSelectedOrder(order)
+		setUpdateModalOpen(true)
+	}
 
 	if (isLoading) {
 		return (
@@ -153,90 +421,118 @@ export function OrdersTable() {
 	const pagination = data?.data?.pagination
 
 	return (
-		<div className='space-y-4'>
-			<div className='rounded-md border'>
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>{t('orders.table.orderId') || 'Order ID'}</TableHead>
-							<TableHead>{t('orders.table.buyerId') || 'Buyer ID'}</TableHead>
-							<TableHead>{t('orders.table.total') || 'Total'}</TableHead>
-							<TableHead>{t('orders.table.status') || 'Status'}</TableHead>
-							<TableHead>{t('orders.table.paymentStatus') || 'Payment'}</TableHead>
-							<TableHead>{t('orders.table.shippingCost') || 'Shipping'}</TableHead>
-							<TableHead>{t('orders.table.createdAt') || 'Created'}</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{orders.length === 0 ? (
+		<>
+			<div className='space-y-4'>
+				<div className='rounded-md border'>
+					<Table>
+						<TableHeader>
 							<TableRow>
-								<TableCell
-									colSpan={8}
-									className='py-8 text-center text-muted-foreground'>
-									{t('orders.noOrders') || 'No orders found'}
-								</TableCell>
+								<TableHead>{t('orders.table.orderId')}</TableHead>
+								<TableHead>{t('orders.table.buyerId')}</TableHead>
+								<TableHead>{t('orders.table.total')}</TableHead>
+								<TableHead>{t('orders.table.status')}</TableHead>
+								<TableHead>{t('orders.table.paymentStatus')}</TableHead>
+								<TableHead>{t('orders.table.shippingCost')}</TableHead>
+								<TableHead>{t('orders.table.createdAt')}</TableHead>
+								<TableHead>{t('common.actions')}</TableHead>
 							</TableRow>
-						) : (
-							orders.map((order: Order) => (
-								<TableRow key={order.id}>
-									<TableCell>
-										<div>
-											<p className='font-medium'>#{order.id}</p>
-											<p className='text-xs text-muted-foreground'>
-												{order.stripeCheckoutSessionId?.substring(0, 20)}...
-											</p>
-										</div>
-									</TableCell>
-									<TableCell>
-										<Badge variant='outline'>{order.buyerId}</Badge>
-									</TableCell>
-									<TableCell>
-										<p className='font-medium'>{formatCurrency(order.total)}</p>
-									</TableCell>
-									<TableCell>
-										<Badge variant={getStatusBadgeVariant(order.status)}>
-											{order.status || 'Unknown'}
-										</Badge>
-									</TableCell>
-									<TableCell>
-										<Badge
-											variant={getPaymentStatusBadgeVariant(
-												order.paymentStatus,
-											)}>
-											{order.paymentStatus || 'Unknown'}
-										</Badge>
-									</TableCell>
-									<TableCell>{formatCurrency(order.shippingCost)}</TableCell>
-									<TableCell>
-										<div>
-											<p className='text-sm'>{formatDate(order.createdAt)}</p>
-											<p className='text-xs text-muted-foreground'>
-												{formatDate(order.updatedAt)}
-											</p>
-										</div>
+						</TableHeader>
+						<TableBody>
+							{orders.length === 0 ? (
+								<TableRow>
+									<TableCell
+										colSpan={8}
+										className='py-8 text-center text-muted-foreground'>
+										{t('orders.noOrders')}
 									</TableCell>
 								</TableRow>
-							))
-						)}
-					</TableBody>
-				</Table>
+							) : (
+								orders.map((order: Order) => (
+									<TableRow key={order.id}>
+										<TableCell>
+											<div>
+												<p className='font-medium'>#{order.id}</p>
+												<p className='text-xs text-muted-foreground'>
+													{order.stripeCheckoutSessionId?.substring(
+														0,
+														20,
+													)}
+													...
+												</p>
+											</div>
+										</TableCell>
+										<TableCell>
+											<Badge variant='outline'>{order.buyerId}</Badge>
+										</TableCell>
+										<TableCell>
+											<p className='font-medium'>
+												{formatCurrency(order.total)}
+											</p>
+										</TableCell>
+										<TableCell>
+											<Badge variant={getStatusBadgeVariant(order.status)}>
+												{order.status || 'Unknown'}
+											</Badge>
+										</TableCell>
+										<TableCell>
+											<Badge
+												variant={getPaymentStatusBadgeVariant(
+													order.paymentStatus,
+												)}>
+												{order.paymentStatus || 'Unknown'}
+											</Badge>
+										</TableCell>
+										<TableCell>{formatCurrency(order.shippingCost)}</TableCell>
+										<TableCell>
+											<div>
+												<p className='text-sm'>
+													{formatDate(order.createdAt)}
+												</p>
+												<p className='text-xs text-muted-foreground'>
+													{formatDate(order.updatedAt)}
+												</p>
+											</div>
+										</TableCell>
+										<TableCell>
+											<Button
+												variant='ghost'
+												size='sm'
+												onClick={() => handleEditOrder(order)}
+												className='gap-2'>
+												<Edit className='h-4 w-4' />
+												{t('common.edit')}
+											</Button>
+										</TableCell>
+									</TableRow>
+								))
+							)}
+						</TableBody>
+					</Table>
+				</div>
+
+				{pagination && (
+					<div className='flex items-center justify-between'>
+						<p className='text-sm text-muted-foreground'>
+							{t('pagination.showing')} {orders.length} {t('pagination.of')}{' '}
+							{pagination.total} {t('orders.itemNames')}
+						</p>
+						<p className='text-sm text-muted-foreground'>
+							{t('pagination.page')} {pagination.page} {t('pagination.of')}{' '}
+							{Math.ceil(pagination.total / pagination.limit)}
+						</p>
+					</div>
+				)}
 			</div>
 
-			{pagination && (
-				<div className='flex items-center justify-between'>
-					<p className='text-sm text-muted-foreground'>
-						{t('pagination.showing') || 'Showing'} {orders.length}{' '}
-						{t('pagination.of') || 'of'} {pagination.total}{' '}
-						{t('orders.itemNames') || 'orders'}
-					</p>
-					<p className='text-sm text-muted-foreground'>
-						{t('pagination.page') || 'Page'} {pagination.page}{' '}
-						{t('pagination.of') || 'of'}{' '}
-						{Math.ceil(pagination.total / pagination.limit)}
-					</p>
-				</div>
+			{/* Update Order Modal */}
+			{selectedOrder && (
+				<UpdateOrderModal
+					order={selectedOrder}
+					open={updateModalOpen}
+					onOpenChange={setUpdateModalOpen}
+				/>
 			)}
-		</div>
+		</>
 	)
 }
 
@@ -245,12 +541,8 @@ export default function OrdersPage() {
 	return (
 		<div className='space-y-6'>
 			<div>
-				<h2 className='text-3xl font-bold tracking-tight'>
-					{t('orders.title') || 'Orders'}
-				</h2>
-				<p className='text-muted-foreground'>
-					{t('orders.description') || 'Manage customer orders and track their status.'}
-				</p>
+				<h2 className='text-3xl font-bold tracking-tight'>{t('orders.title')}</h2>
+				<p className='text-muted-foreground'>{t('orders.description')}</p>
 			</div>
 
 			<OrdersTable />
