@@ -209,7 +209,49 @@ const getPaymentStatusBadgeVariant = (status: string) => {
 	}
 }
 
-// Update Order Modal Component
+// Add these translation helper functions
+const getTranslatedOrderStatus = (status: string, t: any) => {
+	switch (status?.toLowerCase()) {
+		case 'pending':
+			return t('orders.status.pending')
+		case 'processing_payment':
+			return t('orders.status.processingPayment')
+		case 'placed':
+			return t('orders.status.placed')
+		case 'processing':
+			return t('orders.status.processing')
+		case 'shipped':
+			return t('orders.status.shipped')
+		case 'canceled':
+			return t('orders.status.canceled')
+		case 'on_hold':
+			return t('orders.status.onHold')
+		case 'completed':
+			return t('orders.status.completed')
+		default:
+			return status || t('orders.status.unknown')
+	}
+}
+
+const getTranslatedPaymentStatus = (status: string, t: any) => {
+	switch (status?.toLowerCase()) {
+		case 'processing':
+			return t('orders.paymentStatus.processing')
+		case 'paid':
+			return t('orders.paymentStatus.paid')
+		case 'failed':
+			return t('orders.paymentStatus.failed')
+		case 'refunded':
+			return t('orders.paymentStatus.refunded')
+		case 'unpaid':
+			return t('orders.paymentStatus.unpaid')
+		default:
+			return status || t('orders.paymentStatus.unknown')
+	}
+}
+
+// Order Components
+
 function UpdateOrderModal({
 	order,
 	open,
@@ -280,28 +322,28 @@ function UpdateOrderModal({
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value='pending'>
-										{t('orders.form.status.pending')}
+										{t('orders.status.pending')}
 									</SelectItem>
 									<SelectItem value='processing_payment'>
-										{t('orders.form.status.processingPayment')}
+										{t('orders.status.processingPayment')}
 									</SelectItem>
 									<SelectItem value='placed'>
-										{t('orders.form.status.placed')}
+										{t('orders.status.placed')}
 									</SelectItem>
 									<SelectItem value='processing'>
-										{t('orders.form.status.processing')}
+										{t('orders.status.processing')}
 									</SelectItem>
 									<SelectItem value='shipped'>
-										{t('orders.form.status.shipped')}
+										{t('orders.status.shipped')}
 									</SelectItem>
 									<SelectItem value='canceled'>
-										{t('orders.form.status.canceled')}
+										{t('orders.status.canceled')}
 									</SelectItem>
 									<SelectItem value='on_hold'>
-										{t('orders.form.status.onHold')}
+										{t('orders.status.onHold')}
 									</SelectItem>
 									<SelectItem value='completed'>
-										{t('orders.form.status.completed')}
+										{t('orders.status.completed')}
 									</SelectItem>
 								</SelectContent>
 							</Select>
@@ -324,19 +366,19 @@ function UpdateOrderModal({
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value='processing'>
-										{t('orders.form.paymentStatus.processing')}
+										{t('orders.paymentStatus.processing')}
 									</SelectItem>
 									<SelectItem value='paid'>
-										{t('orders.form.paymentStatus.paid')}
+										{t('orders.paymentStatus.paid')}
 									</SelectItem>
 									<SelectItem value='failed'>
-										{t('orders.form.paymentStatus.failed')}
+										{t('orders.paymentStatus.failed')}
 									</SelectItem>
 									<SelectItem value='refunded'>
-										{t('orders.form.paymentStatus.refunded')}
+										{t('orders.paymentStatus.refunded')}
 									</SelectItem>
 									<SelectItem value='unpaid'>
-										{t('orders.form.paymentStatus.unpaid')}
+										{t('orders.paymentStatus.unpaid')}
 									</SelectItem>
 								</SelectContent>
 							</Select>
@@ -384,7 +426,6 @@ function UpdateOrderModal({
 	)
 }
 
-// Order Components
 export function OrdersTable() {
 	const t = useTranslations()
 	const [currentPage, setCurrentPage] = useState(1)
@@ -471,7 +512,7 @@ export function OrdersTable() {
 										</TableCell>
 										<TableCell>
 											<Badge variant={getStatusBadgeVariant(order.status)}>
-												{order.status || 'Unknown'}
+												{getTranslatedOrderStatus(order.status, t)}
 											</Badge>
 										</TableCell>
 										<TableCell>
@@ -479,7 +520,7 @@ export function OrdersTable() {
 												variant={getPaymentStatusBadgeVariant(
 													order.paymentStatus,
 												)}>
-												{order.paymentStatus || 'Unknown'}
+												{getTranslatedPaymentStatus(order.paymentStatus, t)}
 											</Badge>
 										</TableCell>
 										<TableCell>{formatCurrency(order.shippingCost)}</TableCell>

@@ -182,6 +182,25 @@
 			"shippingCost": "Shipping Cost",
 			"createdAt": "Created At"
 		},
+		"status": {
+			"pending": "Pending",
+			"processingPayment": "Processing Payment",
+			"placed": "Placed",
+			"processing": "Processing",
+			"shipped": "Shipped",
+			"canceled": "Canceled",
+			"onHold": "On Hold",
+			"completed": "Completed",
+			"unknown": "Unknown"
+		},
+		"paymentStatus": {
+			"processing": "Processing",
+			"paid": "Paid",
+			"failed": "Failed",
+			"refunded": "Refunded",
+			"unpaid": "Unpaid",
+			"unknown": "Unknown"
+		},
 		"form": {
 			"status": {
 				"label": "Order Status",
