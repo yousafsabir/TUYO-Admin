@@ -173,8 +173,8 @@ const ProductFormNew = forwardRef<ProductFormRef, ProductFormProps>((props, ref)
 	const validateForm = (): boolean => {
 		const newErrors: FormErrors = {}
 
-		if (!formData.title || formData.title.length < 10) {
-			newErrors.title = 'Title must be at least 10 characters'
+		if (!formData.title) {
+			newErrors.title = 'Title is required'
 		}
 		if (!formData.brand) {
 			newErrors.brand = 'Brand is required'
@@ -193,9 +193,6 @@ const ProductFormNew = forwardRef<ProductFormRef, ProductFormProps>((props, ref)
 		}
 		if (!formData.condition) {
 			newErrors.condition = 'Condition is required'
-		}
-		if (!formData.description || formData.description.length < 10) {
-			newErrors.description = 'Description must be at least 10 characters'
 		}
 		if (!formData.sellerId) {
 			newErrors.sellerId = 'Seller ID is required'
