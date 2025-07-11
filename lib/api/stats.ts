@@ -1,5 +1,4 @@
-import { fetchWithNgrok, createAuthHeaders } from './fetch-utils'
-import { API_BASE_URL } from './config'
+import { fetchWithNgrok } from './fetch-utils'
 
 // Define the API response type
 type ApiResponse<T> = {

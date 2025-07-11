@@ -1,4 +1,3 @@
-import { API_BASE_URL } from './config'
 import { fetchWithNgrok, createAuthHeaders } from './fetch-utils'
 
 export interface AuditLog {

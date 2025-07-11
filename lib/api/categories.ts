@@ -1,5 +1,4 @@
 import { fetchWithNgrok, createAuthHeaders } from './fetch-utils'
-import { API_BASE_URL } from './config'
 
 // Define the API response type
 type ApiResponse<T> = {
@@ -83,7 +82,7 @@ export async function getAllCategoriesSubcategories(): Promise<
 // Function to create a new category
 export async function createCategory(data: CreateCategoryData): Promise<ApiResponse<any>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/categories`, {
+		const response = await fetchWithNgrok(`/store-config/categories`, {
 			method: 'POST',
 			headers: createAuthHeaders(),
 			body: JSON.stringify(data),
@@ -106,7 +105,7 @@ export async function createCategory(data: CreateCategoryData): Promise<ApiRespo
 // Function to update a category
 export async function updateCategory(data: UpdateCategoryData): Promise<ApiResponse<any>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/categories`, {
+		const response = await fetchWithNgrok(`/store-config/categories`, {
 			method: 'PATCH',
 			headers: createAuthHeaders(),
 			body: JSON.stringify(data),
@@ -129,7 +128,7 @@ export async function updateCategory(data: UpdateCategoryData): Promise<ApiRespo
 // Function to delete a category
 export async function deleteCategory(data: DeleteCategoryData): Promise<ApiResponse<null>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/categories`, {
+		const response = await fetchWithNgrok(`/store-config/categories`, {
 			method: 'DELETE',
 			headers: createAuthHeaders(),
 			body: JSON.stringify(data),
@@ -152,7 +151,7 @@ export async function deleteCategory(data: DeleteCategoryData): Promise<ApiRespo
 // Function to create a new subcategory
 export async function createSubcategory(data: CreateSubcategoryData): Promise<ApiResponse<any>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/subcategories`, {
+		const response = await fetchWithNgrok(`/store-config/subcategories`, {
 			method: 'POST',
 			headers: createAuthHeaders(),
 			body: JSON.stringify(data),
@@ -175,7 +174,7 @@ export async function createSubcategory(data: CreateSubcategoryData): Promise<Ap
 // Function to update a subcategory
 export async function updateSubcategory(data: UpdateSubcategoryData): Promise<ApiResponse<any>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/subcategories`, {
+		const response = await fetchWithNgrok(`/store-config/subcategories`, {
 			method: 'PATCH',
 			headers: createAuthHeaders(),
 			body: JSON.stringify(data),
@@ -198,7 +197,7 @@ export async function updateSubcategory(data: UpdateSubcategoryData): Promise<Ap
 // Function to delete a subcategory
 export async function deleteSubcategory(data: DeleteSubcategoryData): Promise<ApiResponse<null>> {
 	try {
-		const response = await fetchWithNgrok(`${API_BASE_URL}/store-config/subcategories`, {
+		const response = await fetchWithNgrok(`/store-config/subcategories`, {
 			method: 'DELETE',
 			headers: createAuthHeaders(),
 			body: JSON.stringify(data),

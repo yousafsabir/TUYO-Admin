@@ -1,5 +1,4 @@
-import { API_BASE_URL } from './config'
-import { fetchWithNgrok, createAuthHeaders } from './fetch-utils'
+import { fetchWithNgrok } from './fetch-utils'
 
 interface DbTablesResponse {
 	statusCode: number
