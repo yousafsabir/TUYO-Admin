@@ -195,3 +195,23 @@ export async function getProductById(productId: number): Promise<ApiResponse<Pro
 		throw error
 	}
 }
+
+export async function deleteProduct(productId: number): Promise<ApiResponse<{}>> {
+	try {
+		const response = await fetchWithNgrok(`/products/${productId}`, {
+			method: 'DELETE',
+		})
+
+		if (!response.ok) {
+			const errorData = await response
+				.json()
+				.catch(() => ({ message: `HTTP error ${response.status}` }))
+			throw new Error(errorData.message || 'Failed to delete product')
+		}
+
+		return await response.json()
+	} catch (error) {
+		console.error('Error deleting product:', error)
+		throw error
+	}
+}

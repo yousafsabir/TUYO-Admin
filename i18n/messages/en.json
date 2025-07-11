@@ -8,6 +8,7 @@
 		"delete": "Delete",
 		"deleting": "Deleting...",
 		"confirm": "Confirm",
+		"action-not-reversed": "This action cannot be reversed",
 		"filters": "Filters",
 		"clear": "Clear",
 		"success": "Success",

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { updateProduct, type Product } from '@/lib/api/products'
+import { deleteProduct, updateProduct, type Product } from '@/lib/api/products'
 import { Button } from '@/components/ui/button'
 import {
 	Dialog,
@@ -89,10 +89,35 @@ export function ProductActionsModal({ isOpen, onClose, product }: ProductActions
 		},
 	})
 
+	const { mutate: deleteProductMutation, isPending: deletePending } = useMutation({
+		mutationFn: (id: string) => {
+			if (!product) throw new Error('No product selected')
+
+			return deleteProduct(+id)
+		},
+		onSuccess: () => {
+			// Invalidate the products query to refresh the list
+			queryClient.invalidateQueries({ queryKey: ['products'] })
+			onClose()
+		},
+		onError: (error: Error) => {
+			console.error('Delete product error:', error)
+			setError(error.message || 'Failed to delete product')
+		},
+	})
+
 	const handleEditDetails = () => {
 		if (!product) return
 		router.push(`/dashboard/products/${product.id}/edit`)
 		onClose()
+	}
+
+	const handlDelete = () => {
+		if (!product) return
+		let confirmation = window.confirm(t('common.action-not-reversed'))
+		if (confirmation) {
+			deleteProductMutation(product.id.toString())
+		}
 	}
 
 	const handleSave = () => {
@@ -131,7 +156,7 @@ export function ProductActionsModal({ isOpen, onClose, product }: ProductActions
 
 	return (
 		<Dialog open={isOpen} onOpenChange={handleClose}>
-			<DialogContent className='sm:max-w-[425px]'>
+			<DialogContent className=''>
 				<DialogHeader>
 					<DialogTitle>{t('products.editProduct') || 'Edit Product'}</DialogTitle>
 					<DialogDescription>
@@ -240,6 +265,13 @@ export function ProductActionsModal({ isOpen, onClose, product }: ProductActions
 				</div>
 
 				<DialogFooter className='mt-6'>
+					<Button
+						type='button'
+						variant='destructive'
+						onClick={handlDelete}
+						disabled={deletePending}>
+						{deletePending ? t('common.deleting') : t('common.delete')}
+					</Button>
 					<Button
 						type='button'
 						variant='secondary'
