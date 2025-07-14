@@ -165,7 +165,7 @@ const useUpdateOrder = () => {
 // Util Functions
 const formatCurrency = (amount: number | undefined) => {
 	if (amount === undefined || amount === null) return 'N/A'
-	return `$${(amount / 100).toFixed(2)}`
+	return `$${amount.toFixed(2)}`
 }
 
 const formatDate = (dateString: string | undefined) => {
