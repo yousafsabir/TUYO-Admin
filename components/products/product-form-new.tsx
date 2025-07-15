@@ -533,7 +533,7 @@ const ProductFormNew = forwardRef<ProductFormRef, ProductFormProps>((props, ref)
 											categories[formData.category].subcategories,
 										) &&
 										categories[formData.category].subcategories.map((v) => (
-											<SelectItem key={v[0]} value={v[1]}>
+											<SelectItem key={v[0]} value={v[0]}>
 												{v[0]}
 											</SelectItem>
 										))}
