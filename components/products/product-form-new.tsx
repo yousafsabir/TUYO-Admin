@@ -235,7 +235,7 @@ const ProductFormNew = forwardRef<ProductFormRef, ProductFormProps>((props, ref)
 			setFormData({
 				title: values.title || '',
 				brand: values.brand || '',
-				brandImage: values.images?.[0]?.url || '',
+				brandImage: values.brandImage || '',
 				price: values.price?.toString() || '',
 				size: values.size || '',
 				category: values.category || '',

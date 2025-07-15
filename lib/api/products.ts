@@ -30,10 +30,11 @@ export type Product = {
 	id: number
 	sellerId: number
 	title: string
-	description: string
+	description: string | null
 	category: string
 	subcategory: string
 	brand: string
+	brandImage: string
 	size: string
 	color: string | null
 	colorCode: string | null
