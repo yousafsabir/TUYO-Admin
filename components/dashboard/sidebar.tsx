@@ -89,7 +89,7 @@ export function DashboardSidebar() {
 			{/* Desktop Sidebar */}
 			<div className='hidden border-r bg-background md:block md:w-64'>
 				<div className='flex h-full flex-col'>
-					<div className='border-b px-6 py-4'>
+					<div className='flex h-16 items-center border-b px-6'>
 						<h2 className='text-xl font-bold'>Tuyo Panel</h2>
 					</div>
 					<ScrollArea className='flex-1 px-3 py-2'>
