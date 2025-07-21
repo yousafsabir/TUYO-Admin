@@ -264,27 +264,24 @@
 	},
 	"storeConfiguration": {
 		"title": "Store Configuration",
-		"description": "Manage store settings and configuration.",
+		"description": "View and manage your store settings and configuration.",
 		"loadError": "Failed to load store configuration",
 		"noData": "No store configuration data available",
 		"auctionCommission": "Auction Commission",
 		"auctionCommissionDescription": "Percentage commission charged on auction sales",
 		"deliveryFee": "Delivery Fee",
 		"deliveryFeeDescription": "Standard delivery fee charged to customers",
-		"totalBanners": "Total Banners",
-		"totalBannersDescription": "Number of active banners in the store",
-		"systemInfo": "System Information",
-		"systemInfoDescription": "Configuration details and timestamps",
-		"configId": "Configuration ID",
-		"createdAt": "Created At",
-		"updatedAt": "Last Updated",
-		"status": "Status",
-		"active": "Active",
 		"banners": "Store Banners",
+		"bannersDescription": "Active banners displayed in your store",
 		"banner": "Banner",
-		"imageUrl": "Image URL",
-		"linkUrl": "Link URL",
-		"imageLoadError": "Failed to load image"
+		"imageLoadError": "Failed to load image",
+		"table": {
+			"banner": "Banner",
+			"image": "Image",
+			"linkUrl": "Link URL",
+			"actions": "Actions",
+			"visit": "Visit"
+		}
 	},
 	"brands": {
 		"title": "Brands",

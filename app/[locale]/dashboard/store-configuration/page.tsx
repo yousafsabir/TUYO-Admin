@@ -6,6 +6,14 @@ import { useTranslations } from 'next-intl'
 import { fetchWithNgrok } from '@/lib/api/fetch-utils'
 import { imageUrl } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '@/components/ui/table'
 import { Loader2, ExternalLink, Image as ImageIcon } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
@@ -56,63 +64,26 @@ const formatDate = (dateString: string) => {
 	return new Date(dateString).toLocaleString()
 }
 
-// Banner Component
-function BannerCard({ banner, index }: { banner: [string, string]; index: number }) {
+// Banner Image Component
+function BannerImage({ url, index }: { url: string; index: number }) {
 	const t = useTranslations()
 	const [imageError, setImageError] = useState(false)
-	const [url, linkUrl] = banner
 
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle className='text-lg'>
-					{t('storeConfiguration.banner')} #{index + 1}
-				</CardTitle>
-			</CardHeader>
-			<CardContent className='space-y-4'>
-				{/* Banner Image */}
-				<div className='aspect-video w-full overflow-hidden rounded-lg border bg-muted'>
-					{!imageError ? (
-						<img
-							src={imageUrl(url)}
-							alt={`Banner ${index + 1}`}
-							className='h-full w-full object-cover'
-							onError={() => setImageError(true)}
-						/>
-					) : (
-						<div className='flex h-full w-full items-center justify-center'>
-							<div className='text-center'>
-								<ImageIcon className='mx-auto h-12 w-12 text-muted-foreground' />
-								<p className='mt-2 text-sm text-muted-foreground'>
-									{t('storeConfiguration.imageLoadError')}
-								</p>
-							</div>
-						</div>
-					)}
+		<div className='h-20 w-32 overflow-hidden rounded-lg border bg-muted'>
+			{!imageError ? (
+				<img
+					src={imageUrl(url)}
+					alt={`Banner ${index + 1}`}
+					className='h-full w-full object-cover'
+					onError={() => setImageError(true)}
+				/>
+			) : (
+				<div className='flex h-full w-full items-center justify-center'>
+					<ImageIcon className='h-6 w-6 text-muted-foreground' />
 				</div>
-
-				{/* Banner Details */}
-				<div className='space-y-2'>
-					<div>
-						<label className='text-sm font-medium text-muted-foreground'>
-							{t('storeConfiguration.linkUrl')}
-						</label>
-						<div className='flex items-center gap-2'>
-							<p className='break-all text-sm'>{linkUrl}</p>
-							{linkUrl && (
-								<a
-									href={linkUrl}
-									target='_blank'
-									rel='noopener noreferrer'
-									className='text-primary hover:text-primary/80'>
-									<ExternalLink className='h-4 w-4' />
-								</a>
-							)}
-						</div>
-					</div>
-				</div>
-			</CardContent>
-		</Card>
+			)}
+		</div>
 	)
 }
 
@@ -217,16 +188,62 @@ export default function StoreConfigPage() {
 
 			{/* Banners Section */}
 			{storeConfig.banners.length > 0 && (
-				<div className='space-y-4'>
-					<h2 className='text-2xl font-semibold tracking-tight'>
-						{t('storeConfiguration.banners')}
-					</h2>
-					<div className='grid gap-6 md:grid-cols-2'>
-						{storeConfig.banners.map((banner, index) => (
-							<BannerCard key={index} banner={banner} index={index} />
-						))}
-					</div>
-				</div>
+				<Card>
+					<CardHeader>
+						<CardTitle>{t('storeConfiguration.banners')}</CardTitle>
+						<CardDescription>
+							{t('storeConfiguration.bannersDescription')}
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<Table>
+							<TableHeader>
+								<TableRow>
+									<TableHead>{t('storeConfiguration.table.banner')}</TableHead>
+									<TableHead>{t('storeConfiguration.table.image')}</TableHead>
+									<TableHead>{t('storeConfiguration.table.linkUrl')}</TableHead>
+									<TableHead>{t('storeConfiguration.table.actions')}</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{storeConfig.banners.map((banner, index) => {
+									const [url, linkUrl] = banner
+									return (
+										<TableRow key={index}>
+											<TableCell>
+												<div className='font-medium'>
+													{t('storeConfiguration.banner')} #{index + 1}
+												</div>
+											</TableCell>
+											<TableCell>
+												<BannerImage url={url} index={index} />
+											</TableCell>
+											<TableCell>
+												<div className='max-w-xs'>
+													<p className='break-all text-sm text-muted-foreground'>
+														{linkUrl}
+													</p>
+												</div>
+											</TableCell>
+											<TableCell>
+												{linkUrl && (
+													<a
+														href={linkUrl}
+														target='_blank'
+														rel='noopener noreferrer'
+														className='inline-flex items-center gap-1 text-primary hover:text-primary/80'>
+														<ExternalLink className='h-4 w-4' />
+														{t('storeConfiguration.table.visit')}
+													</a>
+												)}
+											</TableCell>
+										</TableRow>
+									)
+								})}
+							</TableBody>
+						</Table>
+					</CardContent>
+				</Card>
 			)}
 		</div>
 	)

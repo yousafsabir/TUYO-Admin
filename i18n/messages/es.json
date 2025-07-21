@@ -263,28 +263,25 @@
 		"unlimited": "Ilimitado"
 	},
 	"storeConfiguration": {
-		"title": "Configuración de la tienda",
-		"description": "Gestiona la configuración y ajustes de la tienda.",
+		"title": "Configuración de tienda",
+		"description": "Ver y gestionar la configuración y ajustes de tu tienda.",
 		"loadError": "Error al cargar la configuración de la tienda",
 		"noData": "No hay datos de configuración de tienda disponibles",
 		"auctionCommission": "Comisión de subasta",
 		"auctionCommissionDescription": "Porcentaje de comisión cobrado en ventas de subastas",
 		"deliveryFee": "Tarifa de entrega",
 		"deliveryFeeDescription": "Tarifa de entrega estándar cobrada a los clientes",
-		"totalBanners": "Total de banners",
-		"totalBannersDescription": "Número de banners activos en la tienda",
-		"systemInfo": "Información del sistema",
-		"systemInfoDescription": "Detalles de configuración y marcas de tiempo",
-		"configId": "ID de configuración",
-		"createdAt": "Creado en",
-		"updatedAt": "Última actualización",
-		"status": "Estado",
-		"active": "Activo",
 		"banners": "Banners de la tienda",
+		"bannersDescription": "Banners activos mostrados en tu tienda",
 		"banner": "Banner",
-		"imageUrl": "URL de imagen",
-		"linkUrl": "URL de enlace",
-		"imageLoadError": "Error al cargar la imagen"
+		"imageLoadError": "Error al cargar la imagen",
+		"table": {
+			"banner": "Banner",
+			"image": "Imagen",
+			"linkUrl": "URL de enlace",
+			"actions": "Acciones",
+			"visit": "Visitar"
+		}
 	},
 	"brands": {
 		"title": "Marcas",
