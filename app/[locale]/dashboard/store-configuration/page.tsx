@@ -8,6 +8,15 @@ import { imageUrl } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog'
 import {
 	Table,
 	TableBody,
@@ -16,9 +25,19 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table'
-import { Loader2, ExternalLink, Image as ImageIcon, Edit, Check, X } from 'lucide-react'
+import {
+	Loader2,
+	ExternalLink,
+	Image as ImageIcon,
+	Edit,
+	Check,
+	X,
+	Plus,
+	Trash2,
+} from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useToast } from '@/components/ui/use-toast'
+import React from 'react'
 
 interface StoreConfig {
 	id: number
@@ -58,11 +77,14 @@ const useStoreConfig = () => {
 const useUpdateStoreConfig = () => {
 	const queryClient = useQueryClient()
 	const { toast } = useToast()
+	const t = useTranslations()
 
 	return useMutation({
 		mutationFn: async (data: {
 			auctionCommissionPercentage?: number
 			deliveryFee?: number
+			banners?: [string, string][]
+			images?: File[]
 		}) => {
 			const formData = new FormData()
 
@@ -74,6 +96,14 @@ const useUpdateStoreConfig = () => {
 			}
 			if (data.deliveryFee !== undefined) {
 				formData.append('deliveryFee', data.deliveryFee.toString())
+			}
+			if (data.banners !== undefined) {
+				formData.append('banners', JSON.stringify(data.banners))
+			}
+			if (data.images) {
+				data.images.forEach((image, index) => {
+					formData.append('images', image)
+				})
 			}
 
 			const response = await fetchWithNgrok('/store-config', {
@@ -94,14 +124,14 @@ const useUpdateStoreConfig = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['store-config'] })
 			toast({
-				title: 'Success',
-				description: 'Store configuration updated successfully',
+				title: t('common.success'),
+				description: t('storeConfiguration.updateSuccess'),
 				variant: 'default',
 			})
 		},
 		onError: (error: Error) => {
 			toast({
-				title: 'Error',
+				title: t('common.error'),
 				description: error.message,
 				variant: 'destructive',
 			})
@@ -120,6 +150,115 @@ const formatPercentage = (percentage: number) => {
 
 const formatDate = (dateString: string) => {
 	return new Date(dateString).toLocaleString()
+}
+
+// Add Banner Modal Component
+function AddBannerModal({ existingBanners }: { existingBanners: [string, string][] }) {
+	const t = useTranslations()
+	const [open, setOpen] = useState(false)
+	const [selectedFile, setSelectedFile] = useState<File | null>(null)
+	const [linkUrl, setLinkUrl] = useState('')
+	const updateStoreConfigMutation = useUpdateStoreConfig()
+
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0]
+		if (file) {
+			setSelectedFile(file)
+		}
+	}
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault()
+
+		if (!selectedFile) {
+			return
+		}
+
+		// Create new banner entry: ['', linkUrl, fileSize]
+		const newBannerEntry: [string, string, string] = ['', linkUrl, selectedFile.size.toString()]
+		const updatedBanners = [...existingBanners, newBannerEntry]
+
+		updateStoreConfigMutation.mutate({
+			// @ts-ignore
+			banners: updatedBanners,
+			images: [selectedFile],
+		})
+
+		// Reset form
+		setSelectedFile(null)
+		setLinkUrl('')
+		setOpen(false)
+	}
+
+	return (
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogTrigger asChild>
+				<Button className='gap-2'>
+					<Plus className='h-4 w-4' />
+					{t('storeConfiguration.addBanner')}
+				</Button>
+			</DialogTrigger>
+			<DialogContent className='sm:max-w-[425px]'>
+				<DialogHeader>
+					<DialogTitle>{t('storeConfiguration.addBanner')}</DialogTitle>
+					<DialogDescription>
+						{t('storeConfiguration.addBannerDescription')}
+					</DialogDescription>
+				</DialogHeader>
+				<form onSubmit={handleSubmit} className='space-y-4'>
+					<div className='space-y-4'>
+						{/* File Input */}
+						<div className='space-y-2'>
+							<Label htmlFor='banner-image'>
+								{t('storeConfiguration.form.image.label')}
+							</Label>
+							<Input
+								id='banner-image'
+								type='file'
+								accept='image/*'
+								onChange={handleFileChange}
+								required
+							/>
+							{selectedFile && (
+								<p className='text-sm text-muted-foreground'>
+									{t('storeConfiguration.form.image.selected')}:{' '}
+									{selectedFile.name}
+								</p>
+							)}
+						</div>
+
+						{/* Link URL Input */}
+						<div className='space-y-2'>
+							<Label htmlFor='banner-link'>
+								{t('storeConfiguration.form.linkUrl.label')}
+							</Label>
+							<Input
+								id='banner-link'
+								type='url'
+								placeholder={t('storeConfiguration.form.linkUrl.placeholder')}
+								value={linkUrl}
+								onChange={(e) => setLinkUrl(e.target.value)}
+								required
+							/>
+						</div>
+					</div>
+
+					<div className='flex justify-end gap-2'>
+						<Button type='button' variant='outline' onClick={() => setOpen(false)}>
+							{t('common.cancel')}
+						</Button>
+						<Button
+							type='submit'
+							disabled={updateStoreConfigMutation.isPending || !selectedFile}>
+							{updateStoreConfigMutation.isPending
+								? t('common.creating')
+								: t('storeConfiguration.addBanner')}
+						</Button>
+					</div>
+				</form>
+			</DialogContent>
+		</Dialog>
+	)
 }
 
 // Editable Field Component
@@ -258,6 +397,13 @@ export default function StoreConfigPage() {
 		updateStoreConfigMutation.mutate({ deliveryFee: value })
 	}
 
+	const handleRemoveBanner = (indexToRemove: number) => {
+		if (!data?.data) return
+
+		const updatedBanners = data.data.banners.filter((_, index) => index !== indexToRemove)
+		updateStoreConfigMutation.mutate({ banners: updatedBanners })
+	}
+
 	if (isLoading) {
 		return (
 			<div className='space-y-6'>
@@ -364,15 +510,20 @@ export default function StoreConfigPage() {
 			</div>
 
 			{/* Banners Section */}
-			{storeConfig.banners.length > 0 && (
-				<Card>
-					<CardHeader>
-						<CardTitle>{t('storeConfiguration.banners')}</CardTitle>
-						<CardDescription>
-							{t('storeConfiguration.bannersDescription')}
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
+			<Card>
+				<CardHeader>
+					<div className='flex items-center justify-between'>
+						<div>
+							<CardTitle>{t('storeConfiguration.banners')}</CardTitle>
+							<CardDescription>
+								{t('storeConfiguration.bannersDescription')}
+							</CardDescription>
+						</div>
+						<AddBannerModal existingBanners={storeConfig.banners} />
+					</div>
+				</CardHeader>
+				<CardContent>
+					{storeConfig.banners.length > 0 ? (
 						<Table>
 							<TableHeader>
 								<TableRow>
@@ -386,7 +537,7 @@ export default function StoreConfigPage() {
 								{storeConfig.banners.map((banner, index) => {
 									const [url, linkUrl] = banner
 									return (
-										<TableRow key={index}>
+										<TableRow key={index} className='group'>
 											<TableCell>
 												<div className='font-medium'>
 													{t('storeConfiguration.banner')} #{index + 1}
@@ -403,25 +554,41 @@ export default function StoreConfigPage() {
 												</div>
 											</TableCell>
 											<TableCell>
-												{linkUrl && (
-													<a
-														href={linkUrl}
-														target='_blank'
-														rel='noopener noreferrer'
-														className='inline-flex items-center gap-1 text-primary hover:text-primary/80'>
-														<ExternalLink className='h-4 w-4' />
-														{t('storeConfiguration.table.visit')}
-													</a>
-												)}
+												<div className='flex items-center gap-2'>
+													{linkUrl && (
+														<a
+															href={linkUrl}
+															target='_blank'
+															rel='noopener noreferrer'
+															className='inline-flex items-center gap-1 text-primary hover:text-primary/80'>
+															<ExternalLink className='h-4 w-4' />
+															{t('storeConfiguration.table.visit')}
+														</a>
+													)}
+													<Button
+														size='sm'
+														variant='ghost'
+														onClick={() => handleRemoveBanner(index)}
+														className='h-8 w-8 p-0 text-destructive opacity-0 transition-opacity group-hover:opacity-100'
+														disabled={
+															updateStoreConfigMutation.isPending
+														}>
+														<Trash2 className='h-4 w-4' />
+													</Button>
+												</div>
 											</TableCell>
 										</TableRow>
 									)
 								})}
 							</TableBody>
 						</Table>
-					</CardContent>
-				</Card>
-			)}
+					) : (
+						<div className='py-8 text-center text-muted-foreground'>
+							{t('storeConfiguration.noBanners')}
+						</div>
+					)}
+				</CardContent>
+			</Card>
 		</div>
 	)
 }

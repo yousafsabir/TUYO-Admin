@@ -267,6 +267,7 @@
 		"description": "Ver y gestionar la configuración y ajustes de tu tienda.",
 		"loadError": "Error al cargar la configuración de la tienda",
 		"noData": "No hay datos de configuración de tienda disponibles",
+		"updateSuccess": "Configuración de tienda actualizada exitosamente",
 		"auctionCommission": "Comisión de subasta",
 		"auctionCommissionDescription": "Porcentaje de comisión cobrado en ventas de subastas",
 		"deliveryFee": "Tarifa de entrega",
@@ -275,6 +276,19 @@
 		"bannersDescription": "Banners activos mostrados en tu tienda",
 		"banner": "Banner",
 		"imageLoadError": "Error al cargar la imagen",
+		"noBanners": "No hay banners configurados",
+		"addBanner": "Agregar banner",
+		"addBannerDescription": "Subir una nueva imagen de banner y establecer su URL de enlace",
+		"form": {
+			"image": {
+				"label": "Imagen del banner",
+				"selected": "Seleccionado"
+			},
+			"linkUrl": {
+				"label": "URL de enlace",
+				"placeholder": "Ingrese la URL a la que debe enlazar este banner"
+			}
+		},
 		"table": {
 			"banner": "Banner",
 			"image": "Imagen",

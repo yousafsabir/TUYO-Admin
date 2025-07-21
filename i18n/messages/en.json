@@ -267,6 +267,7 @@
 		"description": "View and manage your store settings and configuration.",
 		"loadError": "Failed to load store configuration",
 		"noData": "No store configuration data available",
+		"updateSuccess": "Store configuration updated successfully",
 		"auctionCommission": "Auction Commission",
 		"auctionCommissionDescription": "Percentage commission charged on auction sales",
 		"deliveryFee": "Delivery Fee",
@@ -275,6 +276,19 @@
 		"bannersDescription": "Active banners displayed in your store",
 		"banner": "Banner",
 		"imageLoadError": "Failed to load image",
+		"noBanners": "No banners configured",
+		"addBanner": "Add Banner",
+		"addBannerDescription": "Upload a new banner image and set its link URL",
+		"form": {
+			"image": {
+				"label": "Banner Image",
+				"selected": "Selected"
+			},
+			"linkUrl": {
+				"label": "Link URL",
+				"placeholder": "Enter the URL this banner should link to"
+			}
+		},
 		"table": {
 			"banner": "Banner",
 			"image": "Image",
