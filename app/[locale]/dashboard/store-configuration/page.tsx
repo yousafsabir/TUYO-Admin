@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslations } from 'next-intl'
 import { fetchWithNgrok } from '@/lib/api/fetch-utils'
 import { imageUrl } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
 	Table,
 	TableBody,
@@ -14,8 +16,9 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table'
-import { Loader2, ExternalLink, Image as ImageIcon } from 'lucide-react'
+import { Loader2, ExternalLink, Image as ImageIcon, Edit, Check, X } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useToast } from '@/components/ui/use-toast'
 
 interface StoreConfig {
 	id: number
@@ -51,6 +54,61 @@ const useStoreConfig = () => {
 	})
 }
 
+// Update store config mutation
+const useUpdateStoreConfig = () => {
+	const queryClient = useQueryClient()
+	const { toast } = useToast()
+
+	return useMutation({
+		mutationFn: async (data: {
+			auctionCommissionPercentage?: number
+			deliveryFee?: number
+		}) => {
+			const formData = new FormData()
+
+			if (data.auctionCommissionPercentage !== undefined) {
+				formData.append(
+					'auctionCommissionPercentage',
+					data.auctionCommissionPercentage.toString(),
+				)
+			}
+			if (data.deliveryFee !== undefined) {
+				formData.append('deliveryFee', data.deliveryFee.toString())
+			}
+
+			const response = await fetchWithNgrok('/store-config', {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'remove',
+				},
+				body: formData,
+			})
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.message || 'Failed to update store config')
+			}
+
+			return response.json()
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['store-config'] })
+			toast({
+				title: 'Success',
+				description: 'Store configuration updated successfully',
+				variant: 'default',
+			})
+		},
+		onError: (error: Error) => {
+			toast({
+				title: 'Error',
+				description: error.message,
+				variant: 'destructive',
+			})
+		},
+	})
+}
+
 // Utility functions
 const formatCurrency = (amount: number) => {
 	return `$${amount.toFixed(2)}`
@@ -62,6 +120,106 @@ const formatPercentage = (percentage: number) => {
 
 const formatDate = (dateString: string) => {
 	return new Date(dateString).toLocaleString()
+}
+
+// Editable Field Component
+function EditableField({
+	value,
+	type,
+	fieldName,
+	formatDisplay,
+	onUpdate,
+	isLoading,
+}: {
+	value: number
+	type: 'percentage' | 'currency'
+	fieldName: string
+	formatDisplay: (val: number) => string
+	onUpdate: (value: number) => void
+	isLoading: boolean
+}) {
+	const t = useTranslations()
+	const [isEditing, setIsEditing] = useState(false)
+	const [inputValue, setInputValue] = useState(value.toString())
+
+	const handleEdit = () => {
+		setIsEditing(true)
+		setInputValue(value.toString())
+	}
+
+	const handleCancel = () => {
+		setIsEditing(false)
+		setInputValue(value.toString())
+	}
+
+	const handleUpdate = () => {
+		const numericValue = parseFloat(inputValue)
+		if (isNaN(numericValue) || numericValue < 0) {
+			return
+		}
+
+		if (type === 'percentage' && numericValue > 100) {
+			return
+		}
+
+		onUpdate(numericValue)
+		setIsEditing(false)
+	}
+
+	const handleKeyPress = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter') {
+			handleUpdate()
+		} else if (e.key === 'Escape') {
+			handleCancel()
+		}
+	}
+
+	if (isEditing) {
+		return (
+			<div className='flex items-center gap-2'>
+				<Input
+					type='number'
+					value={inputValue}
+					onChange={(e) => setInputValue(e.target.value)}
+					onKeyDown={handleKeyPress}
+					className='h-8 w-24'
+					min='0'
+					max={type === 'percentage' ? 100 : undefined}
+					step={type === 'percentage' ? 1 : 0.01}
+					disabled={isLoading}
+					autoFocus
+				/>
+				<Button
+					size='sm'
+					onClick={handleUpdate}
+					disabled={isLoading}
+					className='h-8 w-8 p-0'>
+					<Check className='h-4 w-4' />
+				</Button>
+				<Button
+					size='sm'
+					variant='outline'
+					onClick={handleCancel}
+					disabled={isLoading}
+					className='h-8 w-8 p-0'>
+					<X className='h-4 w-4' />
+				</Button>
+			</div>
+		)
+	}
+
+	return (
+		<div className='group relative flex w-min items-center'>
+			<div className='text-2xl font-bold text-primary'>{formatDisplay(value)}</div>
+			<Button
+				size='sm'
+				variant='ghost'
+				onClick={handleEdit}
+				className='h-6 w-6 p-0 opacity-0 transition-opacity group-hover:opacity-100'>
+				<Edit className='h-3 w-3' />
+			</Button>
+		</div>
+	)
 }
 
 // Banner Image Component
@@ -90,6 +248,15 @@ function BannerImage({ url, index }: { url: string; index: number }) {
 export default function StoreConfigPage() {
 	const t = useTranslations()
 	const { data, isLoading, isError, error } = useStoreConfig()
+	const updateStoreConfigMutation = useUpdateStoreConfig()
+
+	const handleUpdateAuctionCommission = (value: number) => {
+		updateStoreConfigMutation.mutate({ auctionCommissionPercentage: value })
+	}
+
+	const handleUpdateDeliveryFee = (value: number) => {
+		updateStoreConfigMutation.mutate({ deliveryFee: value })
+	}
 
 	if (isLoading) {
 		return (
@@ -164,9 +331,14 @@ export default function StoreConfigPage() {
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
-						<div className='text-2xl font-bold text-primary'>
-							{formatPercentage(storeConfig.auctionCommissionPercentage)}
-						</div>
+						<EditableField
+							value={storeConfig.auctionCommissionPercentage}
+							type='percentage'
+							fieldName='auctionCommissionPercentage'
+							formatDisplay={formatPercentage}
+							onUpdate={handleUpdateAuctionCommission}
+							isLoading={updateStoreConfigMutation.isPending}
+						/>
 					</CardContent>
 				</Card>
 
@@ -179,9 +351,14 @@ export default function StoreConfigPage() {
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
-						<div className='text-2xl font-bold text-primary'>
-							{formatCurrency(storeConfig.deliveryFee)}
-						</div>
+						<EditableField
+							value={storeConfig.deliveryFee}
+							type='currency'
+							fieldName='deliveryFee'
+							formatDisplay={formatCurrency}
+							onUpdate={handleUpdateDeliveryFee}
+							isLoading={updateStoreConfigMutation.isPending}
+						/>
 					</CardContent>
 				</Card>
 			</div>
