@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
 	Dialog,
 	DialogContent,
@@ -36,6 +37,8 @@ import {
 	Trash2,
 	ChevronUp,
 	ChevronDown,
+	Monitor,
+	Smartphone,
 } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useToast } from '@/components/ui/use-toast'
@@ -46,6 +49,7 @@ interface StoreConfig {
 	auctionCommissionPercentage: number
 	deliveryFee: number
 	banners: [string, string][] // Array of [imageUrl, linkUrl] tuples
+	mobileBanners: [string, string][] // Array of [imageUrl, linkUrl] tuples
 	createdAt: string
 	updatedAt: string
 }
@@ -56,6 +60,8 @@ interface StoreConfigResponse {
 	message: string
 	data: StoreConfig
 }
+
+type BannerType = 'banners' | 'mobileBanners'
 
 // Query hook
 const useStoreConfig = () => {
@@ -86,6 +92,7 @@ const useUpdateStoreConfig = () => {
 			auctionCommissionPercentage?: number
 			deliveryFee?: number
 			banners?: [string, string][]
+			mobileBanners?: [string, string][]
 			images?: File[]
 		}) => {
 			const formData = new FormData()
@@ -101,6 +108,9 @@ const useUpdateStoreConfig = () => {
 			}
 			if (data.banners !== undefined) {
 				formData.append('banners', JSON.stringify(data.banners))
+			}
+			if (data.mobileBanners !== undefined) {
+				formData.append('mobileBanners', JSON.stringify(data.mobileBanners))
 			}
 			if (data.images) {
 				data.images.forEach((image, index) => {
@@ -155,7 +165,13 @@ const formatDate = (dateString: string) => {
 }
 
 // Add Banner Modal Component
-function AddBannerModal({ existingBanners }: { existingBanners: [string, string][] }) {
+function AddBannerModal({
+	existingBanners,
+	bannerType,
+}: {
+	existingBanners: [string, string][]
+	bannerType: BannerType
+}) {
 	const t = useTranslations()
 	const [open, setOpen] = useState(false)
 	const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -180,16 +196,23 @@ function AddBannerModal({ existingBanners }: { existingBanners: [string, string]
 		const newBannerEntry: [string, string, string] = ['', linkUrl, selectedFile.size.toString()]
 		const updatedBanners = [...existingBanners, newBannerEntry]
 
-		updateStoreConfigMutation.mutate({
-			// @ts-ignore
-			banners: updatedBanners,
+		const updateData = {
+			[bannerType]: updatedBanners,
 			images: [selectedFile],
-		})
+		}
+
+		updateStoreConfigMutation.mutate(updateData as any)
 
 		// Reset form
 		setSelectedFile(null)
 		setLinkUrl('')
 		setOpen(false)
+	}
+
+	const getBannerTypeLabel = () => {
+		return bannerType === 'banners'
+			? t('storeConfiguration.desktopBanner')
+			: t('storeConfiguration.mobileBanner')
 	}
 
 	return (
@@ -202,7 +225,9 @@ function AddBannerModal({ existingBanners }: { existingBanners: [string, string]
 			</DialogTrigger>
 			<DialogContent className='sm:max-w-[425px]'>
 				<DialogHeader>
-					<DialogTitle>{t('storeConfiguration.addBanner')}</DialogTitle>
+					<DialogTitle>
+						{t('storeConfiguration.addBanner')} - {getBannerTypeLabel()}
+					</DialogTitle>
 					<DialogDescription>
 						{t('storeConfiguration.addBannerDescription')}
 					</DialogDescription>
@@ -386,13 +411,175 @@ function BannerImage({ url, index }: { url: string; index: number }) {
 	)
 }
 
+// Banner Management Component (Modularized)
+function BannerManagement({
+	banners,
+	bannerType,
+	pendingChanges,
+	setPendingChanges,
+	onRemove,
+	onMove,
+	onUpdate,
+	onCancel,
+	isLoading,
+}: {
+	banners: [string, string][]
+	bannerType: BannerType
+	pendingChanges: [string, string][] | null
+	setPendingChanges: (banners: [string, string][] | null) => void
+	onRemove: (index: number) => void
+	onMove: (index: number, direction: 'up' | 'down') => void
+	onUpdate: () => void
+	onCancel: () => void
+	isLoading: boolean
+}) {
+	const t = useTranslations()
+	const displayBanners = pendingChanges || banners
+
+	return (
+		<div className='space-y-4'>
+			<div className='flex items-center justify-between'>
+				<div className='space-y-1'>
+					<h3 className='text-lg font-semibold'>
+						{bannerType === 'banners'
+							? t('storeConfiguration.desktopBanners')
+							: t('storeConfiguration.mobileBanners')}
+					</h3>
+					<p className='text-sm text-muted-foreground'>
+						{bannerType === 'banners'
+							? t('storeConfiguration.desktopBannersDescription')
+							: t('storeConfiguration.mobileBannersDescription')}
+					</p>
+				</div>
+				<AddBannerModal existingBanners={displayBanners} bannerType={bannerType} />
+			</div>
+
+			{displayBanners.length > 0 ? (
+				<>
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead>{t('storeConfiguration.table.banner')}</TableHead>
+								<TableHead>{t('storeConfiguration.table.image')}</TableHead>
+								<TableHead>{t('storeConfiguration.table.linkUrl')}</TableHead>
+								<TableHead>{t('storeConfiguration.table.actions')}</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{displayBanners.map((banner, index) => {
+								const [url, linkUrl] = banner
+								return (
+									<TableRow key={index} className='group'>
+										<TableCell>
+											<div className='font-medium'>
+												{t('storeConfiguration.banner')} #{index + 1}
+											</div>
+										</TableCell>
+										<TableCell>
+											<BannerImage url={url} index={index} />
+										</TableCell>
+										<TableCell>
+											<div className='max-w-xs'>
+												<p className='break-all text-sm text-muted-foreground'>
+													{linkUrl}
+												</p>
+											</div>
+										</TableCell>
+										<TableCell>
+											<div className='flex items-center gap-1'>
+												{linkUrl && (
+													<a
+														href={linkUrl}
+														target='_blank'
+														rel='noopener noreferrer'
+														className='inline-flex items-center gap-1 text-primary hover:text-primary/80'>
+														<ExternalLink className='h-4 w-4' />
+														{t('storeConfiguration.table.visit')}
+													</a>
+												)}
+
+												{/* Reorder Controls */}
+												<div className='ml-2 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
+													<Button
+														size='sm'
+														variant='ghost'
+														onClick={() => onMove(index, 'up')}
+														disabled={index === 0 || isLoading}
+														className='h-6 w-6 p-0'>
+														<ChevronUp className='h-3 w-3' />
+													</Button>
+													<Button
+														size='sm'
+														variant='ghost'
+														onClick={() => onMove(index, 'down')}
+														disabled={
+															index === displayBanners.length - 1 ||
+															isLoading
+														}
+														className='h-6 w-6 p-0'>
+														<ChevronDown className='h-3 w-3' />
+													</Button>
+												</div>
+
+												{/* Remove Banner */}
+												<Button
+													size='sm'
+													variant='ghost'
+													onClick={() => onRemove(index)}
+													className='ml-1 h-6 w-6 p-0 text-destructive opacity-0 transition-opacity group-hover:opacity-100'
+													disabled={isLoading}>
+													<Trash2 className='h-3 w-3' />
+												</Button>
+											</div>
+										</TableCell>
+									</TableRow>
+								)
+							})}
+						</TableBody>
+					</Table>
+
+					{/* Update Button - Show when there are pending changes */}
+					{pendingChanges && (
+						<div className='mt-4 flex justify-center gap-2'>
+							<Button onClick={onUpdate} disabled={isLoading} className='gap-2'>
+								{isLoading ? (
+									<>
+										<Loader2 className='h-4 w-4 animate-spin' />
+										{t('common.updating')}
+									</>
+								) : (
+									<>
+										<Check className='h-4 w-4' />
+										{t('storeConfiguration.updateBannerOrder')}
+									</>
+								)}
+							</Button>
+							<Button variant='outline' onClick={onCancel} disabled={isLoading}>
+								{t('common.cancel')}
+							</Button>
+						</div>
+					)}
+				</>
+			) : (
+				<div className='py-8 text-center text-muted-foreground'>
+					{t('storeConfiguration.noBanners')}
+				</div>
+			)}
+		</div>
+	)
+}
+
 export default function StoreConfigPage() {
 	const t = useTranslations()
 	const { data, isLoading, isError, error } = useStoreConfig()
 	const updateStoreConfigMutation = useUpdateStoreConfig()
-	const [pendingBannerChanges, setPendingBannerChanges] = useState<[string, string][] | null>(
+	const [pendingDesktopChanges, setPendingDesktopChanges] = useState<[string, string][] | null>(
 		null,
 	)
+	const [pendingMobileChanges, setPendingMobileChanges] = useState<[string, string][] | null>(
+		null,
+	)
+	const [activeTab, setActiveTab] = useState('desktop')
 
 	const handleUpdateAuctionCommission = (value: number) => {
 		updateStoreConfigMutation.mutate({ auctionCommissionPercentage: value })
@@ -402,17 +589,37 @@ export default function StoreConfigPage() {
 		updateStoreConfigMutation.mutate({ deliveryFee: value })
 	}
 
-	const handleRemoveBanner = (indexToRemove: number) => {
+	const handleRemoveBanner = (indexToRemove: number, bannerType: BannerType) => {
 		if (!data?.data) return
 
-		const updatedBanners = data.data.banners.filter((_, index) => index !== indexToRemove)
-		setPendingBannerChanges(updatedBanners)
+		const currentBanners =
+			bannerType === 'banners' ? data.data.banners : data.data.mobileBanners
+		const pendingChanges =
+			bannerType === 'banners' ? pendingDesktopChanges : pendingMobileChanges
+		const banners = pendingChanges || currentBanners
+
+		const updatedBanners = banners.filter((_, index) => index !== indexToRemove)
+
+		if (bannerType === 'banners') {
+			setPendingDesktopChanges(updatedBanners)
+		} else {
+			setPendingMobileChanges(updatedBanners)
+		}
 	}
 
-	const handleMoveBanner = (currentIndex: number, direction: 'up' | 'down') => {
+	const handleMoveBanner = (
+		currentIndex: number,
+		direction: 'up' | 'down',
+		bannerType: BannerType,
+	) => {
 		if (!data?.data) return
 
-		const banners = pendingBannerChanges || data.data.banners
+		const currentBanners =
+			bannerType === 'banners' ? data.data.banners : data.data.mobileBanners
+		const pendingChanges =
+			bannerType === 'banners' ? pendingDesktopChanges : pendingMobileChanges
+		const banners = pendingChanges || currentBanners
+
 		const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
 
 		if (newIndex < 0 || newIndex >= banners.length) return
@@ -424,21 +631,38 @@ export default function StoreConfigPage() {
 			updatedBanners[currentIndex],
 		]
 
-		setPendingBannerChanges(updatedBanners)
+		if (bannerType === 'banners') {
+			setPendingDesktopChanges(updatedBanners)
+		} else {
+			setPendingMobileChanges(updatedBanners)
+		}
 	}
 
-	const handleUpdateBannerOrder = () => {
-		if (!pendingBannerChanges) return
+	const handleUpdateBannerOrder = (bannerType: BannerType) => {
+		const pendingChanges =
+			bannerType === 'banners' ? pendingDesktopChanges : pendingMobileChanges
+		if (!pendingChanges) return
 
-		updateStoreConfigMutation.mutate({
-			banners: pendingBannerChanges,
-		})
+		const updateData = {
+			[bannerType]: pendingChanges,
+		}
 
-		setPendingBannerChanges(null)
+		updateStoreConfigMutation.mutate(updateData as any)
+
+		// Clear pending changes
+		if (bannerType === 'banners') {
+			setPendingDesktopChanges(null)
+		} else {
+			setPendingMobileChanges(null)
+		}
 	}
 
-	const handleCancelBannerChanges = () => {
-		setPendingBannerChanges(null)
+	const handleCancelBannerChanges = (bannerType: BannerType) => {
+		if (bannerType === 'banners') {
+			setPendingDesktopChanges(null)
+		} else {
+			setPendingMobileChanges(null)
+		}
 	}
 
 	if (isLoading) {
@@ -493,9 +717,6 @@ export default function StoreConfigPage() {
 		)
 	}
 
-	// Use pending changes or current banners
-	const displayBanners = pendingBannerChanges || storeConfig.banners
-
 	return (
 		<div className='space-y-6'>
 			{/* Header */}
@@ -549,145 +770,61 @@ export default function StoreConfigPage() {
 				</Card>
 			</div>
 
-			{/* Banners Section */}
+			{/* Banners Section with Tabs */}
 			<Card>
 				<CardHeader>
-					<div className='flex items-center justify-between'>
-						<div>
-							<CardTitle>{t('storeConfiguration.banners')}</CardTitle>
-							<CardDescription>
-								{t('storeConfiguration.bannersDescription')}
-							</CardDescription>
-						</div>
-						<AddBannerModal existingBanners={displayBanners} />
+					<div>
+						<CardTitle>{t('storeConfiguration.banners')}</CardTitle>
+						<CardDescription>
+							{t('storeConfiguration.bannersDescription')}
+						</CardDescription>
 					</div>
 				</CardHeader>
 				<CardContent>
-					{displayBanners.length > 0 ? (
-						<>
-							<Table>
-								<TableHeader>
-									<TableRow>
-										<TableHead>
-											{t('storeConfiguration.table.banner')}
-										</TableHead>
-										<TableHead>{t('storeConfiguration.table.image')}</TableHead>
-										<TableHead>
-											{t('storeConfiguration.table.linkUrl')}
-										</TableHead>
-										<TableHead>
-											{t('storeConfiguration.table.actions')}
-										</TableHead>
-									</TableRow>
-								</TableHeader>
-								<TableBody>
-									{displayBanners.map((banner, index) => {
-										const [url, linkUrl] = banner
-										return (
-											<TableRow key={index} className='group'>
-												<TableCell>
-													<div className='font-medium'>
-														{t('storeConfiguration.banner')} #
-														{index + 1}
-													</div>
-												</TableCell>
-												<TableCell>
-													<BannerImage url={url} index={index} />
-												</TableCell>
-												<TableCell>
-													<div className='max-w-xs'>
-														<p className='break-all text-sm text-muted-foreground'>
-															{linkUrl}
-														</p>
-													</div>
-												</TableCell>
-												<TableCell>
-													<div className='flex items-center gap-1'>
-														{/* Reorder Controls */}
-														<div className='ml-2 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
-															<Button
-																size='sm'
-																variant='ghost'
-																onClick={() =>
-																	handleMoveBanner(index, 'up')
-																}
-																disabled={
-																	index === 0 ||
-																	updateStoreConfigMutation.isPending
-																}
-																className='h-6 w-6 p-0'>
-																<ChevronUp className='h-3 w-3' />
-															</Button>
-															<Button
-																size='sm'
-																variant='ghost'
-																onClick={() =>
-																	handleMoveBanner(index, 'down')
-																}
-																disabled={
-																	index ===
-																		displayBanners.length - 1 ||
-																	updateStoreConfigMutation.isPending
-																}
-																className='h-6 w-6 p-0'>
-																<ChevronDown className='h-3 w-3' />
-															</Button>
-														</div>
+					<Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-4'>
+						<TabsList className='grid w-full grid-cols-2'>
+							<TabsTrigger value='desktop' className='gap-2'>
+								<Monitor className='h-4 w-4' />
+								{t('storeConfiguration.desktopBanners')}
+							</TabsTrigger>
+							<TabsTrigger value='mobile' className='gap-2'>
+								<Smartphone className='h-4 w-4' />
+								{t('storeConfiguration.mobileBanners')}
+							</TabsTrigger>
+						</TabsList>
 
-														{/* Remove Banner */}
-														<Button
-															size='sm'
-															variant='ghost'
-															onClick={() =>
-																handleRemoveBanner(index)
-															}
-															className='ml-1 h-6 w-6 p-0 text-destructive opacity-0 transition-opacity group-hover:opacity-100'
-															disabled={
-																updateStoreConfigMutation.isPending
-															}>
-															<Trash2 className='h-3 w-3' />
-														</Button>
-													</div>
-												</TableCell>
-											</TableRow>
-										)
-									})}
-								</TableBody>
-							</Table>
+						<TabsContent value='desktop'>
+							<BannerManagement
+								banners={storeConfig.banners}
+								bannerType='banners'
+								pendingChanges={pendingDesktopChanges}
+								setPendingChanges={setPendingDesktopChanges}
+								onRemove={(index) => handleRemoveBanner(index, 'banners')}
+								onMove={(index, direction) =>
+									handleMoveBanner(index, direction, 'banners')
+								}
+								onUpdate={() => handleUpdateBannerOrder('banners')}
+								onCancel={() => handleCancelBannerChanges('banners')}
+								isLoading={updateStoreConfigMutation.isPending}
+							/>
+						</TabsContent>
 
-							{/* Update Button - Show when there are pending changes */}
-							{pendingBannerChanges && (
-								<div className='mt-4 flex justify-center gap-2'>
-									<Button
-										onClick={handleUpdateBannerOrder}
-										disabled={updateStoreConfigMutation.isPending}
-										className='gap-2'>
-										{updateStoreConfigMutation.isPending ? (
-											<>
-												<Loader2 className='h-4 w-4 animate-spin' />
-												{t('common.updating')}
-											</>
-										) : (
-											<>
-												<Check className='h-4 w-4' />
-												{t('storeConfiguration.updateBannerOrder')}
-											</>
-										)}
-									</Button>
-									<Button
-										variant='outline'
-										onClick={handleCancelBannerChanges}
-										disabled={updateStoreConfigMutation.isPending}>
-										{t('common.cancel')}
-									</Button>
-								</div>
-							)}
-						</>
-					) : (
-						<div className='py-8 text-center text-muted-foreground'>
-							{t('storeConfiguration.noBanners')}
-						</div>
-					)}
+						<TabsContent value='mobile'>
+							<BannerManagement
+								banners={storeConfig.mobileBanners}
+								bannerType='mobileBanners'
+								pendingChanges={pendingMobileChanges}
+								setPendingChanges={setPendingMobileChanges}
+								onRemove={(index) => handleRemoveBanner(index, 'mobileBanners')}
+								onMove={(index, direction) =>
+									handleMoveBanner(index, direction, 'mobileBanners')
+								}
+								onUpdate={() => handleUpdateBannerOrder('mobileBanners')}
+								onCancel={() => handleCancelBannerChanges('mobileBanners')}
+								isLoading={updateStoreConfigMutation.isPending}
+							/>
+						</TabsContent>
+					</Tabs>
 				</CardContent>
 			</Card>
 		</div>
