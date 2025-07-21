@@ -34,6 +34,8 @@ import {
 	X,
 	Plus,
 	Trash2,
+	ChevronUp,
+	ChevronDown,
 } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useToast } from '@/components/ui/use-toast'
@@ -388,6 +390,9 @@ export default function StoreConfigPage() {
 	const t = useTranslations()
 	const { data, isLoading, isError, error } = useStoreConfig()
 	const updateStoreConfigMutation = useUpdateStoreConfig()
+	const [pendingBannerChanges, setPendingBannerChanges] = useState<[string, string][] | null>(
+		null,
+	)
 
 	const handleUpdateAuctionCommission = (value: number) => {
 		updateStoreConfigMutation.mutate({ auctionCommissionPercentage: value })
@@ -401,7 +406,39 @@ export default function StoreConfigPage() {
 		if (!data?.data) return
 
 		const updatedBanners = data.data.banners.filter((_, index) => index !== indexToRemove)
-		updateStoreConfigMutation.mutate({ banners: updatedBanners })
+		setPendingBannerChanges(updatedBanners)
+	}
+
+	const handleMoveBanner = (currentIndex: number, direction: 'up' | 'down') => {
+		if (!data?.data) return
+
+		const banners = pendingBannerChanges || data.data.banners
+		const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+
+		if (newIndex < 0 || newIndex >= banners.length) return
+
+		const updatedBanners = [...banners]
+		// Swap positions
+		;[updatedBanners[currentIndex], updatedBanners[newIndex]] = [
+			updatedBanners[newIndex],
+			updatedBanners[currentIndex],
+		]
+
+		setPendingBannerChanges(updatedBanners)
+	}
+
+	const handleUpdateBannerOrder = () => {
+		if (!pendingBannerChanges) return
+
+		updateStoreConfigMutation.mutate({
+			banners: pendingBannerChanges,
+		})
+
+		setPendingBannerChanges(null)
+	}
+
+	const handleCancelBannerChanges = () => {
+		setPendingBannerChanges(null)
 	}
 
 	if (isLoading) {
@@ -455,6 +492,9 @@ export default function StoreConfigPage() {
 			</div>
 		)
 	}
+
+	// Use pending changes or current banners
+	const displayBanners = pendingBannerChanges || storeConfig.banners
 
 	return (
 		<div className='space-y-6'>
@@ -519,69 +559,130 @@ export default function StoreConfigPage() {
 								{t('storeConfiguration.bannersDescription')}
 							</CardDescription>
 						</div>
-						<AddBannerModal existingBanners={storeConfig.banners} />
+						<AddBannerModal existingBanners={displayBanners} />
 					</div>
 				</CardHeader>
 				<CardContent>
-					{storeConfig.banners.length > 0 ? (
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead>{t('storeConfiguration.table.banner')}</TableHead>
-									<TableHead>{t('storeConfiguration.table.image')}</TableHead>
-									<TableHead>{t('storeConfiguration.table.linkUrl')}</TableHead>
-									<TableHead>{t('storeConfiguration.table.actions')}</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{storeConfig.banners.map((banner, index) => {
-									const [url, linkUrl] = banner
-									return (
-										<TableRow key={index} className='group'>
-											<TableCell>
-												<div className='font-medium'>
-													{t('storeConfiguration.banner')} #{index + 1}
-												</div>
-											</TableCell>
-											<TableCell>
-												<BannerImage url={url} index={index} />
-											</TableCell>
-											<TableCell>
-												<div className='max-w-xs'>
-													<p className='break-all text-sm text-muted-foreground'>
-														{linkUrl}
-													</p>
-												</div>
-											</TableCell>
-											<TableCell>
-												<div className='flex items-center gap-2'>
-													{linkUrl && (
-														<a
-															href={linkUrl}
-															target='_blank'
-															rel='noopener noreferrer'
-															className='inline-flex items-center gap-1 text-primary hover:text-primary/80'>
-															<ExternalLink className='h-4 w-4' />
-															{t('storeConfiguration.table.visit')}
-														</a>
-													)}
-													<Button
-														size='sm'
-														variant='ghost'
-														onClick={() => handleRemoveBanner(index)}
-														className='h-8 w-8 p-0 text-destructive opacity-0 transition-opacity group-hover:opacity-100'
-														disabled={
-															updateStoreConfigMutation.isPending
-														}>
-														<Trash2 className='h-4 w-4' />
-													</Button>
-												</div>
-											</TableCell>
-										</TableRow>
-									)
-								})}
-							</TableBody>
-						</Table>
+					{displayBanners.length > 0 ? (
+						<>
+							<Table>
+								<TableHeader>
+									<TableRow>
+										<TableHead>
+											{t('storeConfiguration.table.banner')}
+										</TableHead>
+										<TableHead>{t('storeConfiguration.table.image')}</TableHead>
+										<TableHead>
+											{t('storeConfiguration.table.linkUrl')}
+										</TableHead>
+										<TableHead>
+											{t('storeConfiguration.table.actions')}
+										</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{displayBanners.map((banner, index) => {
+										const [url, linkUrl] = banner
+										return (
+											<TableRow key={index} className='group'>
+												<TableCell>
+													<div className='font-medium'>
+														{t('storeConfiguration.banner')} #
+														{index + 1}
+													</div>
+												</TableCell>
+												<TableCell>
+													<BannerImage url={url} index={index} />
+												</TableCell>
+												<TableCell>
+													<div className='max-w-xs'>
+														<p className='break-all text-sm text-muted-foreground'>
+															{linkUrl}
+														</p>
+													</div>
+												</TableCell>
+												<TableCell>
+													<div className='flex items-center gap-1'>
+														{/* Reorder Controls */}
+														<div className='ml-2 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
+															<Button
+																size='sm'
+																variant='ghost'
+																onClick={() =>
+																	handleMoveBanner(index, 'up')
+																}
+																disabled={
+																	index === 0 ||
+																	updateStoreConfigMutation.isPending
+																}
+																className='h-6 w-6 p-0'>
+																<ChevronUp className='h-3 w-3' />
+															</Button>
+															<Button
+																size='sm'
+																variant='ghost'
+																onClick={() =>
+																	handleMoveBanner(index, 'down')
+																}
+																disabled={
+																	index ===
+																		displayBanners.length - 1 ||
+																	updateStoreConfigMutation.isPending
+																}
+																className='h-6 w-6 p-0'>
+																<ChevronDown className='h-3 w-3' />
+															</Button>
+														</div>
+
+														{/* Remove Banner */}
+														<Button
+															size='sm'
+															variant='ghost'
+															onClick={() =>
+																handleRemoveBanner(index)
+															}
+															className='ml-1 h-6 w-6 p-0 text-destructive opacity-0 transition-opacity group-hover:opacity-100'
+															disabled={
+																updateStoreConfigMutation.isPending
+															}>
+															<Trash2 className='h-3 w-3' />
+														</Button>
+													</div>
+												</TableCell>
+											</TableRow>
+										)
+									})}
+								</TableBody>
+							</Table>
+
+							{/* Update Button - Show when there are pending changes */}
+							{pendingBannerChanges && (
+								<div className='mt-4 flex justify-center gap-2'>
+									<Button
+										onClick={handleUpdateBannerOrder}
+										disabled={updateStoreConfigMutation.isPending}
+										className='gap-2'>
+										{updateStoreConfigMutation.isPending ? (
+											<>
+												<Loader2 className='h-4 w-4 animate-spin' />
+												{t('common.updating')}
+											</>
+										) : (
+											<>
+												<Check className='h-4 w-4' />
+												{t('storeConfiguration.updateBannerOrder')}
+											</>
+										)}
+									</Button>
+									<Button
+										variant='outline'
+										onClick={handleCancelBannerChanges}
+										disabled={updateStoreConfigMutation.isPending}>
+										{t('common.cancel')}
+									</Button>
+								</div>
+							)}
+						</>
 					) : (
 						<div className='py-8 text-center text-muted-foreground'>
 							{t('storeConfiguration.noBanners')}

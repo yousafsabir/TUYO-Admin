@@ -279,6 +279,7 @@
 		"noBanners": "No hay banners configurados",
 		"addBanner": "Agregar banner",
 		"addBannerDescription": "Subir una nueva imagen de banner y establecer su URL de enlace",
+		"updateBannerOrder": "Actualizar orden de banners",
 		"form": {
 			"image": {
 				"label": "Imagen del banner",

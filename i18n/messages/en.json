@@ -279,6 +279,7 @@
 		"noBanners": "No banners configured",
 		"addBanner": "Add Banner",
 		"addBannerDescription": "Upload a new banner image and set its link URL",
+		"updateBannerOrder": "Update Banner Order",
 		"form": {
 			"image": {
 				"label": "Banner Image",
