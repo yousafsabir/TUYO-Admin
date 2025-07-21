@@ -26,7 +26,8 @@
 		"refresh": "Actualizar",
 		"copiedSuccessfully": "Copiado con éxito",
 		"copiedFailed": "Error al copiar",
-		"edit": "Editar"
+		"edit": "Editar",
+		"config": "Configuración"
 	},
 	"navigation": {
 		"dashboard": "Tablero",

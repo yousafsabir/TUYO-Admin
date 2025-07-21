@@ -100,7 +100,11 @@ export function DashboardSidebar() {
 									href={route.href}
 									className={cn(
 										'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-										pathname === '/' + locale + route.href
+										pathname === `/${locale}${route.href}` ||
+											([`/dashboard/store-configuration`].includes(
+												route.href,
+											) &&
+												pathname.startsWith(`/${locale}${route.href}`))
 											? 'bg-primary text-primary-foreground'
 											: 'text-muted-foreground hover:bg-muted hover:text-foreground',
 									)}>

@@ -105,16 +105,23 @@ export function CategoriesSubcategoriesTable() {
 
 	return (
 		<div className='space-y-4'>
-			{/* Action Buttons */}
-			<div className='flex gap-2'>
-				<Button onClick={() => setIsAddCategoryModalOpen(true)}>
-					<Plus className='mr-2 h-4 w-4' />
-					{t('categories.addCategory') || 'Add Category'}
-				</Button>
-				<Button variant='outline' onClick={() => setIsAddSubcategoryModalOpen(true)}>
-					<Plus className='mr-2 h-4 w-4' />
-					{t('subcategories.addSubcategory') || 'Add Subcategory'}
-				</Button>
+			<div className='mb-4 flex justify-between'>
+				<p>
+					{t('categories.description') ||
+						'Manage product categories and their subcategories.'}
+				</p>
+				{/* Action Buttons */}
+
+				<div className='flex gap-2'>
+					<Button onClick={() => setIsAddCategoryModalOpen(true)}>
+						<Plus className='mr-2 h-4 w-4' />
+						{t('categories.addCategory') || 'Add Category'}
+					</Button>
+					<Button variant='outline' onClick={() => setIsAddSubcategoryModalOpen(true)}>
+						<Plus className='mr-2 h-4 w-4' />
+						{t('subcategories.addSubcategory') || 'Add Subcategory'}
+					</Button>
+				</div>
 			</div>
 
 			<div className='rounded-md border'>

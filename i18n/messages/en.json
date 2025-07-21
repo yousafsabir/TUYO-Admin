@@ -26,7 +26,8 @@
 		"refresh": "Refresh",
 		"copiedSuccessfully": "Copied Successfully",
 		"copiedFailed": "Failed to Copy",
-		"edit": "Edit"
+		"edit": "Edit",
+		"config": "Configuration"
 	},
 	"navigation": {
 		"dashboard": "Dashboard",
