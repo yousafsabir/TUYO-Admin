@@ -197,7 +197,45 @@
 		"addDescription": "Create a new product listing.",
 		"editOtherDetails": "Edit Other Details",
 		"featuredStatus": "Featured Status",
-		"featuredStatusDescription": "Mark this product as featured to give it special visibility."
+		"featuredStatusDescription": "Mark this product as featured to give it special visibility.",
+		"loadError": "Failed to load products",
+		"sizeMeasurements": "Size Measurements",
+		"sizeMeasurementsDescription": "Detailed measurements for",
+		"size": "Size",
+		"height": "Height",
+		"chest": "Chest",
+		"waist": "Waist",
+		"hips": "Hips",
+		"basePrice": "Base Price",
+		"highestBid": "Highest Bid",
+		"featured": "Featured",
+		"itemNames": "products",
+		"conditions": {
+			"likeNew": "Like New",
+			"good": "Good",
+			"fair": "Fair",
+			"poor": "Poor"
+		},
+		"statuses": {
+			"draft": "Draft",
+			"pending_approval": "Pending Approval",
+			"live": "Live",
+			"auction_ended": "Auction Ended",
+			"sold": "Sold",
+			"archived": "Archived"
+		},
+		"table": {
+			"image": "Image",
+			"title": "Title",
+			"category": "Category",
+			"size": "Size",
+			"color": "Color",
+			"condition": "Condition",
+			"price": "Price",
+			"type": "Type",
+			"status": "Status",
+			"created": "Created"
+		}
 	},
 	"orders": {
 		"title": "Orders",

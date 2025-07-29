@@ -197,7 +197,44 @@
 		"addDescription": "Crear un nuevo listado de productos.",
 		"editOtherDetails": "Editar otros detalles",
 		"featuredStatus": "Estado destacado",
-		"featuredStatusDescription": "Marca este producto como destacado para darle visibilidad especial."
+		"featuredStatusDescription": "Marca este producto como destacado para darle visibilidad especial.",
+		"loadError": "Error al cargar productos",
+		"sizeMeasurements": "Medidas de talla",
+		"sizeMeasurementsDescription": "Medidas detalladas para",
+		"size": "Talla",
+		"height": "Altura",
+		"chest": "Pecho",
+		"waist": "Cintura",
+		"hips": "Caderas",
+		"basePrice": "Precio base",
+		"highestBid": "Oferta más alta",
+		"featured": "Destacado",
+		"conditions": {
+			"likeNew": "Como nuevo",
+			"good": "Bueno",
+			"fair": "Regular",
+			"poor": "Malo"
+		},
+		"statuses": {
+			"draft": "Borrador",
+			"pending_approval": "Pendiente de aprobación",
+			"live": "Activo",
+			"auction_ended": "Subasta terminada",
+			"sold": "Vendido",
+			"archived": "Archivado"
+		},
+		"table": {
+			"image": "Imagen",
+			"title": "Título",
+			"category": "Categoría",
+			"size": "Talla",
+			"color": "Color",
+			"condition": "Condición",
+			"price": "Precio",
+			"type": "Tipo",
+			"status": "Estado",
+			"created": "Creado"
+		}
 	},
 	"orders": {
 		"title": "Pedidos",
