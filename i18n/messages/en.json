@@ -163,14 +163,14 @@
 			"primary": "Primary"
 		},
 		"tabs": {
-			"orders": "Orders",
 			"products": "Products",
-			"auctions": "Auctions",
-			"activity": "Activity",
-			"ordersContent": "User orders will be displayed here",
+			"sales": "Sales",
+			"subscription": "Subscription",
+			"withdrawal": "Withdrawal Requests",
 			"productsContent": "User products will be displayed here",
-			"auctionsContent": "User auctions will be displayed here",
-			"activityContent": "User activity will be displayed here"
+			"salesContent": "User sales will be displayed here",
+			"subscriptionContent": "User subscription details will be displayed here",
+			"withdrawalContent": "User withdrawal requests will be displayed here"
 		}
 	},
 	"products": {

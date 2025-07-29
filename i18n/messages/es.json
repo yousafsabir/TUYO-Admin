@@ -163,14 +163,14 @@
 			"primary": "Principal"
 		},
 		"tabs": {
-			"orders": "Pedidos",
 			"products": "Productos",
-			"auctions": "Subastas",
-			"activity": "Actividad",
-			"ordersContent": "Los pedidos del usuario se mostrarán aquí",
+			"sales": "Ventas",
+			"subscription": "Suscripción",
+			"withdrawal": "Solicitudes de retiro",
 			"productsContent": "Los productos del usuario se mostrarán aquí",
-			"auctionsContent": "Las subastas del usuario se mostrarán aquí",
-			"activityContent": "La actividad del usuario se mostrará aquí"
+			"salesContent": "Las ventas del usuario se mostrarán aquí",
+			"subscriptionContent": "Los detalles de suscripción del usuario se mostrarán aquí",
+			"withdrawalContent": "Las solicitudes de retiro del usuario se mostrarán aquí"
 		}
 	},
 	"products": {

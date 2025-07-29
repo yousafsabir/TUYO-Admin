@@ -106,7 +106,7 @@ const useUser = (id: string) => {
 
 // Utility functions
 const formatCurrency = (amount: number) => {
-	return `$${(amount / 100).toFixed(2)}`
+	return `$${amount.toFixed(2)}`
 }
 
 const formatDate = (dateString: string) => {
@@ -374,48 +374,48 @@ export default function UserDetailPage(props: { params: Promise<{ id: string }> 
 			{/* Tabs Section */}
 			<Card>
 				<CardContent className='p-0'>
-					<Tabs defaultValue='orders' className='w-full'>
+					<Tabs defaultValue='products' className='w-full'>
 						<TabsList className='grid w-full grid-cols-4 rounded-none border-b'>
-							<TabsTrigger value='orders' className='gap-2'>
-								<ShoppingCart className='h-4 w-4' />
-								{t('userDetail.tabs.orders')}
-							</TabsTrigger>
 							<TabsTrigger value='products' className='gap-2'>
 								<Package className='h-4 w-4' />
 								{t('userDetail.tabs.products')}
 							</TabsTrigger>
-							<TabsTrigger value='auctions' className='gap-2'>
-								<Star className='h-4 w-4' />
-								{t('userDetail.tabs.auctions')}
+							<TabsTrigger value='sales' className='gap-2'>
+								<ShoppingCart className='h-4 w-4' />
+								{t('userDetail.tabs.sales')}
 							</TabsTrigger>
-							<TabsTrigger value='activity' className='gap-2'>
-								<User className='h-4 w-4' />
-								{t('userDetail.tabs.activity')}
+							<TabsTrigger value='subscription' className='gap-2'>
+								<Star className='h-4 w-4' />
+								{t('userDetail.tabs.subscription')}
+							</TabsTrigger>
+							<TabsTrigger value='withdrawal' className='gap-2'>
+								<CreditCard className='h-4 w-4' />
+								{t('userDetail.tabs.withdrawal')}
 							</TabsTrigger>
 						</TabsList>
 
 						<div className='p-6'>
-							<TabsContent value='orders' className='mt-0'>
-								<div className='py-8 text-center text-muted-foreground'>
-									{t('userDetail.tabs.ordersContent')}
-								</div>
-							</TabsContent>
-
 							<TabsContent value='products' className='mt-0'>
 								<div className='py-8 text-center text-muted-foreground'>
 									{t('userDetail.tabs.productsContent')}
 								</div>
 							</TabsContent>
 
-							<TabsContent value='auctions' className='mt-0'>
+							<TabsContent value='sales' className='mt-0'>
 								<div className='py-8 text-center text-muted-foreground'>
-									{t('userDetail.tabs.auctionsContent')}
+									{t('userDetail.tabs.salesContent')}
 								</div>
 							</TabsContent>
 
-							<TabsContent value='activity' className='mt-0'>
+							<TabsContent value='subscription' className='mt-0'>
 								<div className='py-8 text-center text-muted-foreground'>
-									{t('userDetail.tabs.activityContent')}
+									{t('userDetail.tabs.subscriptionContent')}
+								</div>
+							</TabsContent>
+
+							<TabsContent value='withdrawal' className='mt-0'>
+								<div className='py-8 text-center text-muted-foreground'>
+									{t('userDetail.tabs.withdrawalContent')}
 								</div>
 							</TabsContent>
 						</div>
