@@ -40,6 +40,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import UsersProductsTable from './products-table'
 import UsersSalesTable from './sales-table'
+import { UsersSubscriptionsTable } from './subscriptions-table'
 
 // Types & Interfaces
 interface Address {
@@ -406,9 +407,7 @@ export default function UserDetailPage(props: { params: Promise<{ id: string }> 
 							</TabsContent>
 
 							<TabsContent value='subscription' className='mt-0'>
-								<div className='py-8 text-center text-muted-foreground'>
-									{t('userDetail.tabs.subscriptionContent')}
-								</div>
+								<UsersSubscriptionsTable userId={id} />
 							</TabsContent>
 
 							<TabsContent value='withdrawal' className='mt-0'>

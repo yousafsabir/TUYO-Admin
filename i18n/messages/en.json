@@ -360,7 +360,8 @@
 		"of": "of",
 		"subscriptions": "subscriptions",
 		"page": "Page",
-		"unlimited": "Unlimited"
+		"unlimited": "Unlimited",
+		"itemsName": "subscriptions"
 	},
 	"storeConfiguration": {
 		"title": "Store Configuration",

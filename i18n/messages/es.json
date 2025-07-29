@@ -359,7 +359,8 @@
 		"of": "de",
 		"subscriptions": "suscripciones",
 		"page": "Página",
-		"unlimited": "Ilimitado"
+		"unlimited": "Ilimitado",
+		"itemsName": "suscripciones"
 	},
 	"storeConfiguration": {
 		"title": "Configuración de tienda",
