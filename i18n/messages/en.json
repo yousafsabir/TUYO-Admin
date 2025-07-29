@@ -142,6 +142,37 @@
 			"actions": "Actions"
 		}
 	},
+	"userDetail": {
+		"invalidId": "Please pass a correct numeric id of the user",
+		"loadError": "Failed to load user details",
+		"noData": "No user data available",
+		"influencer": "Influencer",
+		"availableBalance": "Available Balance",
+		"lockedBalance": "Locked Balance",
+		"sendMessage": "Send Message",
+		"addresses": "Addresses",
+		"userAddresses": "User Addresses",
+		"userAddressesDescription": "List of all addresses associated with this user",
+		"noAddresses": "No addresses found for this user",
+		"primary": "Primary",
+		"table": {
+			"recipient": "Recipient",
+			"address": "Address",
+			"phone": "Phone",
+			"status": "Status",
+			"primary": "Primary"
+		},
+		"tabs": {
+			"orders": "Orders",
+			"products": "Products",
+			"auctions": "Auctions",
+			"activity": "Activity",
+			"ordersContent": "User orders will be displayed here",
+			"productsContent": "User products will be displayed here",
+			"auctionsContent": "User auctions will be displayed here",
+			"activityContent": "User activity will be displayed here"
+		}
+	},
 	"products": {
 		"title": "Products",
 		"description": "Manage product listings and inventory.",

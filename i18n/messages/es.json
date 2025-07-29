@@ -142,6 +142,37 @@
 			"actions": "Acciones"
 		}
 	},
+	"userDetail": {
+		"invalidId": "Por favor proporcione un ID numérico correcto del usuario",
+		"loadError": "Error al cargar los detalles del usuario",
+		"noData": "No hay datos de usuario disponibles",
+		"influencer": "Influencer",
+		"availableBalance": "Saldo disponible",
+		"lockedBalance": "Saldo bloqueado",
+		"sendMessage": "Enviar mensaje",
+		"addresses": "Direcciones",
+		"userAddresses": "Direcciones del usuario",
+		"userAddressesDescription": "Lista de todas las direcciones asociadas con este usuario",
+		"noAddresses": "No se encontraron direcciones para este usuario",
+		"primary": "Principal",
+		"table": {
+			"recipient": "Destinatario",
+			"address": "Dirección",
+			"phone": "Teléfono",
+			"status": "Estado",
+			"primary": "Principal"
+		},
+		"tabs": {
+			"orders": "Pedidos",
+			"products": "Productos",
+			"auctions": "Subastas",
+			"activity": "Actividad",
+			"ordersContent": "Los pedidos del usuario se mostrarán aquí",
+			"productsContent": "Los productos del usuario se mostrarán aquí",
+			"auctionsContent": "Las subastas del usuario se mostrarán aquí",
+			"activityContent": "La actividad del usuario se mostrará aquí"
+		}
+	},
 	"products": {
 		"title": "Productos",
 		"description": "Gestiona listados de productos e inventario.",

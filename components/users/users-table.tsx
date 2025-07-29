@@ -12,6 +12,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
@@ -164,35 +165,37 @@ export function UsersTable({}: UsersTableProps) {
 									data?.data?.users.map((user: User) => (
 										<TableRow key={user.id}>
 											<TableCell>
-												<div className='flex items-center gap-3'>
-													<Avatar>
-														{!avatarErrors[user.id] ? (
-															<AvatarImage
-																src={
-																	imageUrl(user.avatarUrl) ||
-																	'/placeholder.svg'
-																}
-																alt={`${user.firstName} ${user.lastName}`}
-																onError={() =>
-																	handleAvatarError(user.id)
-																}
-																className='object-cover object-top'
-															/>
-														) : null}
-														<AvatarFallback>
-															{user.firstName.charAt(0)}
-															{user.lastName.charAt(0)}
-														</AvatarFallback>
-													</Avatar>
-													<div>
-														<p className='font-medium'>
-															{user.firstName} {user.lastName}
-														</p>
-														<p className='text-xs text-muted-foreground'>
-															ID: {user.id}
-														</p>
+												<Link href={'/dashboard/users/' + user.id}>
+													<div className='flex items-center gap-3'>
+														<Avatar>
+															{!avatarErrors[user.id] ? (
+																<AvatarImage
+																	src={
+																		imageUrl(user.avatarUrl) ||
+																		'/placeholder.svg'
+																	}
+																	alt={`${user.firstName} ${user.lastName}`}
+																	onError={() =>
+																		handleAvatarError(user.id)
+																	}
+																	className='object-cover object-top'
+																/>
+															) : null}
+															<AvatarFallback>
+																{user.firstName.charAt(0)}
+																{user.lastName.charAt(0)}
+															</AvatarFallback>
+														</Avatar>
+														<div>
+															<p className='font-medium'>
+																{user.firstName} {user.lastName}
+															</p>
+															<p className='text-xs text-muted-foreground'>
+																ID: {user.id}
+															</p>
+														</div>
 													</div>
-												</div>
+												</Link>
 											</TableCell>
 											<TableCell>{user.username}</TableCell>
 											<TableCell>{user.email}</TableCell>
