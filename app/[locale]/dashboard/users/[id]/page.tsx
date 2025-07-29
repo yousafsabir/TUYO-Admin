@@ -39,6 +39,7 @@ import {
 } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import UsersProductsTable from './products-table'
+import UsersSalesTable from './sales-table'
 
 // Types & Interfaces
 interface Address {
@@ -401,9 +402,7 @@ export default function UserDetailPage(props: { params: Promise<{ id: string }> 
 							</TabsContent>
 
 							<TabsContent value='sales' className='mt-0'>
-								<div className='py-8 text-center text-muted-foreground'>
-									{t('userDetail.tabs.salesContent')}
-								</div>
+								<UsersSalesTable userId={id} />
 							</TabsContent>
 
 							<TabsContent value='subscription' className='mt-0'>

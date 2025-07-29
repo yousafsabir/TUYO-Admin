@@ -303,6 +303,37 @@
 			}
 		}
 	},
+	"sales": {
+		"loadError": "Error al cargar datos de ventas",
+		"noSales": "No se encontraron ventas para este usuario",
+		"itemNames": "ventas",
+		"filters": {
+			"title": "Filtros",
+			"status": {
+				"placeholder": "Todos los estados",
+				"all": "Todos los estados"
+			}
+		},
+		"status": {
+			"pending": "Pendiente",
+			"processing": "Procesando",
+			"pendingClearance": "Pendiente de autorización",
+			"succeeded": "Exitoso",
+			"failed": "Fallido",
+			"paymentFailed": "Pago fallido",
+			"cancelled": "Cancelado",
+			"refunded": "Reembolsado",
+			"rejected": "Rechazado"
+		},
+		"table": {
+			"id": "ID de Venta",
+			"orderId": "ID de Pedido",
+			"productId": "ID de Producto",
+			"amount": "Cantidad",
+			"status": "Estado",
+			"created": "Creado"
+		}
+	},
 	"subscriptions": {
 		"title": "Suscripciones",
 		"description": "Gestiona suscripciones de usuarios y facturación.",
