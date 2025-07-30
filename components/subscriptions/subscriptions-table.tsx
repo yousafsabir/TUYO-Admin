@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslations } from 'next-intl'
 import {
@@ -11,6 +12,7 @@ import {
 	TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2 } from 'lucide-react'
 
@@ -43,98 +45,72 @@ interface SubscriptionsResponse {
 			page: number
 			limit: number
 			total: number
-			prevPage: boolean
-			nextPage: boolean
+			prev: boolean
+			next: boolean
 		}
 	}
 }
 
-export async function getSubscriptions(page = 1, limit = 25): Promise<SubscriptionsResponse> {
-	try {
-		const response = await fetchWithNgrok(`/users/subscriptions?page=${page}&limit=${limit}`, {
-			method: 'GET',
-		})
-
-		if (!response.ok) {
-			throw new Error(`Failed to fetch subscriptions: ${response.status}`)
-		}
-
-		return await response.json()
-	} catch (error) {
-		console.error('Error fetching subscriptions:', error)
-		throw error
-	}
-}
-
-interface SubscriptionsTableProps {}
-
-export function SubscriptionsTable({}: SubscriptionsTableProps) {
-	const t = useTranslations()
-
-	const {
-		data: subscriptionsData,
-		isLoading,
-		error,
-	} = useQuery({
-		queryKey: ['subscriptions'],
-		queryFn: () => getSubscriptions(),
+export async function getSubscriptions(
+	page: number,
+	limit: number,
+): Promise<SubscriptionsResponse> {
+	const res = await fetchWithNgrok(`/users/subscriptions?page=${page}&limit=${limit}`, {
+		method: 'GET',
 	})
 
-	const formatDate = (dateString: string) => {
+	if (!res.ok) throw new Error(`Failed to fetch subscriptions: ${res.status}`)
+
+	return res.json()
+}
+
+export function SubscriptionsTable() {
+	const t = useTranslations()
+	const [currentPage, setCurrentPage] = useState(1)
+	const limit = 25
+
+	const { data, isLoading, isError, error } = useQuery({
+		queryKey: ['subscriptions', currentPage],
+		queryFn: () => getSubscriptions(currentPage, limit),
+	})
+
+	const formatDate = (dateStr: string) => {
 		try {
-			return new Date(dateString).toLocaleDateString()
+			return new Date(dateStr).toLocaleDateString()
 		} catch {
-			return dateString
-		}
-	}
-
-	const getStatusBadge = (status: string) => {
-		switch (status.toLowerCase()) {
-			case 'active':
-				return <Badge className='bg-green-100 text-green-800'>{status}</Badge>
-			case 'inactive':
-				return <Badge variant='secondary'>{status}</Badge>
-			case 'cancelled':
-				return <Badge variant='destructive'>{status}</Badge>
-			default:
-				return <Badge variant='outline'>{status}</Badge>
-		}
-	}
-
-	const getPaymentStatusBadge = (paymentStatus: string) => {
-		switch (paymentStatus.toLowerCase()) {
-			case 'paid':
-				return <Badge className='bg-green-100 text-green-800'>{paymentStatus}</Badge>
-			case 'pending':
-				return <Badge className='bg-yellow-100 text-yellow-800'>{paymentStatus}</Badge>
-			case 'failed':
-				return <Badge variant='destructive'>{paymentStatus}</Badge>
-			default:
-				return <Badge variant='outline'>{paymentStatus}</Badge>
+			return dateStr
 		}
 	}
 
 	if (isLoading) {
 		return (
-			<div className='flex items-center justify-center p-8'>
+			<div className='flex justify-center p-8'>
 				<Loader2 className='h-8 w-8 animate-spin' />
-				<span className='ml-2'>{t('common.loading') || 'Loading...'}</span>
 			</div>
 		)
 	}
-
-	if (error) {
+	if (isError) {
 		return (
 			<Alert variant='destructive'>
 				<AlertDescription>
-					{t('subscriptions.errorLoading') ||
-						'Error loading subscriptions. Please try again.'}
+					{t('subscriptions.errorLoading') || 'Error loading subscriptions.'}
 				</AlertDescription>
 			</Alert>
 		)
 	}
 
-	const subscriptions = subscriptionsData?.data?.subscriptions || []
+	const subscriptions = data?.data.subscriptions || []
+	const pagination = data?.data.pagination
+
+	const totalPages = pagination ? Math.max(1, Math.ceil(pagination.total / pagination.limit)) : 1
+
+	const handlePrev = () => {
+		if (currentPage > 1) setCurrentPage(currentPage - 1)
+	}
+
+	const handleNext = () => {
+		if (currentPage < totalPages) setCurrentPage(currentPage + 1)
+	}
 
 	return (
 		<div className='space-y-4'>
@@ -164,24 +140,22 @@ export function SubscriptionsTable({}: SubscriptionsTableProps) {
 								</TableCell>
 							</TableRow>
 						) : (
-							subscriptions.map((subscription: Subscription) => (
-								<TableRow key={subscription.id}>
-									<TableCell className='font-medium'>{subscription.id}</TableCell>
-									<TableCell>{subscription.userId}</TableCell>
+							subscriptions.map((sub) => (
+								<TableRow key={sub.id}>
+									<TableCell className='font-medium'>{sub.id}</TableCell>
+									<TableCell>{sub.userId}</TableCell>
 									<TableCell>
-										<Badge variant='outline'>{subscription.planId}</Badge>
+										<Badge>{sub.planId}</Badge>
 									</TableCell>
-									<TableCell>{getStatusBadge(subscription.status)}</TableCell>
+									<TableCell>{sub.status}</TableCell>
+									<TableCell>{sub.paymentStatus}</TableCell>
 									<TableCell>
-										{getPaymentStatusBadge(subscription.paymentStatus)}
-									</TableCell>
-									<TableCell>
-										{subscription.listingsRemaining > 999999
+										{sub.listingsRemaining > 999999
 											? t('subscriptions.unlimited') || 'Unlimited'
-											: subscription.listingsRemaining.toLocaleString()}
+											: sub.listingsRemaining.toLocaleString()}
 									</TableCell>
-									<TableCell>{formatDate(subscription.nextRenewal)}</TableCell>
-									<TableCell>{formatDate(subscription.createdAt)}</TableCell>
+									<TableCell>{formatDate(sub.nextRenewal)}</TableCell>
+									<TableCell>{formatDate(sub.createdAt)}</TableCell>
 								</TableRow>
 							))
 						)}
@@ -189,17 +163,36 @@ export function SubscriptionsTable({}: SubscriptionsTableProps) {
 				</Table>
 			</div>
 
-			{subscriptionsData?.data?.pagination && (
-				<div className='flex items-center justify-between text-sm text-muted-foreground'>
-					<div>
-						{t('subscriptions.showing') || 'Showing'} {subscriptions.length}{' '}
-						{t('subscriptions.of') || 'of'} {subscriptionsData.data.pagination.total}{' '}
-						{t('subscriptions.subscriptions') || 'subscriptions'}
+			{pagination && (
+				<>
+					<div className='mt-2 flex items-center justify-between'>
+						<Button
+							onClick={handlePrev}
+							disabled={currentPage === 1 || !pagination.prev}
+							size='sm'>
+							{t('pagination.prev')}
+						</Button>
+						<span className='text-sm'>
+							{t('pagination.page', { number: currentPage })}{' '}
+							{t('pagination.of', { number: totalPages })}
+						</span>
+						<Button
+							onClick={handleNext}
+							disabled={currentPage === totalPages || !pagination.next}
+							size='sm'>
+							{t('pagination.next')}
+						</Button>
 					</div>
-					<div>
-						{t('subscriptions.page') || 'Page'} {subscriptionsData.data.pagination.page}
+					<div className='mt-1 flex justify-between text-sm text-muted-foreground'>
+						<div>
+							{t('pagination.showing')} {subscriptions.length}{' '}
+							{t('subscriptions.itemsName')}
+						</div>
+						<div>
+							{t('pagination.total')}: {pagination.total.toLocaleString()}
+						</div>
 					</div>
-				</div>
+				</>
 			)}
 		</div>
 	)
