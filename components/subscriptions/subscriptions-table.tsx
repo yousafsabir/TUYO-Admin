@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslations } from 'next-intl'
+import { fetchWithNgrok } from '@/lib/api/fetch-utils'
 import {
 	Table,
 	TableBody,
@@ -13,12 +14,17 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2 } from 'lucide-react'
 
-import { fetchWithNgrok } from '@/lib/api/fetch-utils'
+// Types & Interfaces
+interface User {
+	firstName: string
+	lastName: string
+	email: string
+}
 
-export interface Subscription {
+interface Subscription {
 	id: number
 	userId: number
 	planId: string
@@ -33,6 +39,7 @@ export interface Subscription {
 	stripeSubscriptionId: string
 	createdAt: string
 	updatedAt: string
+	user: User
 }
 
 interface SubscriptionsResponse {
@@ -42,74 +49,73 @@ interface SubscriptionsResponse {
 	data: {
 		subscriptions: Subscription[]
 		pagination: {
+			total: number
 			page: number
 			limit: number
-			total: number
-			prev: boolean
-			next: boolean
 		}
 	}
 }
 
-export async function getSubscriptions(
-	page: number,
-	limit: number,
-): Promise<SubscriptionsResponse> {
-	const res = await fetchWithNgrok(`/users/subscriptions?page=${page}&limit=${limit}`, {
+const fetchSubscriptions = async (page: number, limit: number): Promise<SubscriptionsResponse> => {
+	const response = await fetchWithNgrok(`/users/subscriptions?page=${page}&limit=${limit}`, {
 		method: 'GET',
 	})
 
-	if (!res.ok) throw new Error(`Failed to fetch subscriptions: ${res.status}`)
+	if (!response.ok) {
+		throw new Error(`Failed to fetch subscriptions: ${response.status}`)
+	}
 
-	return res.json()
+	return response.json()
+}
+
+const formatDate = (dateString: string) => {
+	try {
+		return new Date(dateString).toLocaleDateString()
+	} catch {
+		return dateString
+	}
 }
 
 export function SubscriptionsTable() {
 	const t = useTranslations()
-	const [currentPage, setCurrentPage] = useState(1)
-	const limit = 25
+	const [page, setPage] = useState(1)
+	const [limit] = useState(10)
 
 	const { data, isLoading, isError, error } = useQuery({
-		queryKey: ['subscriptions', currentPage],
-		queryFn: () => getSubscriptions(currentPage, limit),
+		queryKey: ['subscriptions', page, limit],
+		queryFn: () => fetchSubscriptions(page, limit),
 	})
 
-	const formatDate = (dateStr: string) => {
-		try {
-			return new Date(dateStr).toLocaleDateString()
-		} catch {
-			return dateStr
+	const subscriptions = data?.data.subscriptions || []
+	const pagination = data?.data.pagination || { page: 1, limit, total: 0 }
+	const totalPages = Math.ceil(pagination.total / pagination.limit)
+
+	const handlePreviousPage = () => {
+		setPage((prev) => Math.max(prev - 1, 1))
+	}
+
+	const handleNextPage = () => {
+		if (page < totalPages) {
+			setPage((prev) => prev + 1)
 		}
 	}
 
 	if (isLoading) {
 		return (
-			<div className='flex justify-center p-8'>
-				<Loader2 className='h-8 w-8 animate-spin' />
+			<div className='flex justify-center py-8'>
+				<Loader2 className='h-8 w-8 animate-spin text-primary' />
 			</div>
 		)
 	}
+
 	if (isError) {
 		return (
-			<Alert variant='destructive'>
+			<Alert variant='destructive' className='my-4'>
 				<AlertDescription>
-					{t('subscriptions.errorLoading') || 'Error loading subscriptions.'}
+					{error instanceof Error ? error.message : t('subscriptions.errorLoading')}
 				</AlertDescription>
 			</Alert>
 		)
-	}
-
-	const subscriptions = data?.data.subscriptions || []
-	const pagination = data?.data.pagination
-
-	const totalPages = pagination ? Math.max(1, Math.ceil(pagination.total / pagination.limit)) : 1
-
-	const handlePrev = () => {
-		if (currentPage > 1) setCurrentPage(currentPage - 1)
-	}
-
-	const handleNext = () => {
-		if (currentPage < totalPages) setCurrentPage(currentPage + 1)
 	}
 
 	return (
@@ -118,16 +124,14 @@ export function SubscriptionsTable() {
 				<Table>
 					<TableHeader>
 						<TableRow>
-							<TableHead>{t('subscriptions.id') || 'ID'}</TableHead>
-							<TableHead>{t('subscriptions.userId') || 'User ID'}</TableHead>
-							<TableHead>{t('subscriptions.plan') || 'Plan'}</TableHead>
-							<TableHead>{t('subscriptions.status') || 'Status'}</TableHead>
-							<TableHead>{t('subscriptions.payment') || 'Payment'}</TableHead>
-							<TableHead>{t('subscriptions.listings') || 'Listings'}</TableHead>
-							<TableHead>
-								{t('subscriptions.nextRenewal') || 'Next Renewal'}
-							</TableHead>
-							<TableHead>{t('subscriptions.created') || 'Created'}</TableHead>
+							<TableHead>{t('subscriptions.id')}</TableHead>
+							<TableHead>{t('subscriptions.userId')}</TableHead>
+							<TableHead>{t('subscriptions.plan')}</TableHead>
+							<TableHead>{t('subscriptions.status')}</TableHead>
+							<TableHead>{t('subscriptions.payment')}</TableHead>
+							<TableHead>{t('subscriptions.listings')}</TableHead>
+							<TableHead>{t('subscriptions.nextRenewal')}</TableHead>
+							<TableHead>{t('subscriptions.created')}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -136,26 +140,26 @@ export function SubscriptionsTable() {
 								<TableCell
 									colSpan={8}
 									className='py-8 text-center text-muted-foreground'>
-									{t('subscriptions.noSubscriptions') || 'No subscriptions found'}
+									{t('subscriptions.noSubscriptions')}
 								</TableCell>
 							</TableRow>
 						) : (
-							subscriptions.map((sub) => (
-								<TableRow key={sub.id}>
-									<TableCell className='font-medium'>{sub.id}</TableCell>
-									<TableCell>{sub.userId}</TableCell>
+							subscriptions.map((subscription) => (
+								<TableRow key={subscription.id}>
+									<TableCell className='font-medium'>{subscription.id}</TableCell>
+									<TableCell>{subscription.userId}</TableCell>
 									<TableCell>
-										<Badge>{sub.planId}</Badge>
+										<Badge variant='outline'>{subscription.planId}</Badge>
 									</TableCell>
-									<TableCell>{sub.status}</TableCell>
-									<TableCell>{sub.paymentStatus}</TableCell>
+									<TableCell>{subscription.status}</TableCell>
+									<TableCell>{subscription.paymentStatus}</TableCell>
 									<TableCell>
-										{sub.listingsRemaining > 999999
-											? t('subscriptions.unlimited') || 'Unlimited'
-											: sub.listingsRemaining.toLocaleString()}
+										{subscription.listingsRemaining > 999999
+											? t('subscriptions.unlimited')
+											: subscription.listingsRemaining.toLocaleString()}
 									</TableCell>
-									<TableCell>{formatDate(sub.nextRenewal)}</TableCell>
-									<TableCell>{formatDate(sub.createdAt)}</TableCell>
+									<TableCell>{formatDate(subscription.nextRenewal)}</TableCell>
+									<TableCell>{formatDate(subscription.createdAt)}</TableCell>
 								</TableRow>
 							))
 						)}
@@ -163,36 +167,34 @@ export function SubscriptionsTable() {
 				</Table>
 			</div>
 
-			{pagination && (
-				<>
-					<div className='mt-2 flex items-center justify-between'>
+			{/* Pagination */}
+			{subscriptions.length > 0 && (
+				<div className='flex items-center justify-between'>
+					<div className='text-sm text-muted-foreground'>
+						{t('pagination.showing')} {String((page - 1) * limit + 1)}-
+						{String(Math.min(page * limit, pagination.total))} {t('pagination.of')}{' '}
+						{pagination.total} {t('subscriptions.itemsName')}
+					</div>
+					<div className='flex items-center space-x-2'>
 						<Button
-							onClick={handlePrev}
-							disabled={currentPage === 1 || !pagination.prev}
-							size='sm'>
-							{t('pagination.prev')}
+							variant='outline'
+							size='sm'
+							onClick={handlePreviousPage}
+							disabled={page <= 1}>
+							<ChevronLeft className='mr-1 h-4 w-4' /> {t('pagination.prev')}
 						</Button>
-						<span className='text-sm'>
-							{t('pagination.page', { number: currentPage })}{' '}
-							{t('pagination.of', { number: totalPages })}
-						</span>
+						<div className='text-sm'>
+							{t('pagination.page')} {page} {t('pagination.of')} {totalPages}
+						</div>
 						<Button
-							onClick={handleNext}
-							disabled={currentPage === totalPages || !pagination.next}
-							size='sm'>
-							{t('pagination.next')}
+							variant='outline'
+							size='sm'
+							onClick={handleNextPage}
+							disabled={page >= totalPages}>
+							{t('pagination.next')} <ChevronRight className='ml-1 h-4 w-4' />
 						</Button>
 					</div>
-					<div className='mt-1 flex justify-between text-sm text-muted-foreground'>
-						<div>
-							{t('pagination.showing')} {subscriptions.length}{' '}
-							{t('subscriptions.itemsName')}
-						</div>
-						<div>
-							{t('pagination.total')}: {pagination.total.toLocaleString()}
-						</div>
-					</div>
-				</>
+				</div>
 			)}
 		</div>
 	)
