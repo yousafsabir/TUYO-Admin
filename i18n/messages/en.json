@@ -40,6 +40,7 @@
 		"orders": "Orders",
 		"subscriptions": "Subscriptions",
 		"logout": "Logout",
+		"withdrawal-requests": "Withdrawal Requests",
 		"storeConfiguration": "Store Configuration",
 		"auditLogs": "Audit Logs"
 	},
@@ -334,9 +335,10 @@
 			"rejected": "Rejected"
 		},
 		"table": {
-			"id": "Sale ID",
+			"id": "ID",
 			"orderId": "Order ID",
 			"productId": "Product ID",
+			"userId": "User ID",
 			"amount": "Amount",
 			"status": "Status",
 			"created": "Created"

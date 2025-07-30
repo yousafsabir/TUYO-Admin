@@ -20,6 +20,7 @@ import {
 	CreditCard,
 	ShoppingCart,
 	Tag,
+	BanknoteArrowDown,
 } from 'lucide-react'
 
 export function DashboardSidebar() {
@@ -63,6 +64,11 @@ export function DashboardSidebar() {
 			label: t('navigation.subscriptions') || 'Subscriptions',
 			icon: CreditCard,
 			href: `/dashboard/subscriptions`,
+		},
+		{
+			label: t('navigation.withdrawal-requests') || 'Subscriptions',
+			icon: BanknoteArrowDown,
+			href: `/dashboard/withdrawal-requests`,
 		},
 		{
 			label: t('navigation.storeConfiguration') || 'Store Configuration',

@@ -40,6 +40,7 @@
 		"orders": "Pedidos",
 		"subscriptions": "Suscripciones",
 		"logout": "Cerrar sesión",
+		"withdrawal-requests": "Solicitudes de Retiro",
 		"storeConfiguration": "Configuración de la tienda",
 		"auditLogs": "Registros de auditoría"
 	},
@@ -333,9 +334,10 @@
 			"rejected": "Rechazado"
 		},
 		"table": {
-			"id": "ID de Venta",
+			"id": "ID",
 			"orderId": "ID de Pedido",
 			"productId": "ID de Producto",
+			"userId": "ID de Usuario",
 			"amount": "Cantidad",
 			"status": "Estado",
 			"created": "Creado"

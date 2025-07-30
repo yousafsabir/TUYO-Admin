@@ -38,6 +38,7 @@ import {
 	Star,
 	ArrowLeft,
 	MoveLeft,
+	BanknoteArrowDown,
 } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import UsersProductsTable from './products-table'
@@ -403,7 +404,7 @@ export default function UserDetailPage(props: { params: Promise<{ id: string }> 
 								{t('userDetail.tabs.subscription')}
 							</TabsTrigger>
 							<TabsTrigger value='withdrawal' className='gap-2'>
-								<CreditCard className='h-4 w-4' />
+								<BanknoteArrowDown className='h-4 w-4' />
 								{t('userDetail.tabs.withdrawal')}
 							</TabsTrigger>
 						</TabsList>
