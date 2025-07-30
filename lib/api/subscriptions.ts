@@ -27,6 +27,8 @@ interface SubscriptionsResponse {
 			page: number
 			limit: number
 			total: number
+			prevPage: boolean
+			nextPage: boolean
 		}
 	}
 }

@@ -2,7 +2,6 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { useTranslations } from 'next-intl'
-import { getSubscriptions, type Subscription } from '@/lib/api/subscriptions'
 import {
 	Table,
 	TableBody,
@@ -14,6 +13,58 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2 } from 'lucide-react'
+
+import { fetchWithNgrok } from '@/lib/api/fetch-utils'
+
+export interface Subscription {
+	id: number
+	userId: number
+	planId: string
+	status: string
+	paymentStatus: string
+	listingsRemaining: number
+	auctionsAllowed: boolean
+	featuredProductsAllowed: boolean
+	premiumProductsAllowed: boolean
+	renewedAt: string
+	nextRenewal: string
+	stripeSubscriptionId: string
+	createdAt: string
+	updatedAt: string
+}
+
+interface SubscriptionsResponse {
+	statusCode: number
+	status: string
+	message: string
+	data: {
+		subscriptions: Subscription[]
+		pagination: {
+			page: number
+			limit: number
+			total: number
+			prevPage: boolean
+			nextPage: boolean
+		}
+	}
+}
+
+export async function getSubscriptions(page = 1, limit = 25): Promise<SubscriptionsResponse> {
+	try {
+		const response = await fetchWithNgrok(`/users/subscriptions?page=${page}&limit=${limit}`, {
+			method: 'GET',
+		})
+
+		if (!response.ok) {
+			throw new Error(`Failed to fetch subscriptions: ${response.status}`)
+		}
+
+		return await response.json()
+	} catch (error) {
+		console.error('Error fetching subscriptions:', error)
+		throw error
+	}
+}
 
 interface SubscriptionsTableProps {}
 
