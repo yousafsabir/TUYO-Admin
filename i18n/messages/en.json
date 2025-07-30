@@ -335,6 +335,34 @@
 			"created": "Created"
 		}
 	},
+	"withdrawals": {
+		"loadError": "Failed to load withdrawal requests",
+		"noWithdrawals": "No withdrawal requests found",
+		"itemNames": "withdrawal requests",
+		"filters": {
+			"title": "Filters",
+			"status": {
+				"placeholder": "All statuses",
+				"all": "All statuses"
+			}
+		},
+		"status": {
+			"pending": "Pending",
+			"processing": "Processing",
+			"pendingClearance": "Pending Clearance",
+			"succeeded": "Succeeded",
+			"failed": "Failed",
+			"paymentFailed": "Payment Failed",
+			"cancelled": "Cancelled",
+			"refunded": "Refunded",
+			"rejected": "Rejected"
+		},
+		"table": {
+			"amount": "Amount",
+			"status": "Status",
+			"created": "Created"
+		}
+	},
 	"subscriptions": {
 		"title": "Subscriptions",
 		"description": "Manage user subscriptions and billing.",

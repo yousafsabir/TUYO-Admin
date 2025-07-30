@@ -334,6 +334,34 @@
 			"created": "Creado"
 		}
 	},
+	"withdrawals": {
+		"loadError": "Error al cargar solicitudes de retiro",
+		"noWithdrawals": "No se encontraron solicitudes de retiro",
+		"itemNames": "solicitudes de retiro",
+		"filters": {
+			"title": "Filtros",
+			"status": {
+				"placeholder": "Todos los estados",
+				"all": "Todos los estados"
+			}
+		},
+		"status": {
+			"pending": "Pendiente",
+			"processing": "Procesando",
+			"pendingClearance": "Pendiente de autorización",
+			"succeeded": "Exitoso",
+			"failed": "Fallido",
+			"paymentFailed": "Pago fallido",
+			"cancelled": "Cancelado",
+			"refunded": "Reembolsado",
+			"rejected": "Rechazado"
+		},
+		"table": {
+			"amount": "Cantidad",
+			"status": "Estado",
+			"created": "Creado"
+		}
+	},
 	"subscriptions": {
 		"title": "Suscripciones",
 		"description": "Gestiona suscripciones de usuarios y facturación.",
