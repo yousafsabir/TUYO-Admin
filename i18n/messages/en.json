@@ -28,7 +28,8 @@
 		"copiedFailed": "Failed to Copy",
 		"edit": "Edit",
 		"config": "Configuration",
-		"go-back": "Go Back"
+		"go-back": "Go Back",
+		"total": "Total"
 	},
 	"navigation": {
 		"dashboard": "Dashboard",
@@ -148,8 +149,9 @@
 		"loadError": "Failed to load user details",
 		"noData": "No user data available",
 		"influencer": "Influencer",
-		"availableBalance": "Available Balance",
-		"lockedBalance": "Locked Balance",
+		"balance": "Balance",
+		"availableBalance": "Available",
+		"lockedBalance": "Locked",
 		"sendMessage": "Send Message",
 		"addresses": "Addresses",
 		"userAddresses": "User Addresses",

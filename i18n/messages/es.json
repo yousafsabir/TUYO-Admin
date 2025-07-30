@@ -28,7 +28,8 @@
 		"copiedFailed": "Error al copiar",
 		"edit": "Editar",
 		"config": "Configuración",
-		"go-back": "Volver"
+		"go-back": "Volver",
+		"total": "Total"
 	},
 	"navigation": {
 		"dashboard": "Tablero",
@@ -148,8 +149,9 @@
 		"loadError": "Error al cargar los detalles del usuario",
 		"noData": "No hay datos de usuario disponibles",
 		"influencer": "Influencer",
-		"availableBalance": "Saldo disponible",
-		"lockedBalance": "Saldo bloqueado",
+		"balance": "Saldo",
+		"availableBalance": "Disponible",
+		"lockedBalance": "Bloqueado",
 		"sendMessage": "Enviar mensaje",
 		"addresses": "Direcciones",
 		"userAddresses": "Direcciones del usuario",

@@ -345,25 +345,29 @@ export default function UserDetailPage(props: { params: Promise<{ id: string }> 
 							{/* Balance Info */}
 							<div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
 								<div className='flex gap-2'>
-									<CreditCard className='mt-[2px] size-4 text-green-600' />
-									<div>
-										<p className='text-sm text-muted-foreground'>
-											{t('userDetail.availableBalance')}
+									<CreditCard className='mt-[2px] size-4' />
+									<div className='grid grid-cols-2 gap-x-2 gap-y-[2px]'>
+										<p className='col-span-full text-sm font-bold'>
+											{t('userDetail.balance')}
 										</p>
-										<p className='font-semibold text-green-600'>
+										<p className='text-sm text-muted-foreground'>
+											{t('userDetail.availableBalance')}:
+										</p>
+										<p className='text-muted-foreground'>
 											{formatCurrency(user.balance.availableBalance)}
 										</p>
-									</div>
-								</div>
-								{/*  */}
-								<div className='flex gap-2'>
-									<CreditCard className='mt-[2px] size-4 text-orange-600' />
-									<div>
 										<p className='text-sm text-muted-foreground'>
-											{t('userDetail.lockedBalance')}
+											{t('userDetail.lockedBalance')}:
 										</p>
-										<p className='font-semibold text-orange-600'>
+										<p className='text-muted-foreground'>
 											{formatCurrency(user.balance.lockedBalance)}
+										</p>
+										<p className='text-sm font-bold'>{t('common.total')}:</p>
+										<p>
+											{formatCurrency(
+												user.balance.availableBalance +
+													user.balance.lockedBalance,
+											)}
 										</p>
 									</div>
 								</div>
