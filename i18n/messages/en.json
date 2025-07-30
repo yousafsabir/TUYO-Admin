@@ -212,10 +212,14 @@
 		"featured": "Featured",
 		"itemNames": "products",
 		"conditions": {
-			"likeNew": "Like New",
+			"new": "New",
+			"like_new": "Like New",
+			"excellent": "Excellent",
+			"very_good": "Very Good",
 			"good": "Good",
 			"fair": "Fair",
-			"poor": "Poor"
+			"poor": "Poor",
+			"used": "Used"
 		},
 		"statuses": {
 			"draft": "Draft",

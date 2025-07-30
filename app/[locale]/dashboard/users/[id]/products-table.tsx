@@ -427,7 +427,7 @@ export default function UsersProductsTable({ userId }: { userId: string }) {
 										</TableCell>
 										<TableCell>
 											<Badge variant={getStatusBadgeVariant(product.status)}>
-												{t(`products.status.${product.status}` as any)}
+												{t(`products.statuses.${product.status}` as any)}
 											</Badge>
 										</TableCell>
 										<TableCell>

@@ -211,10 +211,14 @@
 		"highestBid": "Oferta más alta",
 		"featured": "Destacado",
 		"conditions": {
-			"likeNew": "Como nuevo",
+			"new": "Nuevo",
+			"like_new": "Como nuevo",
+			"excellent": "Excelente",
+			"very_good": "Muy bueno",
 			"good": "Bueno",
 			"fair": "Regular",
-			"poor": "Malo"
+			"poor": "Pobre",
+			"used": "Usado"
 		},
 		"statuses": {
 			"draft": "Borrador",
