@@ -313,7 +313,7 @@ export default function UserDetailPage(props: { params: Promise<{ id: string }> 
 						/>
 
 						{/* User Info */}
-						<div className='flex-1 space-y-4'>
+						<div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
 							<div>
 								<div className='flex items-center gap-3'>
 									<h1 className='text-2xl font-bold'>
@@ -329,9 +329,17 @@ export default function UserDetailPage(props: { params: Promise<{ id: string }> 
 								<p className='font-bold'>ID: {user.id}</p>
 								<p className='text-muted-foreground'>@{user.username}</p>
 							</div>
+							{/* Action Buttons */}
+							<div className='flex gap-3'>
+								<Button className='gap-2'>
+									<MessageSquare className='h-4 w-4' />
+									{t('userDetail.sendMessage')}
+								</Button>
+								<AddressModal addresses={user.addresses} />
+							</div>
 
 							{/* Contact Info */}
-							<div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+							<div className='space-y-[6px]'>
 								<div className='flex items-center gap-2 text-sm'>
 									<Mail className='h-4 w-4 text-muted-foreground' />
 									<span>{user.email}</span>
@@ -371,15 +379,6 @@ export default function UserDetailPage(props: { params: Promise<{ id: string }> 
 										</p>
 									</div>
 								</div>
-							</div>
-
-							{/* Action Buttons */}
-							<div className='flex gap-3'>
-								<Button className='gap-2'>
-									<MessageSquare className='h-4 w-4' />
-									{t('userDetail.sendMessage')}
-								</Button>
-								<AddressModal addresses={user.addresses} />
 							</div>
 						</div>
 					</div>
