@@ -242,6 +242,7 @@ export default function WithdrawalRequests() {
 						<Table>
 							<TableHeader>
 								<TableRow>
+									<TableHead>{t('sales.table.id')}</TableHead>
 									<TableHead>{t('sales.table.userId')}</TableHead>
 									<TableHead>{t('sales.table.amount')}</TableHead>
 									<TableHead>{t('sales.table.status')}</TableHead>
@@ -252,12 +253,15 @@ export default function WithdrawalRequests() {
 								{transactions.map((transaction) => (
 									<TableRow key={transaction.id}>
 										<TableCell>
-											<span className='font-medium text-green-600'>
+											<span className='font-medium'>#{transaction.id}</span>
+										</TableCell>
+										<TableCell>
+											<span className='font-medium'>
 												#{transaction.userId}
 											</span>
 										</TableCell>
 										<TableCell>
-											<span className='font-medium text-green-600'>
+											<span className='font-medium'>
 												{formatCurrency(transaction.amount)}
 											</span>
 										</TableCell>

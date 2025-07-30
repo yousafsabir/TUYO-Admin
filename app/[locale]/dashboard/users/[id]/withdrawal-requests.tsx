@@ -234,14 +234,18 @@ export default function UsersWithdrawalRequests({ userId }: { userId: string }) 
 						<Table>
 							<TableHeader>
 								<TableRow>
-									<TableHead>{t('withdrawals.table.amount')}</TableHead>
-									<TableHead>{t('withdrawals.table.status')}</TableHead>
-									<TableHead>{t('withdrawals.table.created')}</TableHead>
+									<TableHead>{t('sales.table.id')}</TableHead>
+									<TableHead>{t('sales.table.amount')}</TableHead>
+									<TableHead>{t('sales.table.status')}</TableHead>
+									<TableHead>{t('sales.table.created')}</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
 								{transactions.map((transaction) => (
 									<TableRow key={transaction.id}>
+										<TableCell>
+											<span className='text-sm'>#{transaction.id}</span>
+										</TableCell>
 										<TableCell>
 											<span className='font-medium text-green-600'>
 												{formatCurrency(transaction.amount)}
