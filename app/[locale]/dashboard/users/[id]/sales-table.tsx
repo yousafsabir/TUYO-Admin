@@ -149,6 +149,10 @@ export default function UsersSalesTable({ userId }: { userId: string }) {
 		setCurrentPage(1) // Reset to first page when filter changes
 	}
 
+	const handlePageChange = (page: number) => {
+		setCurrentPage(page)
+	}
+
 	if (isLoading) {
 		return (
 			<div className='flex justify-center py-8'>
@@ -169,6 +173,7 @@ export default function UsersSalesTable({ userId }: { userId: string }) {
 
 	const transactions = data?.data?.transactions || []
 	const pagination = data?.data?.pagination
+	const totalPages = pagination ? Math.ceil(pagination.total / pagination.limit) : 1
 
 	return (
 		<div className='space-y-4'>
@@ -266,16 +271,36 @@ export default function UsersSalesTable({ userId }: { userId: string }) {
 						</Table>
 					</div>
 
-					{/* Pagination Info */}
+					{/* Pagination Controls */}
 					{pagination && (
-						<div className='flex items-center justify-between'>
-							<p className='text-sm text-muted-foreground'>
+						<div className='mt-2 flex items-center justify-between'>
+							<Button
+								variant='outline'
+								size='sm'
+								onClick={() => handlePageChange(currentPage - 1)}
+								disabled={currentPage <= 1 || !pagination.prevPage}>
+								{t('pagination.prev')}
+							</Button>
+							<span className='text-sm text-muted-foreground'>
+								{t('pagination.page')} {pagination.page} {t('pagination.of')}{' '}
+								{totalPages}
+							</span>
+							<Button
+								variant='outline'
+								size='sm'
+								onClick={() => handlePageChange(currentPage + 1)}
+								disabled={currentPage >= totalPages || !pagination.nextPage}>
+								{t('pagination.next')}
+							</Button>
+						</div>
+					)}
+
+					{/* Pagination Summary */}
+					{pagination && (
+						<div className='flex items-center justify-between text-sm text-muted-foreground'>
+							<p>
 								{t('pagination.showing')} {transactions.length} {t('pagination.of')}{' '}
 								{pagination.total} {t('sales.itemNames')}
-							</p>
-							<p className='text-sm text-muted-foreground'>
-								{t('pagination.page')} {pagination.page} {t('pagination.of')}{' '}
-								{Math.ceil(pagination.total / pagination.limit)}
 							</p>
 						</div>
 					)}

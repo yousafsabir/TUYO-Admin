@@ -320,7 +320,7 @@ export default function UsersProductsTable({ userId }: { userId: string }) {
 
 	if (isError) {
 		return (
-			<Alert variant='destructive' className='my-4'>
+			<Alert variant='destructive'>
 				<AlertDescription>
 					{error instanceof Error ? error.message : t('products.loadError')}
 				</AlertDescription>
@@ -330,6 +330,12 @@ export default function UsersProductsTable({ userId }: { userId: string }) {
 
 	const products = data?.data?.products || []
 	const pagination = data?.data?.pagination
+	const totalPages = pagination ? Math.max(1, Math.ceil(pagination.total / pagination.limit)) : 1
+
+	const handlePageChange = (newPage: number) => {
+		if (newPage < 1 || newPage > totalPages) return
+		setCurrentPage(newPage)
+	}
 
 	return (
 		<div className='space-y-4'>
@@ -375,9 +381,7 @@ export default function UsersProductsTable({ userId }: { userId: string }) {
 												<p className='text-sm font-medium'>
 													{product.category}
 												</p>
-												<p className='text-xs text-muted-foreground'>
-													{product.subcategory}
-												</p>
+												<p className='text-xs'>{product.subcategory}</p>
 											</div>
 										</TableCell>
 										<TableCell>
@@ -394,7 +398,9 @@ export default function UsersProductsTable({ userId }: { userId: string }) {
 										</TableCell>
 										<TableCell>
 											<span className='text-sm'>
-												{getConditionLabel(product.condition, t)}
+												{t(
+													`products.conditions.${product.condition}` as any,
+												)}
 											</span>
 										</TableCell>
 										<TableCell>
@@ -421,13 +427,11 @@ export default function UsersProductsTable({ userId }: { userId: string }) {
 										</TableCell>
 										<TableCell>
 											<Badge variant={getStatusBadgeVariant(product.status)}>
-												{t(`products.statuses.${product.status}` as any)}
+												{t(`products.status.${product.status}` as any)}
 											</Badge>
 										</TableCell>
 										<TableCell>
-											<span className='text-sm'>
-												{formatDate(product.createdAt)}
-											</span>
+											<span>{formatDate(product.createdAt)}</span>
 										</TableCell>
 									</TableRow>
 								))}
@@ -435,17 +439,41 @@ export default function UsersProductsTable({ userId }: { userId: string }) {
 						</Table>
 					</div>
 
-					{/* Pagination Info */}
+					{/* Pagination Controls */}
 					{pagination && (
-						<div className='flex items-center justify-between'>
-							<p className='text-sm text-muted-foreground'>
+						<div className='mt-2 flex items-center justify-between'>
+							<Button
+								variant='outline'
+								onClick={() => handlePageChange(currentPage - 1)}
+								disabled={currentPage === 1 || pagination?.prevPage === false}
+								size='sm'>
+								{t('pagination.prev')}
+							</Button>
+
+							<span className='text-sm'>
+								{t('pagination.page')} {currentPage} {t('pagination.of')}{' '}
+								{totalPages}
+							</span>
+
+							<Button
+								variant='outline'
+								onClick={() => handlePageChange(currentPage + 1)}
+								disabled={
+									currentPage === totalPages || pagination?.nextPage === false
+								}
+								size='sm'>
+								{t('pagination.next')}
+							</Button>
+						</div>
+					)}
+
+					{/* Pagination Summary */}
+					{pagination && (
+						<div className='mt-1 flex justify-between text-sm'>
+							<span className='text-muted-foreground'>
 								{t('pagination.showing')} {products.length} {t('pagination.of')}{' '}
 								{pagination.total} {t('products.itemNames')}
-							</p>
-							<p className='text-sm text-muted-foreground'>
-								{t('pagination.page')} {pagination.page} {t('pagination.of')}{' '}
-								{Math.ceil(pagination.total / pagination.limit)}
-							</p>
+							</span>
 						</div>
 					)}
 				</>

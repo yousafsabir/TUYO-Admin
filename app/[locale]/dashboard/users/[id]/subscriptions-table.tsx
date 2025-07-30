@@ -65,15 +65,12 @@ const useUserSubscriptions = (userId: string, page: number = 1, limit: number = 
 				page: page.toString(),
 				limit: limit.toString(),
 			})
-
 			const response = await fetchWithNgrok(`/users/subscriptions?${params.toString()}`, {
 				method: 'GET',
 			})
-
 			if (!response.ok) {
 				throw new Error(`Failed to fetch user subscriptions: ${response.status}`)
 			}
-
 			return response.json()
 		},
 		enabled: !isNaN(parseInt(userId, 10)),
@@ -98,25 +95,25 @@ function PaginationControls({
 	isLoading: boolean
 }) {
 	const t = useTranslations()
-	const totalPages = pagination ? Math.ceil(pagination.total / pagination.limit) : 1
+	const totalPages = pagination ? Math.max(1, Math.ceil(pagination.total / pagination.limit)) : 1
 
 	return (
-		<div className='flex items-center justify-between'>
+		<div className='mt-2 flex items-center justify-between'>
 			<Button
 				variant='outline'
 				onClick={() => onPageChange(currentPage - 1)}
-				disabled={currentPage <= 1 || isLoading || !pagination?.prevPage}>
+				disabled={currentPage <= 1 || isLoading || !pagination?.prevPage}
+				size='sm'>
 				{t('pagination.prev')}
 			</Button>
-
 			<span className='text-sm text-muted-foreground'>
 				{t('pagination.page')} {currentPage} {t('pagination.of')} {totalPages}
 			</span>
-
 			<Button
 				variant='outline'
 				onClick={() => onPageChange(currentPage + 1)}
-				disabled={currentPage >= totalPages || isLoading || !pagination?.nextPage}>
+				disabled={currentPage >= totalPages || isLoading || !pagination?.nextPage}
+				size='sm'>
 				{t('pagination.next')}
 			</Button>
 		</div>
@@ -150,6 +147,7 @@ export function UsersSubscriptionsTable({ userId }: { userId: string }) {
 
 	const subscriptions = data?.data?.subscriptions || []
 	const pagination = data?.data?.pagination
+	const totalPages = pagination ? Math.max(1, Math.ceil(pagination.total / pagination.limit)) : 1
 
 	return (
 		<div className='space-y-4'>
@@ -173,7 +171,14 @@ export function UsersSubscriptionsTable({ userId }: { userId: string }) {
 											</span>
 										</TableCell>
 										<TableCell>
-											<Badge variant='default'>{subscription.status}</Badge>
+											<Badge variant='default'>
+												{t(
+													`subscriptions.status.${subscription.status}` as any,
+													{
+														defaultValue: subscription.status,
+													},
+												)}
+											</Badge>
 										</TableCell>
 										<TableCell>
 											<span className='text-sm'>
