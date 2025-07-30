@@ -428,7 +428,7 @@ function UpdateOrderModal({
 	)
 }
 
-export default function OrdersTable() {
+export function OrdersTable() {
 	const t = useTranslations()
 	const [currentPage, setCurrentPage] = useState(1)
 	const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
@@ -440,16 +440,6 @@ export default function OrdersTable() {
 	const handleEditOrder = (order: Order) => {
 		setSelectedOrder(order)
 		setUpdateModalOpen(true)
-	}
-
-	const handlePreviousPage = () => {
-		setCurrentPage((prev) => Math.max(prev - 1, 1))
-	}
-
-	const handleNextPage = () => {
-		if (data?.data?.pagination && currentPage < Math.ceil(data.data.pagination.total / limit)) {
-			setCurrentPage((prev) => prev + 1)
-		}
 	}
 
 	if (isLoading) {
@@ -474,6 +464,16 @@ export default function OrdersTable() {
 	const pagination = data?.data?.pagination || { total: 0, page: 1, limit }
 
 	const totalPages = Math.ceil(pagination.total / pagination.limit)
+
+	const handlePreviousPage = () => {
+		setCurrentPage((prev) => Math.max(prev - 1, 1))
+	}
+
+	const handleNextPage = () => {
+		if (currentPage < totalPages) {
+			setCurrentPage((prev) => prev + 1)
+		}
+	}
 
 	return (
 		<>
@@ -567,26 +567,34 @@ export default function OrdersTable() {
 
 				{/* Pagination controls */}
 				{orders.length > 0 && (
-					<div className='mt-2 flex items-center justify-between'>
-						<Button
-							variant='outline'
-							size='sm'
-							onClick={handlePreviousPage}
-							disabled={currentPage === 1}>
-							<ChevronLeft className='mr-1 h-4 w-4' />
-							{t('pagination.prev')}
-						</Button>
+					<div className='flex items-center justify-between'>
 						<div className='text-sm text-muted-foreground'>
-							{t('pagination.page')} {currentPage} {t('pagination.of')} {totalPages}
+							{t('pagination.showing')} {String((currentPage - 1) * limit + 1)}-
+							{String(Math.min(currentPage * limit, pagination.total))}{' '}
+							{t('pagination.of')} {String(pagination.total)} {t('orders.itemNames')}
 						</div>
-						<Button
-							variant='outline'
-							size='sm'
-							onClick={handleNextPage}
-							disabled={currentPage === totalPages}>
-							{t('pagination.next')}
-							<ChevronRight className='ml-1 h-4 w-4' />
-						</Button>
+						<div className='flex items-center space-x-2'>
+							<Button
+								variant='outline'
+								size='sm'
+								onClick={handlePreviousPage}
+								disabled={currentPage <= 1}>
+								<ChevronLeft className='mr-1 h-4 w-4' />
+								{t('pagination.prev')}
+							</Button>
+							<div className='text-sm'>
+								{t('pagination.page')} {currentPage} {t('pagination.of')}{' '}
+								{totalPages}
+							</div>
+							<Button
+								variant='outline'
+								size='sm'
+								onClick={handleNextPage}
+								disabled={currentPage >= totalPages}>
+								{t('pagination.next')}
+								<ChevronRight className='ml-1 h-4 w-4' />
+							</Button>
+						</div>
 					</div>
 				)}
 			</div>
@@ -600,5 +608,19 @@ export default function OrdersTable() {
 				/>
 			)}
 		</>
+	)
+}
+
+export default function OrdersPage() {
+	const t = useTranslations()
+	return (
+		<div className='space-y-6'>
+			<div>
+				<h2 className='text-3xl font-bold tracking-tight'>{t('orders.title')}</h2>
+				<p className='text-muted-foreground'>{t('orders.description')}</p>
+			</div>
+
+			<OrdersTable />
+		</div>
 	)
 }
