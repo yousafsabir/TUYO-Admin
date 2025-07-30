@@ -252,6 +252,7 @@
 		"itemNames": "orders",
 		"updateOrder": "Update Order",
 		"updateOrderDescription": "Update the status and shipping information for order",
+		"loading-error": "Error loading orders",
 		"table": {
 			"orderId": "Order ID",
 			"buyerId": "Buyer ID",

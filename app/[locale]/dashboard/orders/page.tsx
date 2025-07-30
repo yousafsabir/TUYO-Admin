@@ -28,7 +28,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog'
-import { Loader2, Edit } from 'lucide-react'
+import { Loader2, Edit, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useTranslations } from 'next-intl'
 import { fetchWithNgrok } from '@/lib/api/fetch-utils'
@@ -64,6 +64,8 @@ interface OrdersResponse {
 			page: number
 			limit: number
 			total: number
+			prevPage: boolean
+			nextPage: boolean
 		}
 	}
 }
@@ -209,7 +211,7 @@ const getPaymentStatusBadgeVariant = (status: string) => {
 	}
 }
 
-// Add these translation helper functions
+// Add these translation helper functions (same as your existing ones)
 const getTranslatedOrderStatus = (status: string, t: any) => {
 	switch (status?.toLowerCase()) {
 		case 'pending':
@@ -426,7 +428,7 @@ function UpdateOrderModal({
 	)
 }
 
-export function OrdersTable() {
+export default function OrdersTable() {
 	const t = useTranslations()
 	const [currentPage, setCurrentPage] = useState(1)
 	const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
@@ -438,6 +440,16 @@ export function OrdersTable() {
 	const handleEditOrder = (order: Order) => {
 		setSelectedOrder(order)
 		setUpdateModalOpen(true)
+	}
+
+	const handlePreviousPage = () => {
+		setCurrentPage((prev) => Math.max(prev - 1, 1))
+	}
+
+	const handleNextPage = () => {
+		if (data?.data?.pagination && currentPage < Math.ceil(data.data.pagination.total / limit)) {
+			setCurrentPage((prev) => prev + 1)
+		}
 	}
 
 	if (isLoading) {
@@ -452,14 +464,16 @@ export function OrdersTable() {
 		return (
 			<Alert variant='destructive' className='my-4'>
 				<AlertDescription>
-					{error instanceof Error ? error.message : 'Failed to load orders'}
+					{error instanceof Error ? error.message : t('orders.loading-error')}
 				</AlertDescription>
 			</Alert>
 		)
 	}
 
 	const orders = data?.data?.orders || []
-	const pagination = data?.data?.pagination
+	const pagination = data?.data?.pagination || { total: 0, page: 1, limit }
+
+	const totalPages = Math.ceil(pagination.total / pagination.limit)
 
 	return (
 		<>
@@ -551,16 +565,28 @@ export function OrdersTable() {
 					</Table>
 				</div>
 
-				{pagination && (
-					<div className='flex items-center justify-between'>
-						<p className='text-sm text-muted-foreground'>
-							{t('pagination.showing')} {orders.length} {t('pagination.of')}{' '}
-							{pagination.total} {t('orders.itemNames')}
-						</p>
-						<p className='text-sm text-muted-foreground'>
-							{t('pagination.page')} {pagination.page} {t('pagination.of')}{' '}
-							{Math.ceil(pagination.total / pagination.limit)}
-						</p>
+				{/* Pagination controls */}
+				{orders.length > 0 && (
+					<div className='mt-2 flex items-center justify-between'>
+						<Button
+							variant='outline'
+							size='sm'
+							onClick={handlePreviousPage}
+							disabled={currentPage === 1}>
+							<ChevronLeft className='mr-1 h-4 w-4' />
+							{t('pagination.prev')}
+						</Button>
+						<div className='text-sm text-muted-foreground'>
+							{t('pagination.page')} {currentPage} {t('pagination.of')} {totalPages}
+						</div>
+						<Button
+							variant='outline'
+							size='sm'
+							onClick={handleNextPage}
+							disabled={currentPage === totalPages}>
+							{t('pagination.next')}
+							<ChevronRight className='ml-1 h-4 w-4' />
+						</Button>
 					</div>
 				)}
 			</div>
@@ -574,19 +600,5 @@ export function OrdersTable() {
 				/>
 			)}
 		</>
-	)
-}
-
-export default function OrdersPage() {
-	const t = useTranslations()
-	return (
-		<div className='space-y-6'>
-			<div>
-				<h2 className='text-3xl font-bold tracking-tight'>{t('orders.title')}</h2>
-				<p className='text-muted-foreground'>{t('orders.description')}</p>
-			</div>
-
-			<OrdersTable />
-		</div>
 	)
 }

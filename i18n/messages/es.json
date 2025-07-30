@@ -251,6 +251,7 @@
 		"itemNames": "pedidos",
 		"updateOrder": "Actualizar pedido",
 		"updateOrderDescription": "Actualizar el estado e información de envío del pedido",
+		"loading-error": "Error al cargar los pedidos",
 		"table": {
 			"orderId": "ID del pedido",
 			"buyerId": "ID del comprador",
