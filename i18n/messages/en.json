@@ -27,7 +27,8 @@
 		"copiedSuccessfully": "Copied Successfully",
 		"copiedFailed": "Failed to Copy",
 		"edit": "Edit",
-		"config": "Configuration"
+		"config": "Configuration",
+		"go-back": "Go Back"
 	},
 	"navigation": {
 		"dashboard": "Dashboard",

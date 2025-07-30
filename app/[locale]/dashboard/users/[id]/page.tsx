@@ -36,12 +36,15 @@ import {
 	Package,
 	ShoppingCart,
 	Star,
+	ArrowLeft,
+	MoveLeft,
 } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import UsersProductsTable from './products-table'
 import UsersSalesTable from './sales-table'
 import { UsersSubscriptionsTable } from './subscriptions-table'
 import UsersWithdrawalRequests from './withdrawal-requests'
+import Link from 'next/link'
 
 // Types & Interfaces
 interface Address {
@@ -294,6 +297,10 @@ export default function UserDetailPage(props: { params: Promise<{ id: string }> 
 
 	return (
 		<div className='space-y-6'>
+			<Link href='/dashboard/users' className='flex items-center gap-2'>
+				<MoveLeft className='size-6' />
+				{t('common.go-back')}
+			</Link>
 			{/* User Header Card */}
 			<Card>
 				<CardContent className='pt-6'>
