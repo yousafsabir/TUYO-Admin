@@ -43,11 +43,14 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useToast } from '@/components/ui/use-toast'
 import React from 'react'
+import { Entries } from 'type-fest'
 
 interface StoreConfig {
 	id: number
 	auctionCommissionPercentage: number
 	deliveryFee: number
+	minimumWithdrawalAmount: number
+	maximumWithdrawalAmount: number
 	banners: [string, string][] // Array of [imageUrl, linkUrl] tuples
 	mobileBanners: [string, string][] // Array of [imageUrl, linkUrl] tuples
 	createdAt: string
@@ -62,6 +65,8 @@ interface StoreConfigResponse {
 }
 
 type BannerType = 'banners' | 'mobileBanners'
+
+type UpdateConfigData = Partial<StoreConfig> & { images?: File[] }
 
 // Query hook
 const useStoreConfig = () => {
@@ -88,34 +93,22 @@ const useUpdateStoreConfig = () => {
 	const t = useTranslations()
 
 	return useMutation({
-		mutationFn: async (data: {
-			auctionCommissionPercentage?: number
-			deliveryFee?: number
-			banners?: [string, string][]
-			mobileBanners?: [string, string][]
-			images?: File[]
-		}) => {
+		mutationFn: async (data: UpdateConfigData) => {
 			const formData = new FormData()
 
-			if (data.auctionCommissionPercentage !== undefined) {
-				formData.append(
-					'auctionCommissionPercentage',
-					data.auctionCommissionPercentage.toString(),
-				)
-			}
-			if (data.deliveryFee !== undefined) {
-				formData.append('deliveryFee', data.deliveryFee.toString())
-			}
-			if (data.banners !== undefined) {
-				formData.append('banners', JSON.stringify(data.banners))
-			}
-			if (data.mobileBanners !== undefined) {
-				formData.append('mobileBanners', JSON.stringify(data.mobileBanners))
-			}
-			if (data.images) {
-				data.images.forEach((image, index) => {
-					formData.append('images', image)
-				})
+			const dataArr = Object.entries(data) as Entries<UpdateConfigData>
+
+			for (const [key, value] of dataArr) {
+				if ((key === 'banners' || key === 'mobileBanners') && Array.isArray(value)) {
+					formData.append(key, JSON.stringify(value))
+				}
+				if (key === 'images' && Array.isArray(value)) {
+					;(value as File[]).forEach((image, index) => {
+						formData.append(key, image)
+					})
+				} else if (value !== undefined) {
+					formData.append(key, value.toString())
+				}
 			}
 
 			const response = await fetchWithNgrok('/store-config', {
@@ -589,6 +582,13 @@ export default function StoreConfigPage() {
 		updateStoreConfigMutation.mutate({ deliveryFee: value })
 	}
 
+	const handleUpdateMinimumWithdrawalAmount = (value: number) => {
+		updateStoreConfigMutation.mutate({ minimumWithdrawalAmount: value })
+	}
+	const handleUpdateMaximumWithdrawalAmount = (value: number) => {
+		updateStoreConfigMutation.mutate({ maximumWithdrawalAmount: value })
+	}
+
 	const handleRemoveBanner = (indexToRemove: number, bannerType: BannerType) => {
 		if (!data?.data) return
 
@@ -766,6 +766,46 @@ export default function StoreConfigPage() {
 							onUpdate={handleUpdateDeliveryFee}
 							isLoading={updateStoreConfigMutation.isPending}
 						/>
+					</CardContent>
+				</Card>
+
+				{/* Withdrawal Amount Limits */}
+				<Card>
+					<CardHeader>
+						<CardTitle>{t('storeConfiguration.withdrawalLimits')}</CardTitle>
+						<CardDescription>
+							{t('storeConfiguration.withdrawalLimitsDescription')}
+						</CardDescription>
+					</CardHeader>
+					<CardContent className='space-y-6'>
+						{/* Minimum Withdrawal */}
+						<div>
+							<Label className='mb-1 block text-sm font-medium'>
+								{t('storeConfiguration.minimumWithdrawalAmount')}
+							</Label>
+							<EditableField
+								value={storeConfig.minimumWithdrawalAmount}
+								type='currency'
+								fieldName='minimumWithdrawalAmount'
+								formatDisplay={formatCurrency}
+								onUpdate={handleUpdateMinimumWithdrawalAmount}
+								isLoading={updateStoreConfigMutation.isPending}
+							/>
+						</div>
+						{/* Maximum Withdrawal */}
+						<div>
+							<Label className='mb-1 block text-sm font-medium'>
+								{t('storeConfiguration.maximumWithdrawalAmount')}
+							</Label>
+							<EditableField
+								value={storeConfig.maximumWithdrawalAmount}
+								type='currency'
+								fieldName='maximumWithdrawalAmount'
+								formatDisplay={formatCurrency}
+								onUpdate={handleUpdateMaximumWithdrawalAmount}
+								isLoading={updateStoreConfigMutation.isPending}
+							/>
+						</div>
 					</CardContent>
 				</Card>
 			</div>
