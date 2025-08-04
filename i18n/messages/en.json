@@ -29,7 +29,9 @@
 		"edit": "Edit",
 		"config": "Configuration",
 		"go-back": "Go Back",
-		"total": "Total"
+		"total": "Total",
+		"approve": "Approve",
+		"reject": "Reject"
 	},
 	"navigation": {
 		"dashboard": "Dashboard",
@@ -342,7 +344,8 @@
 			"userId": "User ID",
 			"amount": "Amount",
 			"status": "Status",
-			"created": "Created"
+			"created": "Created",
+			"actions": "Actions"
 		}
 	},
 	"withdrawals": {

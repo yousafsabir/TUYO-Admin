@@ -29,7 +29,9 @@
 		"edit": "Editar",
 		"config": "Configuración",
 		"go-back": "Volver",
-		"total": "Total"
+		"total": "Total",
+		"approve": "Aprobar",
+		"reject": "Rechazar"
 	},
 	"navigation": {
 		"dashboard": "Tablero",
@@ -341,7 +343,8 @@
 			"userId": "ID de Usuario",
 			"amount": "Cantidad",
 			"status": "Estado",
-			"created": "Creado"
+			"created": "Creado",
+			"actions": "Acciones"
 		}
 	},
 	"withdrawals": {

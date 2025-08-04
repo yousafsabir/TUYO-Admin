@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslations } from 'next-intl'
 import { fetchWithNgrok } from '@/lib/api/fetch-utils'
 import { Badge } from '@/components/ui/badge'
@@ -75,7 +75,7 @@ const useUserWithdrawals = (
 	userId?: string,
 ) => {
 	return useQuery<TransactionsResponse>({
-		queryKey: ['user-withdrawals', userId, page, limit, status],
+		queryKey: ['all-withdrawals', userId, page, limit, status],
 		queryFn: async () => {
 			const params = new URLSearchParams({
 				type: 'withdrawal',
@@ -102,6 +102,55 @@ const useUserWithdrawals = (
 			return response.json()
 		},
 	})
+}
+
+// Mutation hook to perform approve/reject actions
+function useWithdrawAction() {
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationFn: async ({ id, action }: { id: number; action: 'approve' | 'reject' }) => {
+			const response = await fetchWithNgrok(`/revenue/withdrawal-action/${id}`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ action }),
+			})
+
+			if (!response.ok) {
+				const data = await response.json()
+				throw new Error(data.message || 'Failed to perform withdrawal action')
+			}
+
+			return response.json()
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries(['all-withdrawals'] as any)
+		},
+	})
+}
+
+// Buttons component
+export function WithdrawalActions({ id }: { id: number }) {
+	const withdrawAction = useWithdrawAction()
+	const t = useTranslations()
+	return (
+		<div className='flex space-x-2'>
+			<Button
+				variant='outline'
+				size='sm'
+				disabled={withdrawAction.isPending}
+				onClick={() => withdrawAction.mutate({ id, action: 'approve' })}>
+				{t('common.approve')}
+			</Button>
+			<Button
+				variant='destructive'
+				size='sm'
+				disabled={withdrawAction.isPending}
+				onClick={() => withdrawAction.mutate({ id, action: 'reject' })}>
+				{t('common.reject')}
+			</Button>
+		</div>
+	)
 }
 
 // Utility functions
@@ -247,6 +296,7 @@ export default function WithdrawalRequests() {
 									<TableHead>{t('sales.table.amount')}</TableHead>
 									<TableHead>{t('sales.table.status')}</TableHead>
 									<TableHead>{t('sales.table.created')}</TableHead>
+									<TableHead>{t('sales.table.actions')}</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -277,6 +327,9 @@ export default function WithdrawalRequests() {
 											<span className='text-sm'>
 												{formatDate(transaction.createdAt)}
 											</span>
+										</TableCell>
+										<TableCell>
+											<WithdrawalActions id={transaction.id} />
 										</TableCell>
 									</TableRow>
 								))}
